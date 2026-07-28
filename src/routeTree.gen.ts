@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppScheduleRouteImport } from './routes/app/schedule'
+import { Route as AppMessagesRouteImport } from './routes/app/messages'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
 import { Route as AppClientsClientIdRouteImport } from './routes/app/clients.$clientId'
 
@@ -42,6 +43,11 @@ const AppScheduleRoute = AppScheduleRouteImport.update({
   path: '/schedule',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMessagesRoute = AppMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppClientsRoute = AppClientsRouteImport.update({
   id: '/clients',
   path: '/clients',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/': typeof AppIndexRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app': typeof AppIndexRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/': typeof AppIndexRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/clients'
+    | '/app/messages'
     | '/app/schedule'
     | '/app/'
     | '/app/clients/$clientId'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/app/clients'
+    | '/app/messages'
     | '/app/schedule'
     | '/app'
     | '/app/clients/$clientId'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/clients'
+    | '/app/messages'
     | '/app/schedule'
     | '/app/'
     | '/app/clients/$clientId'
@@ -152,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppScheduleRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/messages': {
+      id: '/app/messages'
+      path: '/messages'
+      fullPath: '/app/messages'
+      preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/clients': {
       id: '/app/clients'
       path: '/clients'
@@ -183,12 +202,14 @@ const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppClientsRoute: typeof AppClientsRouteWithChildren
+  AppMessagesRoute: typeof AppMessagesRoute
   AppScheduleRoute: typeof AppScheduleRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppClientsRoute: AppClientsRouteWithChildren,
+  AppMessagesRoute: AppMessagesRoute,
   AppScheduleRoute: AppScheduleRoute,
   AppIndexRoute: AppIndexRoute,
 }
