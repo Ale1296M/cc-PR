@@ -14,12 +14,12 @@ export const Route = createFileRoute("/app")({
   }),
 });
 
-const nav = [
-  { to: "/app", label: "Home", icon: Home, exact: true },
+const nav: Array<{ to: string; label: string; icon: typeof Home }> = [
+  { to: "/app", label: "Home", icon: Home },
   { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/app/clients", label: "Clients", icon: Users },
   { to: "/app/messages", label: "Messages", icon: MessageCircle },
-] as const;
+];
 
 function AppLayout() {
   const { user, loading, role } = useAuth();
@@ -48,12 +48,12 @@ function AppLayout() {
           </p>
         </div>
         <nav className="flex-1 space-y-1 px-3">
-          {nav.map(({ to, label, icon: Icon, exact }) => {
-            const active = exact ? path === to : path.startsWith(to);
+        {nav.map(({ to, label, icon: Icon }) => {
+            const active = to === "/app" ? path === to : path.startsWith(to);
             return (
               <Link
                 key={to}
-                to={to}
+                to={to as "/app"}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
                   active
                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
@@ -88,12 +88,12 @@ function AppLayout() {
 
       {/* Mobile tab bar */}
       <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-around border-t border-border bg-card/95 py-2 backdrop-blur md:hidden">
-        {nav.map(({ to, label, icon: Icon, exact }) => {
-          const active = exact ? path === to : path.startsWith(to);
+        {nav.map(({ to, label, icon: Icon }) => {
+          const active = to === "/app" ? path === to : path.startsWith(to);
           return (
             <Link
               key={to}
-              to={to}
+              to={to as "/app"}
               className={`flex flex-col items-center gap-1 px-3 py-1 text-[11px] ${
                 active ? "text-primary" : "text-muted-foreground"
               }`}
