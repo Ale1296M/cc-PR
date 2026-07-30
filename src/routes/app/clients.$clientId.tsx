@@ -219,7 +219,7 @@ function ClockInBar({ clientId }: { clientId: string }) {
             className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="">Mood…</option>
-            {["Great", "Okay", "Tired", "Unwell", "Cheerful"].map((m) => <option key={m}>{m}</option>)}
+            {["Great", "Okay", "Tired", "Unwell", "Concern", "Cheerful"].map((m) => <option key={m}>{m}</option>)}
           </select>
           <textarea
             value={notes}
