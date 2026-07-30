@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
 import { Route as AppScheduleRouteImport } from './routes/app/schedule'
 import { Route as AppMessagesRouteImport } from './routes/app/messages'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWellbeingRoute = AppWellbeingRouteImport.update({
+  id: '/wellbeing',
+  path: '/wellbeing',
   getParentRoute: () => AppRoute,
 } as any)
 const AppScheduleRoute = AppScheduleRouteImport.update({
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
+  '/app/wellbeing': typeof AppWellbeingRoute
   '/app/': typeof AppIndexRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
+  '/app/wellbeing': typeof AppWellbeingRoute
   '/app': typeof AppIndexRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
+  '/app/wellbeing': typeof AppWellbeingRoute
   '/app/': typeof AppIndexRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
 }
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
+    | '/app/wellbeing'
     | '/app/'
     | '/app/clients/$clientId'
   fileRoutesByTo: FileRoutesByTo
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
+    | '/app/wellbeing'
     | '/app'
     | '/app/clients/$clientId'
   id:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
+    | '/app/wellbeing'
     | '/app/'
     | '/app/clients/$clientId'
   fileRoutesById: FileRoutesById
@@ -175,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/wellbeing': {
+      id: '/app/wellbeing'
+      path: '/wellbeing'
+      fullPath: '/app/wellbeing'
+      preLoaderRoute: typeof AppWellbeingRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/schedule': {
@@ -224,6 +243,7 @@ interface AppRouteChildren {
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppMessagesRoute: typeof AppMessagesRoute
   AppScheduleRoute: typeof AppScheduleRoute
+  AppWellbeingRoute: typeof AppWellbeingRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -231,6 +251,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppClientsRoute: AppClientsRouteWithChildren,
   AppMessagesRoute: AppMessagesRoute,
   AppScheduleRoute: AppScheduleRoute,
+  AppWellbeingRoute: AppWellbeingRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
