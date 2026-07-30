@@ -41,7 +41,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/app`,
+            emailRedirectTo: `${window.location.origin}${safeNext(next) ?? "/app"}`,
             data: { full_name: fullName, role },
           },
         });
@@ -50,7 +50,12 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      navigate({ to: next ?? "/app" });
+      const target = safeNext(next);
+      if (target) {
+        window.location.href = target;
+      } else {
+        navigate({ to: "/app" });
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
