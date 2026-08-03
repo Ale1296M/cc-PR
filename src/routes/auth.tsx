@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import type { AppRole } from "@/lib/use-auth";
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -27,7 +26,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<AppRole>("caregiver");
+  const [phone, setPhone] = useState("");
+  const [language, setLanguage] = useState<"en" | "es">("en");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -42,7 +42,11 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}${safeNext(next) ?? "/app"}`,
-            data: { full_name: fullName, role },
+            data: {
+              full_name: fullName,
+              phone,
+              preferred_language: language,
+            },
           },
         });
         if (error) throw error;
@@ -102,24 +106,40 @@ function AuthPage() {
                     placeholder="Jane Doe"
                   />
                 </Field>
-                <Field label="I am a…">
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["admin", "caregiver", "client"] as const).map((r) => (
+                <Field label="Phone (optional)">
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="input"
+                    placeholder="+1 555 123 4567"
+                  />
+                </Field>
+                <Field label="Preferred language">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "en", label: "English" },
+                      { v: "es", label: "Español" },
+                    ] as const).map((o) => (
                       <button
                         type="button"
-                        key={r}
-                        onClick={() => setRole(r)}
-                        className={`rounded-lg border px-3 py-2 text-sm capitalize transition ${
-                          role === r
+                        key={o.v}
+                        onClick={() => setLanguage(o.v)}
+                        className={`rounded-lg border px-3 py-2 text-sm transition ${
+                          language === o.v
                             ? "border-primary bg-primary/5 text-primary"
                             : "border-border hover:border-primary/60"
                         }`}
                       >
-                        {r === "client" ? "Family" : r}
+                        {o.label}
                       </button>
                     ))}
                   </div>
                 </Field>
+                <p className="rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                  New accounts start without access to care data. An agency admin
+                  assigns your role (caregiver or family member) after signup.
+                </p>
               </>
             )}
             <Field label="Email">

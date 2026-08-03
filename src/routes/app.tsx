@@ -45,7 +45,7 @@ function AppLayout() {
         <div className="p-6">
           <Link to="/" className="font-display text-2xl text-sidebar-primary">Kindred</Link>
           <p className="mt-1 text-xs uppercase tracking-widest text-sidebar-foreground/60">
-            {role ?? "member"}
+            {role ? role.replace("_", " ") : "awaiting role"}
           </p>
         </div>
         <nav className="flex-1 space-y-1 px-3">
