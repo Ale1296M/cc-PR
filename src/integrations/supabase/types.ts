@@ -111,6 +111,70 @@ export type Database = {
           },
         ]
       }
+      care_shifts: {
+        Row: {
+          care_recipient_id: string
+          caregiver_id: string | null
+          created_at: string
+          created_by_admin_id: string | null
+          id: string
+          notes: string | null
+          scheduled_date: string
+          scheduled_end_time: string
+          scheduled_start_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          care_recipient_id: string
+          caregiver_id?: string | null
+          created_at?: string
+          created_by_admin_id?: string | null
+          id?: string
+          notes?: string | null
+          scheduled_date: string
+          scheduled_end_time: string
+          scheduled_start_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          care_recipient_id?: string
+          caregiver_id?: string | null
+          created_at?: string
+          created_by_admin_id?: string | null
+          id?: string
+          notes?: string | null
+          scheduled_date?: string
+          scheduled_end_time?: string
+          scheduled_start_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_shifts_care_recipient_id_fkey"
+            columns: ["care_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "care_recipients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_shifts_caregiver_id_fkey"
+            columns: ["caregiver_id"]
+            isOneToOne: false
+            referencedRelation: "caregivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_shifts_created_by_admin_id_fkey"
+            columns: ["created_by_admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       caregivers: {
         Row: {
           active: boolean
