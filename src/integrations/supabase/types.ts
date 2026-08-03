@@ -52,6 +52,106 @@ export type Database = {
           },
         ]
       }
+      care_recipients: {
+        Row: {
+          address_line: string | null
+          city: string | null
+          created_at: string
+          date_of_birth: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
+          family_id: string
+          full_name: string
+          id: string
+          municipality: string | null
+          notes: string | null
+          updated_at: string
+          zip_code: string | null
+        }
+        Insert: {
+          address_line?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
+          family_id: string
+          full_name: string
+          id?: string
+          municipality?: string | null
+          notes?: string | null
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Update: {
+          address_line?: string | null
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
+          family_id?: string
+          full_name?: string
+          id?: string
+          municipality?: string | null
+          notes?: string | null
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_recipients_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      caregivers: {
+        Row: {
+          active: boolean
+          background_check_date: string | null
+          background_check_status: string
+          bio: string | null
+          created_at: string
+          id: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          background_check_date?: string | null
+          background_check_status?: string
+          bio?: string | null
+          created_at?: string
+          id?: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          background_check_date?: string | null
+          background_check_status?: string
+          bio?: string | null
+          created_at?: string
+          id?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregivers_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_family_members: {
         Row: {
           client_id: string
@@ -119,6 +219,51 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      families: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          start_date: string
+          status: string
+          subscription_tier_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          start_date?: string
+          status?: string
+          subscription_tier_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          start_date?: string
+          status?: string
+          subscription_tier_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "families_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "families_subscription_tier_id_fkey"
+            columns: ["subscription_tier_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -231,6 +376,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_tiers: {
+        Row: {
+          created_at: string
+          hours_per_week: number
+          id: string
+          monthly_price: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hours_per_week: number
+          id?: string
+          monthly_price: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hours_per_week?: number
+          id?: string
+          monthly_price?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       task_completions: {
         Row: {
