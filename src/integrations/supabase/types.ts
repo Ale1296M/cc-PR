@@ -538,10 +538,6 @@ export type Database = {
         Args: { _client_id: string; _user_id: string }
         Returns: boolean
       }
-      user_owns_family: {
-        Args: { _family_id: string; _user_id: string }
-        Returns: boolean
-      }
     }
     Enums: {
       app_role: "admin" | "caregiver" | "family_member"
