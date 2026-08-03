@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 import { CaregiverAvatar } from "./CaregiverAvatar";
 import {
   SHIFT_STATUSES,
@@ -82,7 +83,7 @@ export function AdminShifts({ adminId }: { adminId: string }) {
   });
 
   const updateShift = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: TablesUpdate<"care_shifts"> }) => {
       const { error } = await supabase.from("care_shifts").update(patch).eq("id", id);
       if (error) throw error;
     },

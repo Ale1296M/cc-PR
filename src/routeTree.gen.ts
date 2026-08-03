@@ -16,6 +16,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
+import { Route as AppShiftsRouteImport } from './routes/app/shifts'
 import { Route as AppScheduleRouteImport } from './routes/app/schedule'
 import { Route as AppMessagesRouteImport } from './routes/app/messages'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
@@ -58,6 +59,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppWellbeingRoute = AppWellbeingRouteImport.update({
   id: '/wellbeing',
   path: '/wellbeing',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppShiftsRoute = AppShiftsRouteImport.update({
+  id: '/shifts',
+  path: '/shifts',
   getParentRoute: () => AppRoute,
 } as any)
 const AppScheduleRoute = AppScheduleRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
+  '/app/shifts': typeof AppShiftsRoute
   '/app/wellbeing': typeof AppWellbeingRoute
   '/app/': typeof AppIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
+  '/app/shifts': typeof AppShiftsRoute
   '/app/wellbeing': typeof AppWellbeingRoute
   '/app': typeof AppIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
+  '/app/shifts': typeof AppShiftsRoute
   '/app/wellbeing': typeof AppWellbeingRoute
   '/app/': typeof AppIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
+    | '/app/shifts'
     | '/app/wellbeing'
     | '/app/'
     | '/.lovable/oauth/consent'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
+    | '/app/shifts'
     | '/app/wellbeing'
     | '/app'
     | '/.lovable/oauth/consent'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
+    | '/app/shifts'
     | '/app/wellbeing'
     | '/app/'
     | '/.lovable/oauth/consent'
@@ -269,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/wellbeing'
       fullPath: '/app/wellbeing'
       preLoaderRoute: typeof AppWellbeingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/shifts': {
+      id: '/app/shifts'
+      path: '/shifts'
+      fullPath: '/app/shifts'
+      preLoaderRoute: typeof AppShiftsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/schedule': {
@@ -346,6 +365,7 @@ interface AppRouteChildren {
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppMessagesRoute: typeof AppMessagesRoute
   AppScheduleRoute: typeof AppScheduleRoute
+  AppShiftsRoute: typeof AppShiftsRoute
   AppWellbeingRoute: typeof AppWellbeingRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -354,6 +374,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppClientsRoute: AppClientsRouteWithChildren,
   AppMessagesRoute: AppMessagesRoute,
   AppScheduleRoute: AppScheduleRoute,
+  AppShiftsRoute: AppShiftsRoute,
   AppWellbeingRoute: AppWellbeingRoute,
   AppIndexRoute: AppIndexRoute,
 }
