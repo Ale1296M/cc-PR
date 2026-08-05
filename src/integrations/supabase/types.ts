@@ -582,6 +582,74 @@ export type Database = {
           },
         ]
       }
+      wellbeing_entries: {
+        Row: {
+          created_at: string
+          food_appetite: Database["public"]["Enums"]["appetite_level"] | null
+          food_meals_offered: string | null
+          food_notes: string | null
+          hygiene_bathing_completed: boolean | null
+          hygiene_grooming_completed: boolean | null
+          hygiene_notes: string | null
+          id: string
+          medicine_notes: string | null
+          medicine_taken: Database["public"]["Enums"]["medicine_taken"] | null
+          mood_notes: string | null
+          mood_scale: number | null
+          mood_tags: string[]
+          movement_assisted: boolean | null
+          movement_notes: string | null
+          updated_at: string
+          visit_log_id: string
+        }
+        Insert: {
+          created_at?: string
+          food_appetite?: Database["public"]["Enums"]["appetite_level"] | null
+          food_meals_offered?: string | null
+          food_notes?: string | null
+          hygiene_bathing_completed?: boolean | null
+          hygiene_grooming_completed?: boolean | null
+          hygiene_notes?: string | null
+          id?: string
+          medicine_notes?: string | null
+          medicine_taken?: Database["public"]["Enums"]["medicine_taken"] | null
+          mood_notes?: string | null
+          mood_scale?: number | null
+          mood_tags?: string[]
+          movement_assisted?: boolean | null
+          movement_notes?: string | null
+          updated_at?: string
+          visit_log_id: string
+        }
+        Update: {
+          created_at?: string
+          food_appetite?: Database["public"]["Enums"]["appetite_level"] | null
+          food_meals_offered?: string | null
+          food_notes?: string | null
+          hygiene_bathing_completed?: boolean | null
+          hygiene_grooming_completed?: boolean | null
+          hygiene_notes?: string | null
+          id?: string
+          medicine_notes?: string | null
+          medicine_taken?: Database["public"]["Enums"]["medicine_taken"] | null
+          mood_notes?: string | null
+          mood_scale?: number | null
+          mood_tags?: string[]
+          movement_assisted?: boolean | null
+          movement_notes?: string | null
+          updated_at?: string
+          visit_log_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wellbeing_entries_visit_log_id_fkey"
+            columns: ["visit_log_id"]
+            isOneToOne: true
+            referencedRelation: "visit_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -605,6 +673,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "caregiver" | "family_member"
+      appetite_level: "good" | "fair" | "poor"
+      medicine_taken: "yes" | "no" | "partial"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -733,6 +803,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "caregiver", "family_member"],
+      appetite_level: ["good", "fair", "poor"],
+      medicine_taken: ["yes", "no", "partial"],
     },
   },
 } as const
