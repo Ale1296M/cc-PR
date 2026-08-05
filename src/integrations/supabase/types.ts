@@ -387,6 +387,51 @@ export type Database = {
           },
         ]
       }
+      family_messages: {
+        Row: {
+          content: string
+          created_at: string
+          family_id: string
+          id: string
+          read_at: string | null
+          sender_profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          family_id: string
+          id?: string
+          read_at?: string | null
+          sender_profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          read_at?: string | null
+          sender_profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_messages_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_messages_sender_profile_id_fkey"
+            columns: ["sender_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string
@@ -690,6 +735,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      user_can_access_family: {
+        Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
       user_can_view_client: {
