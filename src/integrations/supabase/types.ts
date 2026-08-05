@@ -737,6 +737,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      profiles_share_care_circle: {
+        Args: { _target: string; _viewer: string }
+        Returns: boolean
+      }
       user_can_access_family: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
