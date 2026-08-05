@@ -20,6 +20,7 @@ import { Route as AppShiftsRouteImport } from './routes/app/shifts'
 import { Route as AppScheduleRouteImport } from './routes/app/schedule'
 import { Route as AppMessagesRouteImport } from './routes/app/messages'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
+import { Route as AppCarePlanRouteImport } from './routes/app/care-plan'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AppClientsClientIdRouteImport } from './routes/app/clients.$clientId'
@@ -81,6 +82,11 @@ const AppClientsRoute = AppClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCarePlanRoute = AppCarePlanRouteImport.update({
+  id: '/care-plan',
+  path: '/care-plan',
+  getParentRoute: () => AppRoute,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/app/care-plan'
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/app/care-plan'
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/app/care-plan'
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
@@ -311,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/care-plan': {
+      id: '/app/care-plan'
+      path: '/care-plan'
+      fullPath: '/app/care-plan'
+      preLoaderRoute: typeof AppCarePlanRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -362,6 +381,7 @@ const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppCarePlanRoute: typeof AppCarePlanRoute
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppMessagesRoute: typeof AppMessagesRoute
   AppScheduleRoute: typeof AppScheduleRoute
@@ -371,6 +391,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCarePlanRoute: AppCarePlanRoute,
   AppClientsRoute: AppClientsRouteWithChildren,
   AppMessagesRoute: AppMessagesRoute,
   AppScheduleRoute: AppScheduleRoute,
