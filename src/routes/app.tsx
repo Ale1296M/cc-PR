@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Activity, CalendarCheck, CalendarDays, Home, LogOut, MessageCircle, Users } from "lucide-react";
+import { Activity, CalendarCheck, CalendarDays, ClipboardList, Home, LogOut, MessageCircle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
@@ -19,6 +19,7 @@ const nav: Array<{ to: string; label: string; icon: typeof Home }> = [
   { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/app/shifts", label: "Shifts", icon: CalendarCheck },
   { to: "/app/clients", label: "Clients", icon: Users },
+  { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
   { to: "/app/wellbeing", label: "Trends", icon: Activity },
   { to: "/app/messages", label: "Messages", icon: MessageCircle },
 ];
