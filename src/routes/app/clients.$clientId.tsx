@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, Check, Plus } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
@@ -12,27 +12,12 @@ export const Route = createFileRoute("/app/clients/$clientId")({
 function ClientDetail() {
   const { clientId } = Route.useParams();
   const { role } = useAuth();
-  const qc = useQueryClient();
-  const [newTask, setNewTask] = useState("");
-
   const { data: client } = useQuery({
     queryKey: ["client", clientId],
     queryFn: async () => {
       const { data, error } = await supabase.from("clients").select("*").eq("id", clientId).maybeSingle();
       if (error) throw error;
       return data;
-    },
-  });
-
-  const { data: careItems } = useQuery({
-    queryKey: ["care-items", clientId],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("care_plan_items")
-        .select("*")
-        .eq("client_id", clientId)
-        .order("created_at");
-      return data ?? [];
     },
   });
 
@@ -46,20 +31,6 @@ function ClientDetail() {
         .order("clock_in", { ascending: false })
         .limit(10);
       return data ?? [];
-    },
-  });
-
-  const addTask = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("care_plan_items").insert({
-        client_id: clientId,
-        title: newTask,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      setNewTask("");
-      qc.invalidateQueries({ queryKey: ["care-items", clientId] });
     },
   });
 
@@ -86,40 +57,10 @@ function ClientDetail() {
 
       <section className="mb-10">
         <h2 className="mb-3 font-display text-2xl">Care plan</h2>
-        <div className="card-soft divide-y divide-border">
-          {(careItems ?? []).length === 0 && (
-            <p className="p-4 text-sm text-muted-foreground">No care items yet.</p>
-          )}
-          {(careItems ?? []).map((item) => (
-            <div key={item.id} className="flex items-start gap-3 p-4">
-              <span className="mt-1 grid h-5 w-5 place-items-center rounded-full border border-primary/50 text-primary">
-                <Check className="h-3 w-3" />
-              </span>
-              <div>
-                <p className="font-medium">{item.title}</p>
-                {item.frequency && (
-                  <p className="text-xs text-muted-foreground">{item.frequency}</p>
-                )}
-              </div>
-            </div>
-          ))}
-          {(role === "admin" || role === "caregiver") && (
-            <form
-              onSubmit={(e) => { e.preventDefault(); if (newTask) addTask.mutate(); }}
-              className="flex items-center gap-2 p-3"
-            >
-              <input
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                placeholder="Add a care item…"
-                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-              <button className="rounded-full bg-primary p-2 text-primary-foreground">
-                <Plus className="h-4 w-4" />
-              </button>
-            </form>
-          )}
-        </div>
+        <p className="card-soft p-4 text-sm text-muted-foreground">
+          Checklists now live per care recipient on the{" "}
+          <Link to="/app/care-plan" className="text-primary underline">Care plan</Link> screen.
+        </p>
       </section>
 
       <section>
