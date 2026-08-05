@@ -89,8 +89,8 @@ function WellbeingTrends() {
       const ids = (visits ?? []).map((v) => v.id);
       if (ids.length === 0) return [];
       const { data, error } = await supabase
-        .from("task_completions")
-        .select("id, completed, visit_log_id, care_plan_items(category, title)")
+        .from("care_plan_completions")
+        .select("id, completed, visit_log_id, care_plan_items(category, task_description)")
         .in("visit_log_id", ids);
       if (error) throw error;
       return data ?? [];

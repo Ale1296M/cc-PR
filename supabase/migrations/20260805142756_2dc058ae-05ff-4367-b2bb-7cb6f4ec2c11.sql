@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.user_can_view_recipient(uuid,uuid) FROM PUBLIC, anon, authenticated;

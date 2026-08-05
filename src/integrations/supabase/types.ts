@@ -14,40 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
-      care_plan_items: {
+      care_plan_completions: {
         Row: {
-          category: string | null
-          client_id: string
+          care_plan_item_id: string
+          completed: boolean
           created_at: string
-          description: string | null
-          frequency: string | null
           id: string
-          title: string
+          notes: string | null
+          updated_at: string
+          visit_log_id: string
         }
         Insert: {
-          category?: string | null
-          client_id: string
+          care_plan_item_id: string
+          completed?: boolean
           created_at?: string
-          description?: string | null
-          frequency?: string | null
           id?: string
-          title: string
+          notes?: string | null
+          updated_at?: string
+          visit_log_id: string
         }
         Update: {
-          category?: string | null
-          client_id?: string
+          care_plan_item_id?: string
+          completed?: boolean
           created_at?: string
-          description?: string | null
-          frequency?: string | null
           id?: string
-          title?: string
+          notes?: string | null
+          updated_at?: string
+          visit_log_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "care_plan_items_client_id_fkey"
-            columns: ["client_id"]
+            foreignKeyName: "care_plan_completions_care_plan_item_id_fkey"
+            columns: ["care_plan_item_id"]
             isOneToOne: false
-            referencedRelation: "clients"
+            referencedRelation: "care_plan_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_plan_completions_visit_log_id_fkey"
+            columns: ["visit_log_id"]
+            isOneToOne: false
+            referencedRelation: "visit_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      care_plan_items: {
+        Row: {
+          active: boolean
+          care_recipient_id: string
+          category: string | null
+          created_at: string
+          created_by_admin_id: string | null
+          frequency: string
+          id: string
+          task_description: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          care_recipient_id: string
+          category?: string | null
+          created_at?: string
+          created_by_admin_id?: string | null
+          frequency?: string
+          id?: string
+          task_description: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          care_recipient_id?: string
+          category?: string | null
+          created_at?: string
+          created_by_admin_id?: string | null
+          frequency?: string
+          id?: string
+          task_description?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_plan_items_care_recipient_id_fkey"
+            columns: ["care_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "care_recipients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_plan_items_created_by_admin_id_fkey"
+            columns: ["created_by_admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -468,48 +526,6 @@ export type Database = {
         }
         Relationships: []
       }
-      task_completions: {
-        Row: {
-          care_plan_item_id: string
-          completed: boolean
-          created_at: string
-          id: string
-          notes: string | null
-          visit_log_id: string
-        }
-        Insert: {
-          care_plan_item_id: string
-          completed?: boolean
-          created_at?: string
-          id?: string
-          notes?: string | null
-          visit_log_id: string
-        }
-        Update: {
-          care_plan_item_id?: string
-          completed?: boolean
-          created_at?: string
-          id?: string
-          notes?: string | null
-          visit_log_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "task_completions_care_plan_item_id_fkey"
-            columns: ["care_plan_item_id"]
-            isOneToOne: false
-            referencedRelation: "care_plan_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "task_completions_visit_log_id_fkey"
-            columns: ["visit_log_id"]
-            isOneToOne: false
-            referencedRelation: "visit_logs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -533,8 +549,9 @@ export type Database = {
       }
       visit_logs: {
         Row: {
+          care_recipient_id: string | null
           caregiver_id: string
-          client_id: string
+          client_id: string | null
           clock_in: string
           clock_out: string | null
           created_at: string
@@ -544,8 +561,9 @@ export type Database = {
           shift_id: string | null
         }
         Insert: {
+          care_recipient_id?: string | null
           caregiver_id: string
-          client_id: string
+          client_id?: string | null
           clock_in?: string
           clock_out?: string | null
           created_at?: string
@@ -555,8 +573,9 @@ export type Database = {
           shift_id?: string | null
         }
         Update: {
+          care_recipient_id?: string | null
           caregiver_id?: string
-          client_id?: string
+          client_id?: string | null
           clock_in?: string
           clock_out?: string | null
           created_at?: string
@@ -566,6 +585,13 @@ export type Database = {
           shift_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "visit_logs_care_recipient_id_fkey"
+            columns: ["care_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "care_recipients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "visit_logs_client_id_fkey"
             columns: ["client_id"]
@@ -668,6 +694,10 @@ export type Database = {
       }
       user_can_view_client: {
         Args: { _client_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_can_view_recipient: {
+        Args: { _recipient_id: string; _user_id: string }
         Returns: boolean
       }
     }
