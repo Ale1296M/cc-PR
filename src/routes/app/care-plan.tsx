@@ -95,7 +95,10 @@ function AdminCarePlan() {
   });
 
   const update = useMutation({
-    mutationFn: async (p: { id: string; fields: Record<string, unknown> }) => {
+    mutationFn: async (p: {
+      id: string;
+      fields: { task_description?: string; category?: string | null; frequency?: string; active?: boolean };
+    }) => {
       const { error } = await supabase.from("care_plan_items").update(p.fields).eq("id", p.id);
       if (error) throw error;
     },
