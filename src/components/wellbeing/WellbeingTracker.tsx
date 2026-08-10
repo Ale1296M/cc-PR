@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine
 } from "recharts";
-import { Heart, Utensils, Pill, Footprints, Droplets, ChevronLeft, ChevronRight, Check, AlertCircle, Loader } from "lucide-react";
+import { Heart, Utensils, Pill, Footprints, Droplets, Check, AlertCircle, Loader } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Supabase ──────────────────────────────────────────────────────────────────
@@ -86,19 +86,19 @@ const INDICATORS = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function today() { return new Date().toISOString().slice(0, 10); }
-function fmtDate(s) {
+function fmtDate(s: any) {
   return new Date(s + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
-function shortDate(s) {
+function shortDate(s: any) {
   return new Date(s + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
-function scoreColor(s) {
+function scoreColor(s: any) {
   if (s == null) return "#C9C2AC";
   if (s >= 3.5) return T.sage;
   if (s >= 2.5) return T.gold;
   return T.clay;
 }
-function scoreLabel(s) {
+function scoreLabel(s: any) {
   if (s == null) return "No entry";
   if (s >= 3.5) return "Good";
   if (s >= 2.5) return "Usual";
@@ -106,7 +106,7 @@ function scoreLabel(s) {
 }
 
 // Convert a wellbeing_entries row → numeric score 1-4 for charting
-function entryToScore(e) {
+function entryToScore(e: any) {
   if (!e) return null;
   const vals = [
     e.mood_scale,
@@ -122,8 +122,8 @@ function entryToScore(e) {
 
 // ── Root ──────────────────────────────────────────────────────────────────────
 export default function WellbeingTracker() {
-  const [session, setSession]   = useState(null);
-  const [role, setRole]         = useState(null);   // "caregiver" | "family_member"
+  const [session, setSession]   = useState<any>(null);
+  const [role, setRole]         = useState<string | null>(null);   // "caregiver" | "family_member"
   const [loading, setLoading]   = useState(true);
   const [view, setView]         = useState("caregiver"); // UI tab
 
@@ -141,7 +141,7 @@ export default function WellbeingTracker() {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function fetchRole(uid) {
+  async function fetchRole(uid: any) {
     const { data } = await sb.from("user_roles").select("role").eq("user_id", uid).single();
     setRole(data?.role ?? null);
     setLoading(false);
@@ -206,15 +206,15 @@ export default function WellbeingTracker() {
 }
 
 // ── Caregiver view ────────────────────────────────────────────────────────────
-function CaregiverView({ userId }) {
-  const [recipients, setRecipients] = useState([]);
-  const [selected,   setSelected]   = useState(null);
-  const [draft,      setDraft]       = useState({});
+function CaregiverView({ userId }: any) {
+  const [recipients, setRecipients] = useState<any[]>([]);
+  const [selected,   setSelected]   = useState<any>(null);
+  const [draft,      setDraft]       = useState<any>({});
   const [notes,      setNotes]       = useState("");
   const [saving,     setSaving]      = useState(false);
   const [saved,      setSaved]       = useState(false);
-  const [error,      setError]       = useState(null);
-  const [existing,   setExisting]    = useState(null); // today's entry if already logged
+  const [error,      setError]       = useState<string | null>(null);
+  const [existing,   setExisting]    = useState<any>(null); // today's entry if already logged
 
   // Load care recipients assigned to this caregiver
   useEffect(() => {
@@ -230,7 +230,7 @@ function CaregiverView({ userId }) {
       if (!data) return;
       // Deduplicate recipients
       const seen = new Set();
-      const unique = [];
+      const unique: any[] = [];
       data.forEach(row => {
         const r = row.care_recipients;
         if (r && !seen.has(r.id)) { seen.add(r.id); unique.push(r); }
@@ -312,7 +312,7 @@ function CaregiverView({ userId }) {
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
-    } catch (e) {
+    } catch (e: any) {
       setError("Couldn't save — " + (e.message || "try again."));
     }
     setSaving(false);
@@ -427,17 +427,17 @@ function CaregiverView({ userId }) {
 }
 
 // ── Family view ───────────────────────────────────────────────────────────────
-function FamilyView({ userId, isAdmin }) {
-  const [recipients, setRecipients] = useState([]);
-  const [selected,   setSelected]   = useState(null);
-  const [entries,    setEntries]     = useState([]);   // last 14 days of wellbeing_entries
+function FamilyView({ userId, isAdmin }: any) {
+  const [recipients, setRecipients] = useState<any[]>([]);
+  const [selected,   setSelected]   = useState<any>(null);
+  const [entries,    setEntries]     = useState<any>({});   // last 14 days of wellbeing_entries
   const [loading,    setLoading]     = useState(true);
   const [focusDate,  setFocusDate]   = useState(today());
 
   // Load care recipients this family can see
   useEffect(() => {
     async function load() {
-      let data;
+      let data: any;
       if (isAdmin) {
         ({ data } = await sb.from("care_recipients").select("id, full_name"));
       } else {
@@ -472,7 +472,7 @@ function FamilyView({ userId, isAdmin }) {
         .order("clock_in", { ascending: true });
 
       // Group by date — take the latest entry per day
-      const byDate = {};
+      const byDate: any = {};
       (data || []).forEach(vl => {
         const d = vl.clock_in.slice(0, 10);
         const e = Array.isArray(vl.wellbeing_entries) ? vl.wellbeing_entries[0] : vl.wellbeing_entries;
@@ -485,7 +485,7 @@ function FamilyView({ userId, isAdmin }) {
   }, [selected]);
 
   // Build last 14 days array
-  const days = [];
+  const days: string[] = [];
   for (let i = 13; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
@@ -609,7 +609,7 @@ function FamilyView({ userId, isAdmin }) {
 }
 
 // ── Small shared components ───────────────────────────────────────────────────
-function SummaryCard({ label, value, sub, color }) {
+function SummaryCard({ label, value, sub, color }: any) {
   return (
     <div style={{ flex: "1 1 180px", background: T.card, border: `1px solid ${T.border}`, borderRadius: 14, padding: "16px 18px" }}>
       <div style={{ fontSize: 11, color: T.muted, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
@@ -620,13 +620,13 @@ function SummaryCard({ label, value, sub, color }) {
     </div>
   );
 }
-function Screen({ children }) {
+function Screen({ children }: any) {
   return <div style={{ minHeight: "100vh", background: T.paper, display: "flex", alignItems: "center", justifyContent: "center" }}>{children}</div>;
 }
 function Spinner() {
   return <div style={{ textAlign: "center", padding: 40, color: T.muted, fontSize: 14 }}>Loading…</div>;
 }
-function Empty({ icon, title, body }) {
+function Empty({ icon, title, body }: any) {
   return (
     <div style={{ maxWidth: 400, margin: "60px auto", textAlign: "center", padding: "0 24px" }}>
       <div style={{ marginBottom: 12 }}>{icon}</div>
@@ -638,7 +638,7 @@ function Empty({ icon, title, body }) {
 function LoginScreen() {
   const [email, setEmail] = useState("");
   const [pw,    setPw]    = useState("");
-  const [err,   setErr]   = useState(null);
+  const [err,   setErr]   = useState<string | null>(null);
   const [busy,  setBusy]  = useState(false);
   async function login() {
     setBusy(true); setErr(null);
