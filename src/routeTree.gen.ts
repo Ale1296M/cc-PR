@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WellbeingRouteImport } from './routes/wellbeing'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -28,6 +29,11 @@ import { Route as AppClientsClientIdRouteImport } from './routes/app/clients.$cl
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
+const WellbeingRoute = WellbeingRouteImport.update({
+  id: '/wellbeing',
+  path: '/wellbeing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/app/care-plan': typeof AppCarePlanRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/app/care-plan': typeof AppCarePlanRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/app/care-plan': typeof AppCarePlanRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/sitemap.xml'
+    | '/wellbeing'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/app/care-plan'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/sitemap.xml'
+    | '/wellbeing'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/app/care-plan'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/sitemap.xml'
+    | '/wellbeing'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/app/care-plan'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   McpRoute: typeof McpRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  WellbeingRoute: typeof WellbeingRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -258,6 +271,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wellbeing': {
+      id: '/wellbeing'
+      path: '/wellbeing'
+      fullPath: '/wellbeing'
+      preLoaderRoute: typeof WellbeingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -429,6 +449,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   McpRoute: McpRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  WellbeingRoute: WellbeingRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,

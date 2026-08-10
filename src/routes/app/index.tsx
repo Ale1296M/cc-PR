@@ -93,6 +93,27 @@ function Dashboard() {
         <Stat label="Unread messages" value={unread ?? 0} accent />
       </section>
 
+      {(role === "caregiver" || role === "family_member" || role === "admin") && (
+        <section className="mt-6">
+          <Link
+            to="/wellbeing"
+            className="card-soft flex items-center justify-between p-5 transition hover:bg-secondary/40"
+          >
+            <div>
+              <p className="font-display text-2xl">
+                {role === "family_member" ? "Wellbeing history" : "Log visit"}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {role === "family_member"
+                  ? "See the last 14 days of daily wellbeing check-ins."
+                  : "Record today's mood, appetite, medicine, movement and hygiene."}
+              </p>
+            </div>
+            <span className="text-primary">→</span>
+          </Link>
+        </section>
+      )}
+
       <section className="mt-10">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-display text-2xl">Upcoming this week</h2>
