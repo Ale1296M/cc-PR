@@ -28,6 +28,7 @@ function Dashboard() {
     queryKey: ["dash-shifts", uid, role, caregiverId],
     enabled: !!uid && (role !== "caregiver" || caregiverId !== undefined),
     queryFn: async () => {
+      if (role === "caregiver" && !caregiverId) return [];
       const from = new Date();
       from.setHours(0, 0, 0, 0);
       const to = new Date(from);
@@ -50,10 +51,19 @@ function Dashboard() {
   });
 
   const { data: clientCount } = useQuery({
-    queryKey: ["dash-clients"],
+    queryKey: ["dash-clients", role, caregiverId],
+    enabled: role !== "caregiver" || caregiverId !== undefined,
     queryFn: async () => {
+      if (role === "caregiver") {
+        if (!caregiverId) return 0;
+        const { data } = await supabase
+          .from("care_shifts")
+          .select("care_recipient_id")
+          .eq("caregiver_id", caregiverId);
+        return new Set((data ?? []).map((r) => r.care_recipient_id)).size;
+      }
       const { count } = await supabase
-        .from("clients")
+        .from("care_recipients")
         .select("*", { count: "exact", head: true });
       return count ?? 0;
     },

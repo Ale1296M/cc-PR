@@ -18,7 +18,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
 import { Route as AppUsersRouteImport } from './routes/app/users'
-import { Route as AppShiftsRouteImport } from './routes/app/shifts'
 import { Route as AppScheduleRouteImport } from './routes/app/schedule'
 import { Route as AppMessagesRouteImport } from './routes/app/messages'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
@@ -72,11 +71,6 @@ const AppWellbeingRoute = AppWellbeingRouteImport.update({
 const AppUsersRoute = AppUsersRouteImport.update({
   id: '/users',
   path: '/users',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppShiftsRoute = AppShiftsRouteImport.update({
-  id: '/shifts',
-  path: '/shifts',
   getParentRoute: () => AppRoute,
 } as any)
 const AppScheduleRoute = AppScheduleRouteImport.update({
@@ -141,7 +135,6 @@ export interface FileRoutesByFullPath {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
-  '/app/shifts': typeof AppShiftsRoute
   '/app/users': typeof AppUsersRoute
   '/app/wellbeing': typeof AppWellbeingRoute
   '/app/': typeof AppIndexRoute
@@ -161,7 +154,6 @@ export interface FileRoutesByTo {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
-  '/app/shifts': typeof AppShiftsRoute
   '/app/users': typeof AppUsersRoute
   '/app/wellbeing': typeof AppWellbeingRoute
   '/app': typeof AppIndexRoute
@@ -183,7 +175,6 @@ export interface FileRoutesById {
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
-  '/app/shifts': typeof AppShiftsRoute
   '/app/users': typeof AppUsersRoute
   '/app/wellbeing': typeof AppWellbeingRoute
   '/app/': typeof AppIndexRoute
@@ -206,7 +197,6 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
-    | '/app/shifts'
     | '/app/users'
     | '/app/wellbeing'
     | '/app/'
@@ -226,7 +216,6 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
-    | '/app/shifts'
     | '/app/users'
     | '/app/wellbeing'
     | '/app'
@@ -247,7 +236,6 @@ export interface FileRouteTypes {
     | '/app/clients'
     | '/app/messages'
     | '/app/schedule'
-    | '/app/shifts'
     | '/app/users'
     | '/app/wellbeing'
     | '/app/'
@@ -334,13 +322,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUsersRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/shifts': {
-      id: '/app/shifts'
-      path: '/shifts'
-      fullPath: '/app/shifts'
-      preLoaderRoute: typeof AppShiftsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/schedule': {
       id: '/app/schedule'
       path: '/schedule'
@@ -424,7 +405,6 @@ interface AppRouteChildren {
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppMessagesRoute: typeof AppMessagesRoute
   AppScheduleRoute: typeof AppScheduleRoute
-  AppShiftsRoute: typeof AppShiftsRoute
   AppUsersRoute: typeof AppUsersRoute
   AppWellbeingRoute: typeof AppWellbeingRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -435,7 +415,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppClientsRoute: AppClientsRouteWithChildren,
   AppMessagesRoute: AppMessagesRoute,
   AppScheduleRoute: AppScheduleRoute,
-  AppShiftsRoute: AppShiftsRoute,
   AppUsersRoute: AppUsersRoute,
   AppWellbeingRoute: AppWellbeingRoute,
   AppIndexRoute: AppIndexRoute,
