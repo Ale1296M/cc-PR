@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/use-auth";
 
 export const Route = createFileRoute("/app/wellbeing")({
   component: WellbeingTrends,
@@ -28,19 +29,21 @@ export const Route = createFileRoute("/app/wellbeing")({
         property: "og:description",
         content: "Descriptive 30-day mood trends and task completion patterns.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });
 
-const MOOD_SCORE: Record<string, number> = {
-  Cheerful: 5,
-  Great: 5,
-  Okay: 4,
-  Tired: 3,
-  Unwell: 2,
-  Concern: 1,
+const MOOD_LABEL: Record<number, string> = {
+  5: "Very good",
+  4: "Good",
+  3: "Usual",
+  2: "Needs attention",
+  1: "Needs attention",
 };
-const CONCERN_MOODS = new Set(["Concern", "Unwell"]);
+
+type Recipient = { id: string; full_name: string };
 
 function daysAgoISO(n: number) {
   const d = new Date();
@@ -50,31 +53,43 @@ function daysAgoISO(n: number) {
 }
 
 function WellbeingTrends() {
-  const [clientId, setClientId] = useState<string>("");
+  const { user } = useAuth();
+  const uid = user?.id;
+  const [recipientId, setRecipientId] = useState<string>("");
   const since = useMemo(() => daysAgoISO(30), []);
 
-  const { data: clients } = useQuery({
-    queryKey: ["wb-clients"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("clients")
-        .select("id, full_name")
-        .order("full_name");
+  const { data: recipients } = useQuery({
+    queryKey: ["trends-recipients", uid],
+    enabled: !!uid,
+    queryFn: async (): Promise<Recipient[]> => {
+      const { data: cg } = await supabase
+        .from("caregivers")
+        .select("id")
+        .eq("profile_id", uid!)
+        .maybeSingle();
+      let query = supabase.from("care_shifts").select("care_recipients(id, full_name)");
+      if (cg?.id) query = query.eq("caregiver_id", cg.id);
+      const { data, error } = await query;
       if (error) throw error;
-      return data ?? [];
+      const map = new Map<string, Recipient>();
+      for (const row of data ?? []) {
+        const r = row.care_recipients as unknown as Recipient | null;
+        if (r?.id) map.set(r.id, r);
+      }
+      return [...map.values()].sort((a, b) => a.full_name.localeCompare(b.full_name));
     },
   });
 
-  const activeId = clientId || clients?.[0]?.id || "";
+  const activeId = recipientId || recipients?.[0]?.id || "";
 
   const { data: visits } = useQuery({
-    queryKey: ["wb-visits", activeId, since],
+    queryKey: ["trends-visits", activeId, since],
     enabled: !!activeId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("visit_logs")
-        .select("id, clock_in, mood")
-        .eq("client_id", activeId)
+        .select("id, clock_in, wellbeing_entries(mood_scale, mood_notes)")
+        .eq("care_recipient_id", activeId)
         .gte("clock_in", since)
         .order("clock_in");
       if (error) throw error;
@@ -83,32 +98,47 @@ function WellbeingTrends() {
   });
 
   const { data: completions } = useQuery({
-    queryKey: ["wb-tasks", activeId, since],
-    enabled: !!activeId,
+    queryKey: ["trends-tasks", activeId, (visits ?? []).length],
+    enabled: !!activeId && (visits ?? []).length > 0,
     queryFn: async () => {
       const ids = (visits ?? []).map((v) => v.id);
-      if (ids.length === 0) return [];
       const { data, error } = await supabase
         .from("care_plan_completions")
-        .select("id, completed, visit_log_id, care_plan_items(category, task_description)")
+        .select("id, completed, visit_log_id, care_plan_items(category)")
         .in("visit_log_id", ids);
       if (error) throw error;
       return data ?? [];
     },
   });
 
-  const chartData = (visits ?? [])
-    .filter((v) => v.mood && MOOD_SCORE[v.mood] !== undefined)
-    .map((v) => ({
-      date: new Date(v.clock_in).toLocaleDateString([], {
-        month: "short",
-        day: "numeric",
-      }),
-      mood: MOOD_SCORE[v.mood as string],
-      label: v.mood as string,
-    }));
+  // Mood over time, grouped by date (average when multiple visits share a day)
+  const byDate = new Map<string, { sum: number; count: number }>();
+  for (const v of visits ?? []) {
+    const entry = Array.isArray(v.wellbeing_entries)
+      ? v.wellbeing_entries[0]
+      : (v.wellbeing_entries as { mood_scale: number | null } | null);
+    const score = entry?.mood_scale;
+    if (score === null || score === undefined) continue;
+    const key = new Date(v.clock_in).toISOString().slice(0, 10);
+    const row = byDate.get(key) ?? { sum: 0, count: 0 };
+    row.sum += score;
+    row.count += 1;
+    byDate.set(key, row);
+  }
+  const chartData = [...byDate.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([key, { sum, count }]) => {
+      const mood = Math.round((sum / count) * 10) / 10;
+      return {
+        date: new Date(`${key}T00:00:00`).toLocaleDateString([], {
+          month: "short",
+          day: "numeric",
+        }),
+        mood,
+        label: MOOD_LABEL[Math.round(mood)] ?? String(mood),
+      };
+    });
 
-  // Task completion rate per checklist category
   const byCategory = new Map<string, { done: number; total: number }>();
   for (const c of completions ?? []) {
     const cat =
@@ -121,12 +151,11 @@ function WellbeingTrends() {
   }
   const categories = [...byCategory.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
-  // Flags — descriptive patterns only
   const flags: string[] = [];
-  const moods = (visits ?? []).filter((v) => v.mood).map((v) => v.mood as string);
-  const lastThree = moods.slice(-3);
-  if (lastThree.length === 3 && lastThree.every((m) => CONCERN_MOODS.has(m))) {
-    flags.push("The last 3 visits in a row were recorded with a mood of concern.");
+  const scores = chartData.map((d) => d.mood);
+  const lastThree = scores.slice(-3);
+  if (lastThree.length === 3 && lastThree.every((s) => s <= 2)) {
+    flags.push("The last 3 recorded days in a row show a mood of ‘needs attention’.");
   }
 
   const visitOrder = (visits ?? []).map((v) => v.id);
@@ -160,19 +189,19 @@ function WellbeingTrends() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Last 30 days</p>
         <h1 className="mt-1 font-display text-4xl md:text-5xl">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          A descriptive summary of what caregivers recorded during recent visits.
+          A descriptive summary of what caregivers recorded during recent check-ins.
         </p>
       </header>
 
-      {(clients ?? []).length > 1 && (
+      {(recipients ?? []).length > 1 && (
         <select
           value={activeId}
-          onChange={(e) => setClientId(e.target.value)}
+          onChange={(e) => setRecipientId(e.target.value)}
           className="mb-6 rounded-md border border-border bg-background px-3 py-2 text-sm"
         >
-          {(clients ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.full_name}
+          {(recipients ?? []).map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.full_name}
             </option>
           ))}
         </select>
@@ -193,10 +222,10 @@ function WellbeingTrends() {
       )}
 
       <section className="card-soft p-5">
-        <h2 className="font-display text-2xl">Mood recorded per visit</h2>
+        <h2 className="font-display text-2xl">Mood recorded per day</h2>
         {chartData.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            No mood entries recorded in the last 30 days.
+            No wellbeing check-ins recorded in the last 30 days.
           </p>
         ) : (
           <div className="mt-4 h-64 w-full">
@@ -224,10 +253,10 @@ function WellbeingTrends() {
           </div>
         )}
         <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-          This screen shows trends and patterns from caregiver-recorded visit notes only. It is not
-          a medical assessment and should not be used to make health decisions. If you have
-          questions about your family member&apos;s wellbeing, please speak with their care team or
-          a qualified healthcare professional.
+          This screen shows trends and patterns from caregiver-recorded check-ins only. It is not a
+          medical assessment and should not be used to make health decisions. If you have questions
+          about your family member&apos;s wellbeing, please speak with their care team or a
+          qualified healthcare professional.
         </p>
       </section>
 
