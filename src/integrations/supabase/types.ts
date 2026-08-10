@@ -173,6 +173,7 @@ export type Database = {
         Row: {
           care_recipient_id: string
           caregiver_id: string | null
+          client_id: string | null
           created_at: string
           created_by_admin_id: string | null
           id: string
@@ -186,6 +187,7 @@ export type Database = {
         Insert: {
           care_recipient_id: string
           caregiver_id?: string | null
+          client_id?: string | null
           created_at?: string
           created_by_admin_id?: string | null
           id?: string
@@ -199,6 +201,7 @@ export type Database = {
         Update: {
           care_recipient_id?: string
           caregiver_id?: string | null
+          client_id?: string | null
           created_at?: string
           created_by_admin_id?: string | null
           id?: string
@@ -222,6 +225,13 @@ export type Database = {
             columns: ["caregiver_id"]
             isOneToOne: false
             referencedRelation: "caregivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_shifts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
           {
@@ -500,50 +510,6 @@ export type Database = {
         }
         Relationships: []
       }
-      shifts: {
-        Row: {
-          caregiver_id: string | null
-          client_id: string
-          created_at: string
-          ends_at: string
-          id: string
-          notes: string | null
-          starts_at: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          caregiver_id?: string | null
-          client_id: string
-          created_at?: string
-          ends_at: string
-          id?: string
-          notes?: string | null
-          starts_at: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          caregiver_id?: string | null
-          client_id?: string
-          created_at?: string
-          ends_at?: string
-          id?: string
-          notes?: string | null
-          starts_at?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shifts_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       subscription_tiers: {
         Row: {
           created_at: string
@@ -648,7 +614,7 @@ export type Database = {
             foreignKeyName: "visit_logs_shift_id_fkey"
             columns: ["shift_id"]
             isOneToOne: false
-            referencedRelation: "shifts"
+            referencedRelation: "care_shifts"
             referencedColumns: ["id"]
           },
         ]

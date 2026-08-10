@@ -5,16 +5,31 @@ import { SHIFT_STATUSES, formatDay, formatTime, statusClass, statusLabel } from 
 export function CaregiverShifts({ userId }: { userId: string }) {
   const qc = useQueryClient();
 
-  const { data: shifts, isLoading } = useQuery({
-    queryKey: ["my-shifts", userId],
+  const { data: caregiverId } = useQuery({
+    queryKey: ["my-caregiver-id", userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
+        .from("caregivers")
+        .select("id")
+        .eq("profile_id", userId)
+        .maybeSingle();
+      return data?.id ?? null;
+    },
+  });
+
+  const { data: shifts, isLoading } = useQuery({
+    queryKey: ["my-shifts", userId, caregiverId],
+    enabled: caregiverId !== undefined,
+    queryFn: async () => {
+      let q = supabase
         .from("care_shifts")
         .select(
           "id, scheduled_date, scheduled_start_time, scheduled_end_time, status, notes, care_recipients(full_name, address_line, city, municipality)",
         )
         .order("scheduled_date")
         .order("scheduled_start_time");
+      if (caregiverId) q = q.eq("caregiver_id", caregiverId);
+      const { data, error } = await q;
       if (error) throw error;
       return data ?? [];
     },

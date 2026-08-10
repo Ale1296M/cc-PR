@@ -11,21 +11,38 @@ function Dashboard() {
   const { user, role } = useAuth();
   const uid = user?.id;
 
+  const { data: caregiverId } = useQuery({
+    queryKey: ["dash-caregiver-id", uid],
+    enabled: !!uid && role === "caregiver",
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("caregivers")
+        .select("id")
+        .eq("profile_id", uid!)
+        .maybeSingle();
+      return data?.id ?? null;
+    },
+  });
+
   const { data: shifts } = useQuery({
-    queryKey: ["dash-shifts", uid, role],
-    enabled: !!uid,
+    queryKey: ["dash-shifts", uid, role, caregiverId],
+    enabled: !!uid && (role !== "caregiver" || caregiverId !== undefined),
     queryFn: async () => {
       const from = new Date();
       from.setHours(0, 0, 0, 0);
       const to = new Date(from);
       to.setDate(to.getDate() + 7);
+      const iso = (d: Date) => d.toISOString().slice(0, 10);
       let q = supabase
-        .from("shifts")
-        .select("id, starts_at, ends_at, status, notes, clients(id, full_name)")
-        .gte("starts_at", from.toISOString())
-        .lte("starts_at", to.toISOString())
-        .order("starts_at");
-      if (role === "caregiver") q = q.eq("caregiver_id", uid!);
+        .from("care_shifts")
+        .select(
+          "id, scheduled_date, scheduled_start_time, scheduled_end_time, status, notes, care_recipients(id, full_name)",
+        )
+        .gte("scheduled_date", iso(from))
+        .lte("scheduled_date", iso(to))
+        .order("scheduled_date")
+        .order("scheduled_start_time");
+      if (role === "caregiver" && caregiverId) q = q.eq("caregiver_id", caregiverId);
       const { data, error } = await q;
       if (error) throw error;
       return data ?? [];
@@ -56,9 +73,10 @@ function Dashboard() {
   });
 
   const today = new Date();
-  const todayShifts = (shifts ?? []).filter(
-    (s) => new Date(s.starts_at).toDateString() === today.toDateString(),
-  );
+  const todayKey = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10);
+  const todayShifts = (shifts ?? []).filter((s) => s.scheduled_date === todayKey);
 
   return (
     <div>
@@ -89,8 +107,8 @@ function Dashboard() {
             </p>
           )}
           {(shifts ?? []).slice(0, 8).map((s) => {
-            const d = new Date(s.starts_at);
-            const e = new Date(s.ends_at);
+            const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
+            const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);
             return (
               <div key={s.id} className="flex items-center gap-4 p-4">
                 <div className="w-20 shrink-0 text-sm">
@@ -103,7 +121,8 @@ function Dashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium">
-                    {(s.clients as unknown as { full_name: string } | null)?.full_name ?? "Client"}
+                    {(s.care_recipients as unknown as { full_name: string } | null)?.full_name ??
+                      "Care recipient"}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {Math.round((+e - +d) / 3600000)}h · {s.status}
