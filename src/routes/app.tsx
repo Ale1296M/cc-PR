@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Activity, CalendarCheck, CalendarDays, ClipboardList, Home, LogOut, MessageCircle, Users } from "lucide-react";
+import { Activity, CalendarCheck, CalendarDays, ClipboardList, Home, LogOut, MessageCircle, ShieldCheck, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
@@ -14,11 +14,12 @@ export const Route = createFileRoute("/app")({
   }),
 });
 
-const nav: Array<{ to: string; label: string; icon: typeof Home }> = [
+const nav: Array<{ to: string; label: string; icon: typeof Home; adminOnly?: boolean }> = [
   { to: "/app", label: "Home", icon: Home },
   { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/app/shifts", label: "Shifts", icon: CalendarCheck },
   { to: "/app/clients", label: "Clients", icon: Users },
+  { to: "/app/users", label: "Users", icon: ShieldCheck, adminOnly: true },
   { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
   { to: "/app/wellbeing", label: "Trends", icon: Activity },
   { to: "/app/messages", label: "Messages", icon: MessageCircle },
@@ -28,6 +29,7 @@ function AppLayout() {
   const { user, loading, role } = useAuth();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const visibleNav = nav.filter((item) => !item.adminOnly || role === "admin");
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { next: path } });
@@ -51,7 +53,7 @@ function AppLayout() {
           </p>
         </div>
         <nav className="flex-1 space-y-1 px-3">
-        {nav.map(({ to, label, icon: Icon }) => {
+        {visibleNav.map(({ to, label, icon: Icon }) => {
             const active = to === "/app" ? path === to : path.startsWith(to);
             return (
               <Link
@@ -91,7 +93,7 @@ function AppLayout() {
 
       {/* Mobile tab bar */}
       <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-around border-t border-border bg-card/95 py-2 backdrop-blur md:hidden">
-        {nav.map(({ to, label, icon: Icon }) => {
+        {visibleNav.map(({ to, label, icon: Icon }) => {
           const active = to === "/app" ? path === to : path.startsWith(to);
           return (
             <Link
