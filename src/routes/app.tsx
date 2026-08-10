@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Activity, CalendarCheck, CalendarDays, ClipboardList, Home, LogOut, MessageCircle, ShieldCheck, Users } from "lucide-react";
+import { Activity, CalendarDays, ClipboardList, Home, LogOut, MessageCircle, ShieldCheck, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
@@ -17,7 +17,6 @@ export const Route = createFileRoute("/app")({
 const nav: Array<{ to: string; label: string; icon: typeof Home; adminOnly?: boolean }> = [
   { to: "/app", label: "Home", icon: Home },
   { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
-  { to: "/app/shifts", label: "Shifts", icon: CalendarCheck },
   { to: "/app/clients", label: "Clients", icon: Users },
   { to: "/app/users", label: "Users", icon: ShieldCheck, adminOnly: true },
   { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
