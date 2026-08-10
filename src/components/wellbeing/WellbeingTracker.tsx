@@ -128,12 +128,12 @@ export default function WellbeingTracker() {
   const [view, setView]         = useState("caregiver"); // UI tab
 
   useEffect(() => {
-    sb.auth.getSession().then(({ data }) => {
+    sb.auth.getSession().then(({ data }: any) => {
       setSession(data.session);
       if (data.session) fetchRole(data.session.user.id);
       else setLoading(false);
     });
-    const { data: { subscription } } = sb.auth.onAuthStateChange((_e, s) => {
+    const { data: { subscription } } = sb.auth.onAuthStateChange((_e: any, s: any) => {
       setSession(s);
       if (s) fetchRole(s.user.id);
       else { setRole(null); setLoading(false); }
@@ -231,7 +231,7 @@ function CaregiverView({ userId }: any) {
       // Deduplicate recipients
       const seen = new Set();
       const unique: any[] = [];
-      data.forEach(row => {
+      data.forEach((row: any) => {
         const r = row.care_recipients;
         if (r && !seen.has(r.id)) { seen.add(r.id); unique.push(r); }
       });
@@ -260,7 +260,7 @@ function CaregiverView({ userId }: any) {
         const e = Array.isArray(data.wellbeing_entries) ? data.wellbeing_entries[0] : data.wellbeing_entries;
         setExisting(e);
         // Pre-fill draft with existing values
-        const preFill = {};
+        const preFill: any = {};
         if (e.mood_scale)                preFill.mood     = e.mood_scale >= 4 ? 4 : e.mood_scale <= 2 ? 2 : 3;
         if (e.food_appetite)             preFill.appetite = e.food_appetite;
         if (e.medicine_taken)            preFill.medicine = e.medicine_taken;
@@ -378,7 +378,7 @@ function CaregiverView({ userId }: any) {
                   const active = draft[ind.key] === opt.val;
                   return (
                     <button key={opt.val} className="opt-btn"
-                      onClick={() => setDraft(d => ({ ...d, [ind.key]: opt.val }))}
+                      onClick={() => setDraft((d: any) => ({ ...d, [ind.key]: opt.val }))}
                       style={{
                         flex: 1, padding: "10px 6px", borderRadius: 10, fontSize: 12, fontWeight: 600,
                         border: active ? `2px solid ${opt.color}` : `1px solid ${T.border}`,
@@ -446,9 +446,9 @@ function FamilyView({ userId, isAdmin }: any) {
           .from("client_family_members")
           .select("clients(care_recipients(id, full_name))")
           .eq("user_id", userId));
-        data = (data || []).flatMap(r => r.clients?.care_recipients || []);
+        data = (data || []).flatMap((r: any) => r.clients?.care_recipients || []);
       }
-      const unique = [...new Map((data || []).map(r => [r.id, r])).values()];
+      const unique = [...new Map((data || []).map((r: any) => [r.id, r])).values()];
       setRecipients(unique);
       if (unique.length > 0) setSelected(unique[0]);
     }
@@ -473,7 +473,7 @@ function FamilyView({ userId, isAdmin }: any) {
 
       // Group by date — take the latest entry per day
       const byDate: any = {};
-      (data || []).forEach(vl => {
+      (data || []).forEach((vl: any) => {
         const d = vl.clock_in.slice(0, 10);
         const e = Array.isArray(vl.wellbeing_entries) ? vl.wellbeing_entries[0] : vl.wellbeing_entries;
         if (e) byDate[d] = e;
@@ -498,7 +498,7 @@ function FamilyView({ userId, isAdmin }: any) {
 
   const latest    = [...chartData].reverse().find(c => c.score != null);
   const weekAgo   = chartData.slice(0, 7).reverse().find(c => c.score != null);
-  const delta     = latest && weekAgo ? +(latest.score - weekAgo.score).toFixed(1) : null;
+  const delta     = latest?.score != null && weekAgo?.score != null ? +(latest.score - weekAgo.score).toFixed(1) : null;
   const focusEntry = entries[focusDate];
   const focusScore = entryToScore(focusEntry);
 
