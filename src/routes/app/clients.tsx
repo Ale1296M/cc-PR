@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { toast } from "sonner";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/app/clients")({
   component: () => (
@@ -27,7 +29,12 @@ function CareRecipientsPage() {
   const [showNew, setShowNew] = useState(false);
   const qc = useQueryClient();
 
-  const { data: recipients } = useQuery({
+  const {
+    data: recipients,
+    isPending,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["care-recipients-list"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -63,30 +70,38 @@ function CareRecipientsPage() {
       if (error) throw error;
     },
     onSuccess: () => {
+      toast.success("Care recipient added");
       qc.invalidateQueries({ queryKey: ["care-recipients-list"] });
       setShowNew(false);
     },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't add the care recipient — try again."),
   });
 
   return (
     <div>
-      <header className="mb-8 flex items-end justify-between">
-        <div>
+      <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+        <div className="min-w-0">
           <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipients</p>
-          <h1 className="mt-1 font-display text-4xl">Who we care for</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl">Who we care for</h1>
         </div>
         {role === "admin" && (
           <button
             onClick={() => setShowNew(true)}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+            className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
           >
-            <Plus className="h-4 w-4" /> Add care recipient
+            <Plus className="h-4 w-4 shrink-0" /> <span className="hidden sm:inline">Add care recipient</span><span className="sm:hidden">Add</span>
           </button>
         )}
       </header>
 
-      {(recipients ?? []).length === 0 && (
-        <p className="card-soft p-6 text-sm text-muted-foreground">No care recipients yet.</p>
+      {isPending && <LoadingState label="Loading care recipients…" />}
+      {error && <ErrorState what="care recipients" error={error} onRetry={() => refetch()} />}
+      {!isPending && !error && (recipients ?? []).length === 0 && (
+        <EmptyState
+          title="No care recipients yet"
+          hint="Use “Add care recipient” to create the first person on the roster and link them to a family."
+        />
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
