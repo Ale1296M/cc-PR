@@ -9,17 +9,16 @@ export default defineTool({
   inputSchema: {
     recipient_id: z.string().uuid().describe("User id of the recipient."),
     body: z.string().trim().min(1).describe("Message text."),
-    client_id: z.string().uuid().optional().describe("Optional care recipient this message is about."),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
-  handler: async ({ recipient_id, body, client_id }, ctx) => {
+  handler: async ({ recipient_id, body }, ctx) => {
     if (!ctx.isAuthenticated()) return unauthenticated();
     const userId = ctx.getUserId();
     if (!userId) return unauthenticated();
     const supabase = supabaseForUser(ctx);
     const { data, error } = await supabase
       .from("messages")
-      .insert({ sender_id: userId, recipient_id, body, client_id: client_id ?? null })
+      .insert({ sender_id: userId, recipient_id, body })
       .select("id, created_at, recipient_id, body")
       .single();
     return error ? toolError(error.message) : toolJson(data);
