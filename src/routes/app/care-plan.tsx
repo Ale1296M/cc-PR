@@ -397,13 +397,21 @@ function CaregiverChecklist() {
         <h1 className="mt-1 font-display text-4xl">Care checklist</h1>
       </header>
 
-      {(shifts ?? []).length === 0 ? (
-        <p className="card-soft p-6 text-sm text-muted-foreground">No shifts scheduled for you today.</p>
-      ) : (
+      {shiftsPending && <LoadingState label="Loading today's visits…" />}
+      {shiftsError && (
+        <ErrorState what="today's visits" error={shiftsError} onRetry={() => refetchShifts()} />
+      )}
+      {!shiftsPending && !shiftsError && (shifts ?? []).length === 0 ? (
+        <EmptyState
+          title="No visits scheduled for you today"
+          hint="When the care team assigns you a shift for today, the checklist for that person will appear here."
+        />
+      ) : (shifts ?? []).length > 0 ? (
         <select
+          aria-label="Today's visit"
           value={active}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="mb-6 w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
         >
           {(shifts ?? []).map((s) => (
             <option key={s.id} value={s.care_recipient_id}>
@@ -412,12 +420,13 @@ function CaregiverChecklist() {
             </option>
           ))}
         </select>
-      )}
+      ) : null}
 
       {active && !visit && (
         <button
           onClick={() => startVisit.mutate()}
-          className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+          disabled={startVisit.isPending}
+          className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
         >
           Start visit to use the checklist
         </button>
