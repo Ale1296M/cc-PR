@@ -6,53 +6,64 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
 export const Route = createFileRoute("/app/clients/$clientId")({
-  component: ClientDetail,
+  component: CareRecipientDetail,
 });
 
-function ClientDetail() {
-  const { clientId } = Route.useParams();
+function CareRecipientDetail() {
+  const { clientId: recipientId } = Route.useParams();
   const { role } = useAuth();
-  const { data: client } = useQuery({
-    queryKey: ["client", clientId],
+  const { data: recipient } = useQuery({
+    queryKey: ["care-recipient", recipientId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("clients").select("*").eq("id", clientId).maybeSingle();
+      const { data, error } = await supabase
+        .from("care_recipients")
+        .select("*")
+        .eq("id", recipientId)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
   });
 
   const { data: visits } = useQuery({
-    queryKey: ["visits", clientId],
+    queryKey: ["visits", recipientId],
     queryFn: async () => {
       const { data } = await supabase
         .from("visit_logs")
         .select("id, clock_in, clock_out, notes, mood, caregiver_id, profiles:caregiver_id(full_name)")
-        .eq("client_id", clientId)
+        .eq("care_recipient_id", recipientId)
         .order("clock_in", { ascending: false })
         .limit(10);
       return data ?? [];
     },
   });
 
-  if (!client) return <p className="text-muted-foreground">Loading…</p>;
+  if (!recipient) return <p className="text-muted-foreground">Loading…</p>;
+
+  const address = [recipient.address_line, recipient.municipality ?? recipient.city, recipient.zip_code]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <div>
       <Link to="/app/clients" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> All clients
+        <ArrowLeft className="h-4 w-4" /> All care recipients
       </Link>
 
       <header className="card-soft mb-8 p-6">
-        <p className="text-sm uppercase tracking-widest text-muted-foreground">Client</p>
-        <h1 className="mt-1 font-display text-4xl">{client.full_name}</h1>
+        <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipient</p>
+        <h1 className="mt-1 font-display text-4xl">{recipient.full_name}</h1>
         <div className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-          {client.address && <p>📍 {client.address}</p>}
-          {client.date_of_birth && <p>🎂 {new Date(client.date_of_birth).toLocaleDateString()}</p>}
-          {client.primary_contact_name && (
-            <p>👥 {client.primary_contact_name} {client.primary_contact_phone ? `· ${client.primary_contact_phone}` : ""}</p>
+          {address && <p>📍 {address}</p>}
+          {recipient.date_of_birth && <p>🎂 {new Date(recipient.date_of_birth).toLocaleDateString()}</p>}
+          {recipient.emergency_contact_name && (
+            <p>
+              👥 {recipient.emergency_contact_name}
+              {recipient.emergency_contact_phone ? ` · ${recipient.emergency_contact_phone}` : ""}
+            </p>
           )}
         </div>
-        {client.notes && <p className="mt-4 text-sm">{client.notes}</p>}
+        {recipient.notes && <p className="mt-4 text-sm">{recipient.notes}</p>}
       </header>
 
       <section className="mb-10">
@@ -86,26 +97,26 @@ function ClientDetail() {
           ))}
         </div>
 
-        {role === "caregiver" && <ClockInBar clientId={clientId} />}
+        {role === "caregiver" && <ClockInBar careRecipientId={recipientId} />}
       </section>
     </div>
   );
 }
 
-function ClockInBar({ clientId }: { clientId: string }) {
+function ClockInBar({ careRecipientId }: { careRecipientId: string }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [notes, setNotes] = useState("");
   const [mood, setMood] = useState("");
 
   const { data: active } = useQuery({
-    queryKey: ["active-visit", clientId, user?.id],
+    queryKey: ["active-visit", careRecipientId, user?.id],
     enabled: !!user,
     queryFn: async () => {
       const { data } = await supabase
         .from("visit_logs")
         .select("*")
-        .eq("client_id", clientId)
+        .eq("care_recipient_id", careRecipientId)
         .eq("caregiver_id", user!.id)
         .is("clock_out", null)
         .maybeSingle();
@@ -116,12 +127,12 @@ function ClockInBar({ clientId }: { clientId: string }) {
   const clockIn = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("visit_logs").insert({
-        client_id: clientId,
+        care_recipient_id: careRecipientId,
         caregiver_id: user!.id,
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["active-visit", clientId, user?.id] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["active-visit", careRecipientId, user?.id] }),
   });
 
   const clockOut = useMutation({
@@ -134,8 +145,8 @@ function ClockInBar({ clientId }: { clientId: string }) {
     },
     onSuccess: () => {
       setNotes(""); setMood("");
-      qc.invalidateQueries({ queryKey: ["active-visit", clientId, user?.id] });
-      qc.invalidateQueries({ queryKey: ["visits", clientId] });
+      qc.invalidateQueries({ queryKey: ["active-visit", careRecipientId, user?.id] });
+      qc.invalidateQueries({ queryKey: ["visits", careRecipientId] });
     },
   });
 

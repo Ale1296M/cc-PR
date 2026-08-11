@@ -692,6 +692,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      caregiver_has_shift_with_client: {
+        Args: { _client_id: string; _uid: string }
+        Returns: boolean
+      }
+      caregiver_has_shift_with_recipient: {
+        Args: { _recipient_id: string; _uid: string }
+        Returns: boolean
+      }
       current_user_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
@@ -701,6 +709,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_caregiver_self: {
+        Args: { _caregiver_id: string; _uid: string }
         Returns: boolean
       }
       profiles_share_care_circle: {

@@ -17,7 +17,7 @@ export const Route = createFileRoute("/app")({
 const nav: Array<{ to: string; label: string; icon: typeof Home; adminOnly?: boolean }> = [
   { to: "/app", label: "Home", icon: Home },
   { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
-  { to: "/app/clients", label: "Clients", icon: Users },
+  { to: "/app/clients", label: "Care recipients", icon: Users },
   { to: "/app/users", label: "Users", icon: ShieldCheck, adminOnly: true },
   { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
   { to: "/app/wellbeing", label: "Trends", icon: Activity },

@@ -6,33 +6,59 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
 export const Route = createFileRoute("/app/clients")({
-  component: ClientsPage,
+  component: CareRecipientsPage,
 });
 
-function ClientsPage() {
+type NewRecipient = {
+  full_name: string;
+  family_id: string;
+  address_line: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+};
+
+function CareRecipientsPage() {
   const { role } = useAuth();
   const [showNew, setShowNew] = useState(false);
   const qc = useQueryClient();
 
-  const { data: clients } = useQuery({
-    queryKey: ["clients-list"],
+  const { data: recipients } = useQuery({
+    queryKey: ["care-recipients-list"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("clients")
-        .select("id, full_name, address, primary_contact_name, primary_contact_phone")
+        .from("care_recipients")
+        .select("id, full_name, address_line, city, municipality, emergency_contact_name, emergency_contact_phone")
         .order("full_name");
       if (error) throw error;
       return data ?? [];
     },
   });
 
+  const { data: families } = useQuery({
+    queryKey: ["families-options"],
+    enabled: role === "admin",
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("families")
+        .select("id, status, profiles:profile_id(full_name)")
+        .order("created_at");
+      return data ?? [];
+    },
+  });
+
   const create = useMutation({
-    mutationFn: async (fields: { full_name: string; address: string; primary_contact_name: string; primary_contact_phone: string }) => {
-      const { error } = await supabase.from("clients").insert(fields);
+    mutationFn: async (fields: NewRecipient) => {
+      const { error } = await supabase.from("care_recipients").insert({
+        full_name: fields.full_name,
+        family_id: fields.family_id,
+        address_line: fields.address_line || null,
+        emergency_contact_name: fields.emergency_contact_name || null,
+        emergency_contact_phone: fields.emergency_contact_phone || null,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["clients-list"] });
+      qc.invalidateQueries({ queryKey: ["care-recipients-list"] });
       setShowNew(false);
     },
   });
@@ -41,7 +67,7 @@ function ClientsPage() {
     <div>
       <header className="mb-8 flex items-end justify-between">
         <div>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">Clients</p>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipients</p>
           <h1 className="mt-1 font-display text-4xl">Who we care for</h1>
         </div>
         {role === "admin" && (
@@ -49,17 +75,17 @@ function ClientsPage() {
             onClick={() => setShowNew(true)}
             className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
           >
-            <Plus className="h-4 w-4" /> Add client
+            <Plus className="h-4 w-4" /> Add care recipient
           </button>
         )}
       </header>
 
-      {(clients ?? []).length === 0 && (
-        <p className="card-soft p-6 text-sm text-muted-foreground">No clients yet.</p>
+      {(recipients ?? []).length === 0 && (
+        <p className="card-soft p-6 text-sm text-muted-foreground">No care recipients yet.</p>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {(clients ?? []).map((c) => (
+        {(recipients ?? []).map((c) => (
           <Link
             key={c.id}
             to="/app/clients/$clientId"
@@ -67,11 +93,15 @@ function ClientsPage() {
             className="card-soft group p-5 transition hover:border-primary"
           >
             <p className="font-display text-2xl group-hover:text-primary">{c.full_name}</p>
-            {c.address && <p className="mt-1 text-sm text-muted-foreground">{c.address}</p>}
-            {c.primary_contact_name && (
+            {(c.address_line || c.municipality || c.city) && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {[c.address_line, c.municipality ?? c.city].filter(Boolean).join(", ")}
+              </p>
+            )}
+            {c.emergency_contact_name && (
               <p className="mt-3 text-xs text-muted-foreground">
-                Contact: {c.primary_contact_name}
-                {c.primary_contact_phone ? ` · ${c.primary_contact_phone}` : ""}
+                Emergency contact: {c.emergency_contact_name}
+                {c.emergency_contact_phone ? ` · ${c.emergency_contact_phone}` : ""}
               </p>
             )}
           </Link>
@@ -79,7 +109,13 @@ function ClientsPage() {
       </div>
 
       {showNew && (
-        <NewClient
+        <NewCareRecipient
+          families={(families ?? []).map((f) => ({
+            id: f.id,
+            label:
+              (f.profiles as unknown as { full_name: string | null } | null)?.full_name ??
+              `Family ${f.id.slice(0, 8)}`,
+          }))}
           onCreate={(f) => create.mutate(f)}
           onClose={() => setShowNew(false)}
           busy={create.isPending}
@@ -89,32 +125,47 @@ function ClientsPage() {
   );
 }
 
-function NewClient({
-  onCreate, onClose, busy,
+function NewCareRecipient({
+  families, onCreate, onClose, busy,
 }: {
-  onCreate: (f: { full_name: string; address: string; primary_contact_name: string; primary_contact_phone: string }) => void;
+  families: Array<{ id: string; label: string }>;
+  onCreate: (f: NewRecipient) => void;
   onClose: () => void;
   busy: boolean;
 }) {
   const [full_name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [primary_contact_name, setContact] = useState("");
-  const [primary_contact_phone, setPhone] = useState("");
+  const [family_id, setFamily] = useState("");
+  const [address_line, setAddress] = useState("");
+  const [emergency_contact_name, setContact] = useState("");
+  const [emergency_contact_phone, setPhone] = useState("");
   return (
     <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
       <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="mb-4 font-display text-2xl">New client</h3>
+        <h3 className="mb-4 font-display text-2xl">New care recipient</h3>
         <div className="space-y-3">
           <F label="Full name" value={full_name} onChange={setName} />
-          <F label="Address" value={address} onChange={setAddress} />
-          <F label="Primary contact" value={primary_contact_name} onChange={setContact} />
-          <F label="Contact phone" value={primary_contact_phone} onChange={setPhone} />
+          <label className="block">
+            <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Family</span>
+            <select
+              value={family_id}
+              onChange={(e) => setFamily(e.target.value)}
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="">Select a family…</option>
+              {families.map((f) => (
+                <option key={f.id} value={f.id}>{f.label}</option>
+              ))}
+            </select>
+          </label>
+          <F label="Address" value={address_line} onChange={setAddress} />
+          <F label="Emergency contact" value={emergency_contact_name} onChange={setContact} />
+          <F label="Contact phone" value={emergency_contact_phone} onChange={setPhone} />
         </div>
         <div className="mt-6 flex justify-end gap-2">
           <button onClick={onClose} className="rounded-full border border-border px-4 py-2 text-sm">Cancel</button>
           <button
-            disabled={!full_name || busy}
-            onClick={() => onCreate({ full_name, address, primary_contact_name, primary_contact_phone })}
+            disabled={!full_name || !family_id || busy}
+            onClick={() => onCreate({ full_name, family_id, address_line, emergency_contact_name, emergency_contact_phone })}
             className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
           >
             Add
