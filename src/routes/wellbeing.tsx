@@ -1,3 +1,4 @@
+import { RoleGate } from "@/lib/role-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -6,7 +7,11 @@ import { useAuth } from "@/lib/use-auth";
 import { ArrowLeft, Check } from "lucide-react";
 
 export const Route = createFileRoute("/wellbeing")({
-  component: LogVisit,
+  component: () => (
+    <RoleGate allow={["admin", "caregiver"]}>
+      <LogVisit />
+    </RoleGate>
+  ),
   head: () => ({
     meta: [
       { title: "Log a visit · Kindred" },

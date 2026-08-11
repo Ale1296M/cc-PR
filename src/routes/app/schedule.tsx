@@ -1,3 +1,4 @@
+import { RoleGate } from "@/lib/role-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -7,7 +8,11 @@ import { useAuth } from "@/lib/use-auth";
 import { SHIFT_STATUSES, formatDay, formatTime, statusLabel } from "@/components/shifts/shift-utils";
 
 export const Route = createFileRoute("/app/schedule")({
-  component: SchedulePage,
+  component: () => (
+    <RoleGate allow={["admin", "caregiver"]}>
+      <SchedulePage />
+    </RoleGate>
+  ),
 });
 
 function SchedulePage() {

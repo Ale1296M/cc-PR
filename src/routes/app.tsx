@@ -1,8 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Activity, CalendarDays, ClipboardList, Home, LogOut, MessageCircle, ShieldCheck, Users } from "lucide-react";
+import { Activity, CalendarDays, ClipboardList, Home, LogOut, MessageCircle, NotebookPen, ShieldCheck, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/use-auth";
+import { useAuth, type AppRole } from "@/lib/use-auth";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -14,21 +14,38 @@ export const Route = createFileRoute("/app")({
   }),
 });
 
-const nav: Array<{ to: string; label: string; icon: typeof Home; adminOnly?: boolean }> = [
-  { to: "/app", label: "Home", icon: Home },
-  { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
-  { to: "/app/clients", label: "Care recipients", icon: Users },
-  { to: "/app/users", label: "Users", icon: ShieldCheck, adminOnly: true },
-  { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
-  { to: "/app/wellbeing", label: "Trends", icon: Activity },
-  { to: "/app/messages", label: "Messages", icon: MessageCircle },
-];
+type NavItem = { to: string; label: string; icon: typeof Home };
+
+const NAV_BY_ROLE: Record<AppRole, NavItem[]> = {
+  admin: [
+    { to: "/app", label: "Home", icon: Home },
+    { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
+    { to: "/app/clients", label: "Care recipients", icon: Users },
+    { to: "/app/users", label: "Users", icon: ShieldCheck },
+    { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
+    { to: "/app/wellbeing", label: "Trends", icon: Activity },
+    { to: "/app/messages", label: "Messages", icon: MessageCircle },
+  ],
+  caregiver: [
+    { to: "/app", label: "Home", icon: Home },
+    { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
+    { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
+    { to: "/wellbeing", label: "Log visit", icon: NotebookPen },
+    { to: "/app/messages", label: "Messages", icon: MessageCircle },
+  ],
+  family_member: [
+    { to: "/app", label: "Home", icon: Home },
+    { to: "/app/wellbeing", label: "Wellbeing", icon: Activity },
+    { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
+    { to: "/app/messages", label: "Messages", icon: MessageCircle },
+  ],
+};
 
 function AppLayout() {
   const { user, loading, role } = useAuth();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const visibleNav = nav.filter((item) => !item.adminOnly || role === "admin");
+  const visibleNav = role ? NAV_BY_ROLE[role] : [{ to: "/app", label: "Home", icon: Home }];
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { next: path } });
@@ -86,7 +103,7 @@ function AppLayout() {
 
       <main className="flex-1 pb-24 md:pb-0">
         <div className="mx-auto max-w-5xl px-5 py-8 md:px-10">
-          <Outlet />
+          {role === null ? <AwaitingRole email={user.email ?? ""} /> : <Outlet />}
         </div>
       </main>
 
@@ -108,6 +125,19 @@ function AppLayout() {
           );
         })}
       </nav>
+    </div>
+  );
+}
+
+function AwaitingRole({ email }: { email: string }) {
+  return (
+    <div className="card-soft mx-auto max-w-xl p-8 text-center">
+      <h1 className="font-display text-3xl">Your account is set up</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        An admin will assign your role shortly. Once that's done, your schedule, care plans and
+        messages will appear here automatically.
+      </p>
+      {email && <p className="mt-4 text-xs text-muted-foreground">Signed in as {email}</p>}
     </div>
   );
 }

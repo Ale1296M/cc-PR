@@ -1,3 +1,4 @@
+import { RoleGate } from "@/lib/role-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -6,7 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 
 export const Route = createFileRoute("/app/clients/$clientId")({
-  component: CareRecipientDetail,
+  component: () => (
+    <RoleGate allow={["admin"]}>
+      <CareRecipientDetail />
+    </RoleGate>
+  ),
 });
 
 function CareRecipientDetail() {
