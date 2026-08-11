@@ -278,7 +278,12 @@ function CaregiverChecklist() {
   const today = new Date().toISOString().slice(0, 10);
   const [recipientId, setRecipientId] = useState("");
 
-  const { data: shifts } = useQuery({
+  const {
+    data: shifts,
+    isPending: shiftsPending,
+    error: shiftsError,
+    refetch: refetchShifts,
+  } = useQuery({
     queryKey: ["cp-today-shifts", user?.id, today],
     enabled: !!user,
     queryFn: async () => {
@@ -297,7 +302,8 @@ function CaregiverChecklist() {
   });
 
   const active = recipientId || shifts?.[0]?.care_recipient_id || "";
-  const { data: items } = useItems(active, true);
+  const { data: items, isPending: itemsPending, error: itemsError, refetch: refetchItems } =
+    useItems(active, true);
 
   const { data: visit } = useQuery({
     queryKey: ["cp-visit", active, user?.id],
@@ -335,7 +341,12 @@ function CaregiverChecklist() {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cp-visit"] }),
+    onSuccess: () => {
+      toast.success("Visit started");
+      qc.invalidateQueries({ queryKey: ["cp-visit"] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't start the visit — try again."),
   });
 
   const endVisit = useMutation({
@@ -346,7 +357,12 @@ function CaregiverChecklist() {
         .eq("id", visit!.id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cp-visit"] }),
+    onSuccess: () => {
+      toast.success("Visit ended");
+      qc.invalidateQueries({ queryKey: ["cp-visit"] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't end the visit — try again."),
   });
 
   const toggle = useMutation({
@@ -365,6 +381,8 @@ function CaregiverChecklist() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["cp-completions"] }),
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't save that check — try again."),
   });
 
   const completionFor = (itemId: string) =>
