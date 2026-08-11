@@ -19,8 +19,15 @@ export function useRoleGate(allowed: AppRole[]) {
     }
   }, [denied, navigate]);
 
-  if (loading || role === null) {
+  if (loading) {
     return <p className="card-soft p-6 text-sm text-muted-foreground">Loading…</p>;
+  }
+  if (role === null) {
+    return (
+      <p className="card-soft p-6 text-sm text-muted-foreground">
+        Your account is set up — an admin will assign your role shortly.
+      </p>
+    );
   }
   if (denied) {
     return (
