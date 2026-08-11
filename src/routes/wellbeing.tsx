@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { ArrowLeft, Check } from "lucide-react";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/wellbeing")({
   component: () => (
@@ -111,7 +112,12 @@ function LogVisit() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
-  const { data: recipients, isLoading } = useQuery({
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useQuery({
     queryKey: ["logvisit-recipients", uid],
     enabled: !!uid,
     queryFn: async (): Promise<Recipient[]> => {
@@ -209,6 +215,7 @@ function LogVisit() {
   }
 
   if (saved) {
+    const savedName = (recipients ?? []).find((r) => r.id === recipientId)?.full_name;
     return (
       <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center px-6 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -216,10 +223,10 @@ function LogVisit() {
         </div>
         <h1 className="mt-5 font-display text-4xl">Check-in saved</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Today&apos;s wellbeing check-in has been recorded for this care recipient.
+          Today&apos;s wellbeing check-in has been recorded{savedName ? ` for ${savedName}` : ""}.
         </p>
-        <div className="mt-6 flex gap-3">
-          <Link to="/app" className="rounded-xl bg-primary px-5 py-3 text-sm text-primary-foreground">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link to="/app" className="min-h-11 rounded-xl bg-primary px-5 py-3 text-sm text-primary-foreground">
             Back to home
           </Link>
           <button
@@ -234,7 +241,7 @@ function LogVisit() {
               setHygiene(null);
               setNotes("");
             }}
-            className="rounded-xl border border-border px-5 py-3 text-sm hover:bg-secondary/50"
+            className="min-h-11 rounded-xl border border-border px-5 py-3 text-sm hover:bg-secondary/50"
           >
             Log another visit
           </button>
@@ -244,7 +251,7 @@ function LogVisit() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-6 py-10">
+      <main className="mx-auto min-h-screen max-w-3xl px-4 py-10 sm:px-6">
       <Link
         to="/app"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -260,17 +267,24 @@ function LogVisit() {
             day: "numeric",
           })}
         </p>
-        <h1 className="mt-1 font-display text-4xl md:text-5xl">Log a visit</h1>
+        <h1 className="mt-1 font-display text-3xl md:text-5xl">Log a visit</h1>
       </header>
 
       <section>
         <h2 className="mb-3 font-display text-2xl">Who are you visiting?</h2>
-        {isLoading && <p className="text-sm text-muted-foreground">Loading care recipients…</p>}
-        {!isLoading && (recipients ?? []).length === 0 && (
-          <p className="card-soft p-5 text-sm text-muted-foreground">
-            You have no care recipients assigned yet. Once a shift is assigned to you, they will
-            appear here.
-          </p>
+        {recipientsPending && <LoadingState label="Loading your care recipients…" />}
+        {recipientsError && (
+          <ErrorState
+            what="your care recipients"
+            error={recipientsError}
+            onRetry={() => refetchRecipients()}
+          />
+        )}
+        {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
+          <EmptyState
+            title="No care recipients assigned yet"
+            hint="Once the care team assigns you a shift, the people you visit will appear here and you can log their check-in."
+          />
         )}
         <div className="grid gap-3 sm:grid-cols-2">
           {(recipients ?? []).map((r) => {
