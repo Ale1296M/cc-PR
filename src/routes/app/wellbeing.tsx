@@ -14,6 +14,7 @@ import {
 import { AlertTriangle, ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/app/wellbeing")({
   component: () => (
@@ -129,7 +130,12 @@ function WellbeingTrends() {
     return d.toISOString();
   }, []);
 
-  const { data: recipients } = useQuery({
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useQuery({
     queryKey: ["trends-recipients", uid, role],
     enabled: !!uid && !!role,
     queryFn: async (): Promise<Recipient[]> => {
@@ -189,7 +195,12 @@ function WellbeingTrends() {
   const activeId = recipientId || list[0]?.id || "";
   const activeName = list.find((r) => r.id === activeId)?.full_name ?? "";
 
-  const { data: visits } = useQuery({
+  const {
+    data: visits,
+    isPending: visitsPending,
+    error: visitsError,
+    refetch: refetchVisits,
+  } = useQuery({
     queryKey: ["trends-visits", activeId, since],
     enabled: !!activeId,
     queryFn: async (): Promise<Visit[]> => {
