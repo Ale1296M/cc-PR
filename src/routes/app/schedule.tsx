@@ -6,6 +6,8 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { SHIFT_STATUSES, formatDay, formatTime, statusLabel } from "@/components/shifts/shift-utils";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/schedule")({
   component: () => (
@@ -34,7 +36,12 @@ function SchedulePage() {
     },
   });
 
-  const { data: shifts } = useQuery({
+  const {
+    data: shifts,
+    isPending: shiftsPending,
+    error: shiftsError,
+    refetch: refetchShifts,
+  } = useQuery({
     queryKey: ["shifts", uid, role, caregiverId],
     enabled: !!uid && (role !== "caregiver" || caregiverId !== undefined),
     queryFn: async () => {
@@ -63,30 +70,44 @@ function SchedulePage() {
       const { error } = await supabase.from("care_shifts").update({ status }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["shifts"] }),
+    onSuccess: () => {
+      toast.success("Shift updated");
+      qc.invalidateQueries({ queryKey: ["shifts"] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't update this shift — try again."),
   });
 
   return (
     <div>
-      <header className="mb-8 flex items-end justify-between">
-        <div>
+      <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:justify-between">
+        <div className="min-w-0">
           <p className="text-sm uppercase tracking-widest text-muted-foreground">Schedule</p>
-          <h1 className="mt-1 font-display text-4xl">Shifts & visits</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl">Shifts &amp; visits</h1>
         </div>
         {role === "admin" && (
           <button
             onClick={() => setShowNew(true)}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+            className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="h-4 w-4" /> New shift
           </button>
         )}
       </header>
 
-      {Object.keys(groups).length === 0 && (
-        <p className="card-soft p-6 text-sm text-muted-foreground">
-          No shifts yet.{role === "admin" ? " Create the first one." : ""}
-        </p>
+      {shiftsPending && <LoadingState label="Loading the schedule…" />}
+      {shiftsError && (
+        <ErrorState what="the schedule" error={shiftsError} onRetry={() => refetchShifts()} />
+      )}
+      {!shiftsPending && !shiftsError && Object.keys(groups).length === 0 && (
+        <EmptyState
+          title="No shifts scheduled"
+          hint={
+            role === "admin"
+              ? "Use “New shift” to schedule the first visit — pick a care recipient, a caregiver, and a time."
+              : "Once the care team assigns you a visit, it will appear here."
+          }
+        />
       )}
 
       <div className="space-y-8">
@@ -95,21 +116,25 @@ function SchedulePage() {
             <h2 className="mb-3 font-display text-xl">{formatDay(day)}</h2>
             <div className="card-soft divide-y divide-border">
               {list.map((s) => (
-                <div key={s.id} className="flex flex-wrap items-center gap-4 p-4">
-                  <div className="w-32 text-sm">
+                <div
+                  key={s.id}
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 sm:flex sm:gap-4"
+                >
+                  <div className="order-1 min-w-0 text-sm sm:w-32 sm:shrink-0">
                     {formatTime(s.scheduled_start_time)} – {formatTime(s.scheduled_end_time)}
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium">
+                  <div className="order-3 col-span-2 min-w-0 sm:order-2 sm:col-span-1 sm:flex-1">
+                    <p className="truncate font-medium">
                       {(s.care_recipients as unknown as { full_name: string } | null)?.full_name}
                     </p>
                     {s.notes && <p className="text-xs text-muted-foreground">{s.notes}</p>}
                   </div>
                   <select
+                    aria-label="Shift status"
                     value={s.status}
                     onChange={(ev) => updateStatus.mutate({ id: s.id, status: ev.target.value })}
                     disabled={role !== "admin" && s.caregiver_id !== caregiverId}
-                    className="rounded-md border border-border bg-background px-2 py-1 text-xs"
+                    className="order-2 min-h-10 shrink-0 rounded-md border border-border bg-background px-2 text-xs sm:order-3"
                   >
                     {SHIFT_STATUSES.map((o) => (
                       <option key={o} value={o}>
@@ -176,14 +201,17 @@ function NewShiftDialog({ adminId, onClose }: { adminId: string; onClose: () => 
       if (error) throw error;
     },
     onSuccess: () => {
+      toast.success("Shift created");
       qc.invalidateQueries({ queryKey: ["shifts"] });
       onClose();
     },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't create the shift — try again."),
   });
 
   return (
     <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card p-6 shadow-xl">
         <h3 className="mb-4 font-display text-2xl">New shift</h3>
         <div className="space-y-3">
           <Select label="Care recipient" value={recipientId} onChange={setRecipientId}>

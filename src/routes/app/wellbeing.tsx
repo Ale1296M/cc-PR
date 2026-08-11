@@ -14,6 +14,7 @@ import {
 import { AlertTriangle, ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/app/wellbeing")({
   component: () => (
@@ -129,7 +130,12 @@ function WellbeingTrends() {
     return d.toISOString();
   }, []);
 
-  const { data: recipients } = useQuery({
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useQuery({
     queryKey: ["trends-recipients", uid, role],
     enabled: !!uid && !!role,
     queryFn: async (): Promise<Recipient[]> => {
@@ -189,7 +195,12 @@ function WellbeingTrends() {
   const activeId = recipientId || list[0]?.id || "";
   const activeName = list.find((r) => r.id === activeId)?.full_name ?? "";
 
-  const { data: visits } = useQuery({
+  const {
+    data: visits,
+    isPending: visitsPending,
+    error: visitsError,
+    refetch: refetchVisits,
+  } = useQuery({
     queryKey: ["trends-visits", activeId, since],
     enabled: !!activeId,
     queryFn: async (): Promise<Visit[]> => {
@@ -219,6 +230,42 @@ function WellbeingTrends() {
       return data ?? [];
     },
   });
+
+  const isFamily = role === "family_member";
+  const shell = (children: React.ReactNode) => (
+    <div>
+      <header className="mb-8">
+        <p className="text-sm uppercase tracking-widest text-muted-foreground">Last 14 days</p>
+        <h1 className="mt-1 font-display text-3xl md:text-5xl">Wellbeing trends</h1>
+      </header>
+      {children}
+    </div>
+  );
+
+  if (recipientsPending) return shell(<LoadingState label="Loading wellbeing check-ins…" />);
+  if (recipientsError)
+    return shell(
+      <ErrorState
+        what="the wellbeing trends"
+        error={recipientsError}
+        onRetry={() => refetchRecipients()}
+      />,
+    );
+  if (list.length === 0)
+    return shell(
+      <EmptyState
+        title={isFamily ? "No one linked to your account yet" : "No care recipients yet"}
+        hint={
+          isFamily
+            ? "Once the care team links your loved one to your account, their daily check-ins will show up here."
+            : "Wellbeing trends appear once you're assigned to someone and caregivers start logging visits."
+        }
+      />,
+    );
+  if (visitsError)
+    return shell(
+      <ErrorState what="the wellbeing check-ins" error={visitsError} onRetry={() => refetchVisits()} />,
+    );
 
   // One entry per day (most recent visit of that day wins)
   const byDay = new Map<string, Entry>();
@@ -300,22 +347,31 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Last 14 days</p>
-        <h1 className="mt-1 font-display text-4xl md:text-5xl">Wellbeing trends</h1>
+        <h1 className="mt-1 font-display text-3xl md:text-5xl">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {list.length === 1 && activeName
+          {activeName
             ? `A descriptive summary of what caregivers recorded for ${activeName}.`
-            : "A descriptive summary of what caregivers recorded during recent check-ins."}
+            : isFamily
+              ? "A descriptive summary of what caregivers recorded for your loved one."
+              : "A descriptive summary of what caregivers recorded during recent check-ins."}
         </p>
       </header>
 
+      {visitsPending && (
+        <div className="mb-6">
+          <LoadingState label="Loading the last 14 days…" />
+        </div>
+      )}
+
       {list.length > 1 && (
         <select
+          aria-label="Choose a person"
           value={activeId}
           onChange={(e) => {
             setRecipientId(e.target.value);
             setSelectedDay(null);
           }}
-          className="mb-6 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
         >
           {list.map((r) => (
             <option key={r.id} value={r.id}>
@@ -354,7 +410,8 @@ function WellbeingTrends() {
                 type="button"
                 onClick={() => setSelectedDay(d.key)}
                 title={`${date.toLocaleDateString([], { month: "short", day: "numeric" })} · ${BAND_LABEL[d.band]}`}
-                className={`flex flex-col items-center gap-1 rounded-lg p-1 transition ${
+                aria-label={`${date.toLocaleDateString([], { month: "short", day: "numeric" })}: ${BAND_LABEL[d.band]}`}
+                className={`flex min-h-[3.25rem] min-w-0 flex-col items-center gap-1 rounded-lg p-1 transition ${
                   active ? "ring-2 ring-primary" : "hover:opacity-80"
                 }`}
               >

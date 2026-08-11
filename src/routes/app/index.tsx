@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -24,7 +25,12 @@ function Dashboard() {
     },
   });
 
-  const { data: shifts } = useQuery({
+  const {
+    data: shifts,
+    isPending: shiftsPending,
+    error: shiftsError,
+    refetch: refetchShifts,
+  } = useQuery({
     queryKey: ["dash-shifts", uid, role, caregiverId],
     enabled: !!uid && (role !== "caregiver" || caregiverId !== undefined),
     queryFn: async () => {
@@ -87,6 +93,7 @@ function Dashboard() {
     .toISOString()
     .slice(0, 10);
   const todayShifts = (shifts ?? []).filter((s) => s.scheduled_date === todayKey);
+  const isFamily = role === "family_member";
 
   return (
     <div>
@@ -99,7 +106,10 @@ function Dashboard() {
 
       <section className="grid gap-4 sm:grid-cols-3">
         <Stat label="Today's visits" value={todayShifts.length} />
-        <Stat label="Active care recipients" value={clientCount ?? 0} />
+        <Stat
+          label={isFamily ? "Your loved ones" : "Active care recipients"}
+          value={clientCount ?? 0}
+        />
         <Stat label="Unread messages" value={unread ?? 0} accent />
       </section>
 
@@ -114,8 +124,8 @@ function Dashboard() {
                 {role === "family_member" ? "Wellbeing history" : "Log visit"}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {role === "family_member"
-                  ? "See the last 14 days of daily wellbeing check-ins."
+                {isFamily
+                  ? "See the last 14 days of daily wellbeing check-ins for your loved one."
                   : "Record today's mood, appetite, medicine, movement and hygiene."}
               </p>
             </div>
@@ -131,18 +141,30 @@ function Dashboard() {
             Full schedule →
           </Link>
         </div>
+        {shiftsPending && <LoadingState label="Loading your upcoming visits…" />}
+        {shiftsError && (
+          <ErrorState what="your upcoming visits" error={shiftsError} onRetry={() => refetchShifts()} />
+        )}
+        {!shiftsPending && !shiftsError && (shifts ?? []).length === 0 && (
+          <EmptyState
+            title="Nothing scheduled this week"
+            hint={
+              isFamily
+                ? "Visits booked by the care team for the next 7 days will show up here."
+                : role === "admin"
+                  ? "Create a shift from the Schedule screen and it will appear here."
+                  : "Once the care team assigns you a visit, it will appear here."
+            }
+          />
+        )}
+        {!shiftsPending && !shiftsError && (shifts ?? []).length > 0 && (
         <div className="card-soft divide-y divide-border">
-          {(shifts ?? []).length === 0 && (
-            <p className="p-6 text-sm text-muted-foreground">
-              No shifts scheduled in the next 7 days.
-            </p>
-          )}
           {(shifts ?? []).slice(0, 8).map((s) => {
             const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
             const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);
             return (
-              <div key={s.id} className="flex items-center gap-4 p-4">
-                <div className="w-20 shrink-0 text-sm">
+              <div key={s.id} className="flex items-center gap-3 p-4 sm:gap-4">
+                <div className="w-16 shrink-0 text-sm sm:w-20">
                   <p className="font-medium">
                     {d.toLocaleDateString(undefined, { weekday: "short" })}
                   </p>
@@ -150,20 +172,23 @@ function Dashboard() {
                     {d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                   </p>
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">
                     {(s.care_recipients as unknown as { full_name: string } | null)?.full_name ??
-                      "Care recipient"}
+                      (isFamily ? "Your loved one" : "Care recipient")}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {Math.round((+e - +d) / 3600000)}h · {s.status}
                   </p>
                 </div>
-                <span className="rounded-full bg-secondary px-3 py-1 text-xs">{s.status}</span>
+                <span className="hidden shrink-0 rounded-full bg-secondary px-3 py-1 text-xs sm:inline">
+                  {s.status}
+                </span>
               </div>
             );
           })}
         </div>
+        )}
       </section>
     </div>
   );

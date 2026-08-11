@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Check, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/care-plan")({
   component: CarePlanPage,
@@ -58,7 +60,7 @@ function useItems(recipientId: string, onlyActive: boolean) {
 
 function CarePlanPage() {
   const { role, loading } = useAuth();
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
+  if (loading) return <LoadingState label="Loading your care plan…" />;
   if (role === "admin") return <AdminCarePlan />;
   if (role === "caregiver") return <CaregiverChecklist />;
   return <FamilyCarePlan />;
@@ -69,10 +71,16 @@ function CarePlanPage() {
 function AdminCarePlan() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const { data: recipients } = useRecipients();
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useRecipients();
   const [recipientId, setRecipientId] = useState("");
   const active = recipientId || recipients?.[0]?.id || "";
-  const { data: items } = useItems(active, false);
+  const { data: items, isPending: itemsPending, error: itemsError, refetch: refetchItems } =
+    useItems(active, false);
 
   const [task, setTask] = useState("");
   const [category, setCategory] = useState("");
@@ -91,7 +99,14 @@ function AdminCarePlan() {
       });
       if (error) throw error;
     },
-    onSuccess: () => { setTask(""); setCategory(""); invalidate(); },
+    onSuccess: () => {
+      setTask("");
+      setCategory("");
+      toast.success("Checklist item added");
+      invalidate();
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't add the item — try again."),
   });
 
   const update = useMutation({
@@ -102,7 +117,12 @@ function AdminCarePlan() {
       const { error } = await supabase.from("care_plan_items").update(p.fields).eq("id", p.id);
       if (error) throw error;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      toast.success("Checklist updated");
+      invalidate();
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't save that change — try again."),
   });
 
   const remove = useMutation({
@@ -110,7 +130,12 @@ function AdminCarePlan() {
       const { error } = await supabase.from("care_plan_items").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      toast.success("Checklist item removed");
+      invalidate();
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't remove the item — try again."),
   });
 
   return (
@@ -120,21 +145,46 @@ function AdminCarePlan() {
         <h1 className="mt-1 font-display text-4xl">Checklist builder</h1>
       </header>
 
+      {recipientsError && (
+        <ErrorState
+          what="the care recipients"
+          error={recipientsError}
+          onRetry={() => refetchRecipients()}
+        />
+      )}
+      {recipientsPending && <LoadingState label="Loading care recipients…" />}
+      {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
+        <EmptyState
+          title="No care recipients yet"
+          hint="Add a care recipient on the Care recipients screen, then build their checklist here."
+        />
+      )}
+      {(recipients ?? []).length > 0 && (
+      <>
       <select
+        aria-label="Care recipient"
         value={active}
         onChange={(e) => setRecipientId(e.target.value)}
-        className="mb-6 w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
+        className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
       >
-        {(recipients ?? []).length === 0 && <option value="">No care recipients yet</option>}
         {(recipients ?? []).map((r) => (
           <option key={r.id} value={r.id}>{r.full_name}{r.city ? ` · ${r.city}` : ""}</option>
         ))}
       </select>
 
-      <div className="card-soft mb-6 divide-y divide-border">
-        {(items ?? []).length === 0 && (
-          <p className="p-4 text-sm text-muted-foreground">No checklist items yet.</p>
-        )}
+      {itemsPending && <LoadingState label="Loading checklist items…" />}
+      {itemsError && (
+        <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+      )}
+      {!itemsPending && !itemsError && (items ?? []).length === 0 && (
+        <div className="mb-6">
+          <EmptyState
+            title="No checklist items yet"
+            hint="Add the first task below — for example “Morning medication” — and it will appear on the caregiver's visit checklist."
+          />
+        </div>
+      )}
+      <div className={`card-soft mb-6 divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
         {(items ?? []).map((item) => (
           <div key={item.id} className="flex flex-wrap items-center gap-3 p-4">
             <div className="min-w-0 flex-1">
@@ -189,28 +239,33 @@ function AdminCarePlan() {
           value={task}
           onChange={(e) => setTask(e.target.value)}
           placeholder="Task description…"
-          className="min-w-[12rem] flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          aria-label="Task description"
+          className="min-h-10 min-w-[12rem] flex-1 rounded-md border border-border bg-background px-3 text-sm"
         />
         <input
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           placeholder="Category"
-          className="w-40 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          aria-label="Category"
+          className="min-h-10 w-40 rounded-md border border-border bg-background px-3 text-sm"
         />
         <select
           value={frequency}
           onChange={(e) => setFrequency(e.target.value)}
-          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+          aria-label="Frequency"
+          className="min-h-10 rounded-md border border-border bg-background px-3 text-sm"
         >
           {FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
         </select>
         <button
           disabled={!task || !active || add.isPending}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+          className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
         >
-          <Plus className="h-4 w-4" /> Add item
+          <Plus className="h-4 w-4" /> {add.isPending ? "Adding…" : "Add item"}
         </button>
       </form>
+      </>
+      )}
     </div>
   );
 }
@@ -223,7 +278,12 @@ function CaregiverChecklist() {
   const today = new Date().toISOString().slice(0, 10);
   const [recipientId, setRecipientId] = useState("");
 
-  const { data: shifts } = useQuery({
+  const {
+    data: shifts,
+    isPending: shiftsPending,
+    error: shiftsError,
+    refetch: refetchShifts,
+  } = useQuery({
     queryKey: ["cp-today-shifts", user?.id, today],
     enabled: !!user,
     queryFn: async () => {
@@ -242,7 +302,8 @@ function CaregiverChecklist() {
   });
 
   const active = recipientId || shifts?.[0]?.care_recipient_id || "";
-  const { data: items } = useItems(active, true);
+  const { data: items, isPending: itemsPending, error: itemsError, refetch: refetchItems } =
+    useItems(active, true);
 
   const { data: visit } = useQuery({
     queryKey: ["cp-visit", active, user?.id],
@@ -280,7 +341,12 @@ function CaregiverChecklist() {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cp-visit"] }),
+    onSuccess: () => {
+      toast.success("Visit started");
+      qc.invalidateQueries({ queryKey: ["cp-visit"] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't start the visit — try again."),
   });
 
   const endVisit = useMutation({
@@ -291,7 +357,12 @@ function CaregiverChecklist() {
         .eq("id", visit!.id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cp-visit"] }),
+    onSuccess: () => {
+      toast.success("Visit ended");
+      qc.invalidateQueries({ queryKey: ["cp-visit"] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't end the visit — try again."),
   });
 
   const toggle = useMutation({
@@ -310,6 +381,8 @@ function CaregiverChecklist() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["cp-completions"] }),
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't save that check — try again."),
   });
 
   const completionFor = (itemId: string) =>
@@ -324,13 +397,21 @@ function CaregiverChecklist() {
         <h1 className="mt-1 font-display text-4xl">Care checklist</h1>
       </header>
 
-      {(shifts ?? []).length === 0 ? (
-        <p className="card-soft p-6 text-sm text-muted-foreground">No shifts scheduled for you today.</p>
-      ) : (
+      {shiftsPending && <LoadingState label="Loading today's visits…" />}
+      {shiftsError && (
+        <ErrorState what="today's visits" error={shiftsError} onRetry={() => refetchShifts()} />
+      )}
+      {!shiftsPending && !shiftsError && (shifts ?? []).length === 0 ? (
+        <EmptyState
+          title="No visits scheduled for you today"
+          hint="When the care team assigns you a shift for today, the checklist for that person will appear here."
+        />
+      ) : (shifts ?? []).length > 0 ? (
         <select
+          aria-label="Today's visit"
           value={active}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="mb-6 w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
         >
           {(shifts ?? []).map((s) => (
             <option key={s.id} value={s.care_recipient_id}>
@@ -339,12 +420,13 @@ function CaregiverChecklist() {
             </option>
           ))}
         </select>
-      )}
+      ) : null}
 
       {active && !visit && (
         <button
           onClick={() => startVisit.mutate()}
-          className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+          disabled={startVisit.isPending}
+          className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
         >
           Start visit to use the checklist
         </button>
@@ -357,10 +439,17 @@ function CaregiverChecklist() {
             <span>{done}/{(items ?? []).length} checked</span>
           </div>
 
-          <div className="card-soft divide-y divide-border">
-            {(items ?? []).length === 0 && (
-              <p className="p-4 text-sm text-muted-foreground">No active checklist items for this care recipient.</p>
-            )}
+          {itemsPending && <LoadingState label="Loading the checklist…" />}
+          {itemsError && (
+            <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+          )}
+          {!itemsPending && !itemsError && (items ?? []).length === 0 && (
+            <EmptyState
+              title="No active checklist items"
+              hint="An admin can add tasks for this care recipient on the Care plan screen."
+            />
+          )}
+          <div className={`card-soft divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
             {(items ?? []).map((item) => {
               const c = completionFor(item.id);
               const checked = !!c?.completed;
@@ -368,16 +457,17 @@ function CaregiverChecklist() {
                 <div key={item.id} className="p-4">
                   <button
                     onClick={() => toggle.mutate({ itemId: item.id, completed: !checked })}
-                    className="flex w-full items-start gap-3 text-left"
+                    aria-pressed={checked}
+                    className="flex w-full min-h-10 items-start gap-3 py-1 text-left"
                   >
                     <span
-                      className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border ${
+                      className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border ${
                         checked ? "border-primary bg-primary text-primary-foreground" : "border-border"
                       }`}
                     >
-                      {checked && <Check className="h-3 w-3" />}
+                      {checked && <Check className="h-4 w-4" />}
                     </span>
-                    <span>
+                    <span className="min-w-0">
                       <span className={`block text-sm font-medium ${checked ? "line-through opacity-60" : ""}`}>
                         {item.task_description}
                       </span>
@@ -389,10 +479,11 @@ function CaregiverChecklist() {
                   <input
                     defaultValue={c?.notes ?? ""}
                     placeholder="Notes…"
+                    aria-label={`Notes for ${item.task_description}`}
                     onBlur={(e) =>
                       toggle.mutate({ itemId: item.id, completed: checked, notes: e.target.value || null })
                     }
-                    className="mt-3 w-full rounded-md border border-border bg-background px-3 py-2 text-xs"
+                    className="mt-3 min-h-10 w-full rounded-md border border-border bg-background px-3 text-xs"
                   />
                 </div>
               );
@@ -401,7 +492,8 @@ function CaregiverChecklist() {
 
           <button
             onClick={() => endVisit.mutate()}
-            className="mt-6 rounded-full border border-border px-5 py-2 text-sm"
+            disabled={endVisit.isPending}
+            className="mt-6 min-h-10 rounded-full border border-border px-5 text-sm disabled:opacity-50"
           >
             End visit
           </button>
@@ -414,29 +506,64 @@ function CaregiverChecklist() {
 /* ---------------- Family / read-only ---------------- */
 
 function FamilyCarePlan() {
-  const { data: recipients } = useRecipients();
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useRecipients();
   const [recipientId, setRecipientId] = useState("");
   const active = recipientId || recipients?.[0]?.id || "";
-  const { data: items } = useItems(active, true);
+  const { data: items, isPending: itemsPending, error: itemsError, refetch: refetchItems } =
+    useItems(active, true);
+  const activeName = (recipients ?? []).find((r) => r.id === active)?.full_name;
 
   return (
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="mt-1 font-display text-4xl">Checklist</h1>
+        <h1 className="mt-1 font-display text-3xl sm:text-4xl">
+          {activeName ? `${activeName}'s care plan` : "Your loved one's care plan"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          What the care team does during each visit.
+        </p>
       </header>
-      <select
-        value={active}
-        onChange={(e) => setRecipientId(e.target.value)}
-        className="mb-6 w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
-      >
-        {(recipients ?? []).length === 0 && <option value="">No care recipients</option>}
-        {(recipients ?? []).map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
-      </select>
-      <div className="card-soft divide-y divide-border">
-        {(items ?? []).length === 0 && (
-          <p className="p-4 text-sm text-muted-foreground">No checklist items yet.</p>
-        )}
+      {recipientsPending && <LoadingState label="Loading the care plan…" />}
+      {recipientsError && (
+        <ErrorState
+          what="the care plan"
+          error={recipientsError}
+          onRetry={() => refetchRecipients()}
+        />
+      )}
+      {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
+        <EmptyState
+          title="No care plan yet"
+          hint="Once the care team sets up your loved one's plan, the visit checklist will appear here."
+        />
+      )}
+      {(recipients ?? []).length > 1 && (
+        <select
+          aria-label="Choose a person"
+          value={active}
+          onChange={(e) => setRecipientId(e.target.value)}
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
+        >
+          {(recipients ?? []).map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
+        </select>
+      )}
+      {active && itemsPending && <LoadingState label="Loading the checklist…" />}
+      {itemsError && (
+        <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+      )}
+      {active && !itemsPending && !itemsError && (items ?? []).length === 0 && (
+        <EmptyState
+          title="No checklist items yet"
+          hint={`The care team hasn't added visit tasks${activeName ? ` for ${activeName}` : ""} yet.`}
+        />
+      )}
+      <div className={`card-soft divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
         {(items ?? []).map((i) => (
           <div key={i.id} className="p-4">
             <p className="text-sm font-medium">{i.task_description}</p>
