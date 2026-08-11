@@ -231,6 +231,42 @@ function WellbeingTrends() {
     },
   });
 
+  const isFamily = role === "family_member";
+  const shell = (children: React.ReactNode) => (
+    <div>
+      <header className="mb-8">
+        <p className="text-sm uppercase tracking-widest text-muted-foreground">Last 14 days</p>
+        <h1 className="mt-1 font-display text-3xl md:text-5xl">Wellbeing trends</h1>
+      </header>
+      {children}
+    </div>
+  );
+
+  if (recipientsPending) return shell(<LoadingState label="Loading wellbeing check-ins…" />);
+  if (recipientsError)
+    return shell(
+      <ErrorState
+        what="the wellbeing trends"
+        error={recipientsError}
+        onRetry={() => refetchRecipients()}
+      />,
+    );
+  if (list.length === 0)
+    return shell(
+      <EmptyState
+        title={isFamily ? "No one linked to your account yet" : "No care recipients yet"}
+        hint={
+          isFamily
+            ? "Once the care team links your loved one to your account, their daily check-ins will show up here."
+            : "Wellbeing trends appear once you're assigned to someone and caregivers start logging visits."
+        }
+      />,
+    );
+  if (visitsError)
+    return shell(
+      <ErrorState what="the wellbeing check-ins" error={visitsError} onRetry={() => refetchVisits()} />,
+    );
+
   // One entry per day (most recent visit of that day wins)
   const byDay = new Map<string, Entry>();
   for (const v of visits ?? []) {
