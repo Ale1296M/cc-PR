@@ -208,7 +208,11 @@ function LogVisit() {
       }
       setSaved(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not save this check-in.");
+      setError(
+        e instanceof Error
+          ? `Couldn't save this check-in — ${e.message}`
+          : "Couldn't save this check-in — try again.",
+      );
     } finally {
       setSaving(false);
     }
