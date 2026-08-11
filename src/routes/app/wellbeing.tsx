@@ -344,7 +344,7 @@ function WellbeingTrends() {
           <h2 className="font-display text-2xl">Day by day</h2>
           <DeltaBadge delta={delta} />
         </div>
-        <div className="mt-4 grid grid-cols-7 gap-2 sm:grid-cols-14">
+        <div className="mt-4 grid grid-cols-7 gap-2 sm:[grid-template-columns:repeat(14,minmax(0,1fr))]">
           {ribbon.map((d) => {
             const date = new Date(`${d.key}T00:00:00`);
             const active = activeDay?.key === d.key;
