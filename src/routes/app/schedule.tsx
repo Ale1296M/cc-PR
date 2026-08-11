@@ -201,14 +201,17 @@ function NewShiftDialog({ adminId, onClose }: { adminId: string; onClose: () => 
       if (error) throw error;
     },
     onSuccess: () => {
+      toast.success("Shift created");
       qc.invalidateQueries({ queryKey: ["shifts"] });
       onClose();
     },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't create the shift — try again."),
   });
 
   return (
     <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card p-6 shadow-xl">
         <h3 className="mb-4 font-display text-2xl">New shift</h3>
         <div className="space-y-3">
           <Select label="Care recipient" value={recipientId} onChange={setRecipientId}>
