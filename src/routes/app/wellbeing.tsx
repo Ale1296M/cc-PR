@@ -347,22 +347,31 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Last 14 days</p>
-        <h1 className="mt-1 font-display text-4xl md:text-5xl">Wellbeing trends</h1>
+        <h1 className="mt-1 font-display text-3xl md:text-5xl">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {list.length === 1 && activeName
+          {activeName
             ? `A descriptive summary of what caregivers recorded for ${activeName}.`
-            : "A descriptive summary of what caregivers recorded during recent check-ins."}
+            : isFamily
+              ? "A descriptive summary of what caregivers recorded for your loved one."
+              : "A descriptive summary of what caregivers recorded during recent check-ins."}
         </p>
       </header>
 
+      {visitsPending && (
+        <div className="mb-6">
+          <LoadingState label="Loading the last 14 days…" />
+        </div>
+      )}
+
       {list.length > 1 && (
         <select
+          aria-label="Choose a person"
           value={activeId}
           onChange={(e) => {
             setRecipientId(e.target.value);
             setSelectedDay(null);
           }}
-          className="mb-6 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
         >
           {list.map((r) => (
             <option key={r.id} value={r.id}>
@@ -401,7 +410,8 @@ function WellbeingTrends() {
                 type="button"
                 onClick={() => setSelectedDay(d.key)}
                 title={`${date.toLocaleDateString([], { month: "short", day: "numeric" })} · ${BAND_LABEL[d.band]}`}
-                className={`flex flex-col items-center gap-1 rounded-lg p-1 transition ${
+                aria-label={`${date.toLocaleDateString([], { month: "short", day: "numeric" })}: ${BAND_LABEL[d.band]}`}
+                className={`flex min-h-[3.25rem] min-w-0 flex-col items-center gap-1 rounded-lg p-1 transition ${
                   active ? "ring-2 ring-primary" : "hover:opacity-80"
                 }`}
               >
