@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Check, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/care-plan")({
   component: CarePlanPage,
@@ -58,7 +60,7 @@ function useItems(recipientId: string, onlyActive: boolean) {
 
 function CarePlanPage() {
   const { role, loading } = useAuth();
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
+  if (loading) return <LoadingState label="Loading your care plan…" />;
   if (role === "admin") return <AdminCarePlan />;
   if (role === "caregiver") return <CaregiverChecklist />;
   return <FamilyCarePlan />;
@@ -69,10 +71,16 @@ function CarePlanPage() {
 function AdminCarePlan() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const { data: recipients } = useRecipients();
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useRecipients();
   const [recipientId, setRecipientId] = useState("");
   const active = recipientId || recipients?.[0]?.id || "";
-  const { data: items } = useItems(active, false);
+  const { data: items, isPending: itemsPending, error: itemsError, refetch: refetchItems } =
+    useItems(active, false);
 
   const [task, setTask] = useState("");
   const [category, setCategory] = useState("");
@@ -91,7 +99,14 @@ function AdminCarePlan() {
       });
       if (error) throw error;
     },
-    onSuccess: () => { setTask(""); setCategory(""); invalidate(); },
+    onSuccess: () => {
+      setTask("");
+      setCategory("");
+      toast.success("Checklist item added");
+      invalidate();
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't add the item — try again."),
   });
 
   const update = useMutation({
@@ -102,7 +117,12 @@ function AdminCarePlan() {
       const { error } = await supabase.from("care_plan_items").update(p.fields).eq("id", p.id);
       if (error) throw error;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      toast.success("Checklist updated");
+      invalidate();
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't save that change — try again."),
   });
 
   const remove = useMutation({
@@ -110,7 +130,12 @@ function AdminCarePlan() {
       const { error } = await supabase.from("care_plan_items").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      toast.success("Checklist item removed");
+      invalidate();
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't remove the item — try again."),
   });
 
   return (
@@ -120,21 +145,46 @@ function AdminCarePlan() {
         <h1 className="mt-1 font-display text-4xl">Checklist builder</h1>
       </header>
 
+      {recipientsError && (
+        <ErrorState
+          what="the care recipients"
+          error={recipientsError}
+          onRetry={() => refetchRecipients()}
+        />
+      )}
+      {recipientsPending && <LoadingState label="Loading care recipients…" />}
+      {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
+        <EmptyState
+          title="No care recipients yet"
+          hint="Add a care recipient on the Care recipients screen, then build their checklist here."
+        />
+      )}
+      {(recipients ?? []).length > 0 && (
+      <>
       <select
+        aria-label="Care recipient"
         value={active}
         onChange={(e) => setRecipientId(e.target.value)}
-        className="mb-6 w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
+        className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
       >
-        {(recipients ?? []).length === 0 && <option value="">No care recipients yet</option>}
         {(recipients ?? []).map((r) => (
           <option key={r.id} value={r.id}>{r.full_name}{r.city ? ` · ${r.city}` : ""}</option>
         ))}
       </select>
 
-      <div className="card-soft mb-6 divide-y divide-border">
-        {(items ?? []).length === 0 && (
-          <p className="p-4 text-sm text-muted-foreground">No checklist items yet.</p>
-        )}
+      {itemsPending && <LoadingState label="Loading checklist items…" />}
+      {itemsError && (
+        <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+      )}
+      {!itemsPending && !itemsError && (items ?? []).length === 0 && (
+        <div className="mb-6">
+          <EmptyState
+            title="No checklist items yet"
+            hint="Add the first task below — for example “Morning medication” — and it will appear on the caregiver's visit checklist."
+          />
+        </div>
+      )}
+      <div className={`card-soft mb-6 divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
         {(items ?? []).map((item) => (
           <div key={item.id} className="flex flex-wrap items-center gap-3 p-4">
             <div className="min-w-0 flex-1">
