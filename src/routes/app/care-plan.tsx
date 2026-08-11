@@ -439,10 +439,17 @@ function CaregiverChecklist() {
             <span>{done}/{(items ?? []).length} checked</span>
           </div>
 
-          <div className="card-soft divide-y divide-border">
-            {(items ?? []).length === 0 && (
-              <p className="p-4 text-sm text-muted-foreground">No active checklist items for this care recipient.</p>
-            )}
+          {itemsPending && <LoadingState label="Loading the checklist…" />}
+          {itemsError && (
+            <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+          )}
+          {!itemsPending && !itemsError && (items ?? []).length === 0 && (
+            <EmptyState
+              title="No active checklist items"
+              hint="An admin can add tasks for this care recipient on the Care plan screen."
+            />
+          )}
+          <div className={`card-soft divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
             {(items ?? []).map((item) => {
               const c = completionFor(item.id);
               const checked = !!c?.completed;
@@ -450,16 +457,17 @@ function CaregiverChecklist() {
                 <div key={item.id} className="p-4">
                   <button
                     onClick={() => toggle.mutate({ itemId: item.id, completed: !checked })}
-                    className="flex w-full items-start gap-3 text-left"
+                    aria-pressed={checked}
+                    className="flex w-full min-h-10 items-start gap-3 py-1 text-left"
                   >
                     <span
-                      className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border ${
+                      className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border ${
                         checked ? "border-primary bg-primary text-primary-foreground" : "border-border"
                       }`}
                     >
-                      {checked && <Check className="h-3 w-3" />}
+                      {checked && <Check className="h-4 w-4" />}
                     </span>
-                    <span>
+                    <span className="min-w-0">
                       <span className={`block text-sm font-medium ${checked ? "line-through opacity-60" : ""}`}>
                         {item.task_description}
                       </span>
@@ -471,10 +479,11 @@ function CaregiverChecklist() {
                   <input
                     defaultValue={c?.notes ?? ""}
                     placeholder="Notes…"
+                    aria-label={`Notes for ${item.task_description}`}
                     onBlur={(e) =>
                       toggle.mutate({ itemId: item.id, completed: checked, notes: e.target.value || null })
                     }
-                    className="mt-3 w-full rounded-md border border-border bg-background px-3 py-2 text-xs"
+                    className="mt-3 min-h-10 w-full rounded-md border border-border bg-background px-3 text-xs"
                   />
                 </div>
               );
@@ -483,7 +492,8 @@ function CaregiverChecklist() {
 
           <button
             onClick={() => endVisit.mutate()}
-            className="mt-6 rounded-full border border-border px-5 py-2 text-sm"
+            disabled={endVisit.isPending}
+            className="mt-6 min-h-10 rounded-full border border-border px-5 text-sm disabled:opacity-50"
           >
             End visit
           </button>
@@ -496,29 +506,64 @@ function CaregiverChecklist() {
 /* ---------------- Family / read-only ---------------- */
 
 function FamilyCarePlan() {
-  const { data: recipients } = useRecipients();
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useRecipients();
   const [recipientId, setRecipientId] = useState("");
   const active = recipientId || recipients?.[0]?.id || "";
-  const { data: items } = useItems(active, true);
+  const { data: items, isPending: itemsPending, error: itemsError, refetch: refetchItems } =
+    useItems(active, true);
+  const activeName = (recipients ?? []).find((r) => r.id === active)?.full_name;
 
   return (
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="mt-1 font-display text-4xl">Checklist</h1>
+        <h1 className="mt-1 font-display text-3xl sm:text-4xl">
+          {activeName ? `${activeName}'s care plan` : "Your loved one's care plan"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          What the care team does during each visit.
+        </p>
       </header>
-      <select
-        value={active}
-        onChange={(e) => setRecipientId(e.target.value)}
-        className="mb-6 w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm"
-      >
-        {(recipients ?? []).length === 0 && <option value="">No care recipients</option>}
-        {(recipients ?? []).map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
-      </select>
-      <div className="card-soft divide-y divide-border">
-        {(items ?? []).length === 0 && (
-          <p className="p-4 text-sm text-muted-foreground">No checklist items yet.</p>
-        )}
+      {recipientsPending && <LoadingState label="Loading the care plan…" />}
+      {recipientsError && (
+        <ErrorState
+          what="the care plan"
+          error={recipientsError}
+          onRetry={() => refetchRecipients()}
+        />
+      )}
+      {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
+        <EmptyState
+          title="No care plan yet"
+          hint="Once the care team sets up your loved one's plan, the visit checklist will appear here."
+        />
+      )}
+      {(recipients ?? []).length > 1 && (
+        <select
+          aria-label="Choose a person"
+          value={active}
+          onChange={(e) => setRecipientId(e.target.value)}
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
+        >
+          {(recipients ?? []).map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
+        </select>
+      )}
+      {active && itemsPending && <LoadingState label="Loading the checklist…" />}
+      {itemsError && (
+        <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+      )}
+      {active && !itemsPending && !itemsError && (items ?? []).length === 0 && (
+        <EmptyState
+          title="No checklist items yet"
+          hint={`The care team hasn't added visit tasks${activeName ? ` for ${activeName}` : ""} yet.`}
+        />
+      )}
+      <div className={`card-soft divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
         {(items ?? []).map((i) => (
           <div key={i.id} className="p-4">
             <p className="text-sm font-medium">{i.task_description}</p>
