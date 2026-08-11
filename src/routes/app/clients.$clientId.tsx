@@ -173,7 +173,12 @@ function ClockInBar({ careRecipientId }: { careRecipientId: string }) {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["active-visit", careRecipientId, user?.id] }),
+    onSuccess: () => {
+      toast.success("Clocked in");
+      qc.invalidateQueries({ queryKey: ["active-visit", careRecipientId, user?.id] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't clock in — try again."),
   });
 
   const clockOut = useMutation({
@@ -185,10 +190,13 @@ function ClockInBar({ careRecipientId }: { careRecipientId: string }) {
       if (error) throw error;
     },
     onSuccess: () => {
+      toast.success("Visit saved");
       setNotes(""); setMood("");
       qc.invalidateQueries({ queryKey: ["active-visit", careRecipientId, user?.id] });
       qc.invalidateQueries({ queryKey: ["visits", careRecipientId] });
     },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't save the visit — try again."),
   });
 
   return (
@@ -197,9 +205,10 @@ function ClockInBar({ careRecipientId }: { careRecipientId: string }) {
       {!active ? (
         <button
           onClick={() => clockIn.mutate()}
-          className="mt-3 rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+          disabled={clockIn.isPending}
+          className="mt-3 min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
         >
-          Clock in now
+          {clockIn.isPending ? "Clocking in…" : "Clock in now"}
         </button>
       ) : (
         <div className="mt-3 space-y-3">
@@ -209,7 +218,8 @@ function ClockInBar({ careRecipientId }: { careRecipientId: string }) {
           <select
             value={mood}
             onChange={(e) => setMood(e.target.value)}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            aria-label="Mood"
+            className="min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
           >
             <option value="">Mood…</option>
             {["Great", "Okay", "Tired", "Unwell", "Concern", "Cheerful"].map((m) => <option key={m}>{m}</option>)}
@@ -223,9 +233,10 @@ function ClockInBar({ careRecipientId }: { careRecipientId: string }) {
           />
           <button
             onClick={() => clockOut.mutate()}
-            className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground"
+            disabled={clockOut.isPending}
+            className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
           >
-            Clock out & save
+            {clockOut.isPending ? "Saving…" : "Clock out & save"}
           </button>
         </div>
       )}
