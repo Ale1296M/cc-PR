@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { toast } from "sonner";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/app/messages")({
   component: MessagesPage,
@@ -36,14 +38,20 @@ function MessagesPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Families reachable to this user (admins: all, family: own, caregivers: assigned)
-  const { data: recipients } = useQuery({
+  const {
+    data: recipients,
+    isPending: recipientsPending,
+    error: recipientsError,
+    refetch: refetchRecipients,
+  } = useQuery({
     queryKey: ["chat-recipients", uid],
     enabled: !!uid,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("care_recipients")
         .select("id, full_name, family_id")
         .order("full_name");
+      if (error) throw error;
       return data ?? [];
     },
   });
@@ -60,15 +68,21 @@ function MessagesPage() {
     if (!familyId && families.length) setFamilyId(families[0].id);
   }, [familyId, families]);
 
-  const { data: messages } = useQuery({
+  const {
+    data: messages,
+    isPending: messagesPending,
+    error: messagesError,
+    refetch: refetchMessages,
+  } = useQuery({
     queryKey: ["family-messages", familyId],
     enabled: !!familyId,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("family_messages")
         .select("id, family_id, sender_profile_id, content, created_at, read_at")
         .eq("family_id", familyId!)
         .order("created_at");
+      if (error) throw error;
       return (data ?? []) as Msg[];
     },
   });
@@ -124,18 +138,32 @@ function MessagesPage() {
       setBody("");
       qc.invalidateQueries({ queryKey: ["family-messages", familyId] });
     },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't send that message — try again."),
   });
 
   return (
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Messages</p>
-        <h1 className="mt-1 font-display text-4xl">Family chat</h1>
+        <h1 className="mt-1 font-display text-3xl sm:text-4xl">Family chat</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           One thread per family — shared by the family, their caregivers, and the care team.
         </p>
       </header>
 
+      {recipientsPending && <LoadingState label="Loading your conversations…" />}
+      {recipientsError && (
+        <ErrorState what="your conversations" error={recipientsError} onRetry={() => refetchRecipients()} />
+      )}
+      {!recipientsPending && !recipientsError && families.length === 0 && (
+        <EmptyState
+          title="No conversations yet"
+          hint="A thread appears here as soon as a family and their care recipient are set up."
+        />
+      )}
+
+      {families.length > 0 && (
       <div className="card-soft grid min-h-[60vh] overflow-hidden md:grid-cols-[240px_1fr]">
         <aside className="border-b border-border md:border-b-0 md:border-r">
           <ul>
@@ -143,7 +171,7 @@ function MessagesPage() {
               <li key={f.id}>
                 <button
                   onClick={() => setFamilyId(f.id)}
-                  className={`w-full px-4 py-3 text-left text-sm hover:bg-secondary ${
+                  className={`min-h-11 w-full px-4 py-3 text-left text-sm hover:bg-secondary ${
                     familyId === f.id ? "bg-secondary font-medium" : ""
                   }`}
                 >
@@ -151,14 +179,17 @@ function MessagesPage() {
                 </button>
               </li>
             ))}
-            {families.length === 0 && (
-              <li className="px-4 py-3 text-sm text-muted-foreground">No families available yet.</li>
-            )}
           </ul>
         </aside>
 
         <section className="flex min-h-[50vh] flex-col">
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            {familyId && messagesPending && (
+              <p className="text-sm text-muted-foreground">Loading messages…</p>
+            )}
+            {messagesError && (
+              <ErrorState what="these messages" error={messagesError} onRetry={() => refetchMessages()} />
+            )}
             {(messages ?? []).map((m) => {
               const mine = m.sender_profile_id === uid;
               return (
@@ -179,8 +210,10 @@ function MessagesPage() {
                 </div>
               );
             })}
-            {familyId && (messages ?? []).length === 0 && (
-              <p className="text-sm text-muted-foreground">No messages yet — say hello.</p>
+            {familyId && !messagesPending && !messagesError && (messages ?? []).length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No messages yet — send the first one to start the conversation.
+              </p>
             )}
             <div ref={bottomRef} />
           </div>
@@ -198,13 +231,19 @@ function MessagesPage() {
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Type a message…"
                 aria-label="Message"
-                className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm"
+                className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm"
               />
-              <button className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">Send</button>
+              <button
+                disabled={send.isPending || !body.trim()}
+                className="min-h-11 shrink-0 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
+              >
+                {send.isPending ? "Sending…" : "Send"}
+              </button>
             </form>
           )}
         </section>
       </div>
+      )}
     </div>
   );
 }
