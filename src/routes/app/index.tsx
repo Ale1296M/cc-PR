@@ -51,7 +51,7 @@ function Dashboard() {
   });
 
   const { data: clientCount } = useQuery({
-    queryKey: ["dash-clients", role, caregiverId],
+    queryKey: ["dash-recipients", role, caregiverId],
     enabled: role !== "caregiver" || caregiverId !== undefined,
     queryFn: async () => {
       if (role === "caregiver") {
@@ -99,7 +99,7 @@ function Dashboard() {
 
       <section className="grid gap-4 sm:grid-cols-3">
         <Stat label="Today's visits" value={todayShifts.length} />
-        <Stat label="Active clients" value={clientCount ?? 0} />
+        <Stat label="Active care recipients" value={clientCount ?? 0} />
         <Stat label="Unread messages" value={unread ?? 0} accent />
       </section>
 

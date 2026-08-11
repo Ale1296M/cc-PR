@@ -19,7 +19,7 @@
       {
         "name": "list_care_recipients",
         "title": "List care recipients",
-        "description": "List the care recipients (clients) the signed-in user can access.",
+        "description": "List the care recipients the signed-in user can access.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -108,7 +108,7 @@
           "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
           "properties": {
-            "client_id": {
+            "care_recipient_id": {
               "description": "Only visits for this care recipient.",
               "type": "string",
               "format": "uuid",
