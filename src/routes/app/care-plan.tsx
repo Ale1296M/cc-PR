@@ -239,28 +239,33 @@ function AdminCarePlan() {
           value={task}
           onChange={(e) => setTask(e.target.value)}
           placeholder="Task description…"
-          className="min-w-[12rem] flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          aria-label="Task description"
+          className="min-h-10 min-w-[12rem] flex-1 rounded-md border border-border bg-background px-3 text-sm"
         />
         <input
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           placeholder="Category"
-          className="w-40 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          aria-label="Category"
+          className="min-h-10 w-40 rounded-md border border-border bg-background px-3 text-sm"
         />
         <select
           value={frequency}
           onChange={(e) => setFrequency(e.target.value)}
-          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+          aria-label="Frequency"
+          className="min-h-10 rounded-md border border-border bg-background px-3 text-sm"
         >
           {FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
         </select>
         <button
           disabled={!task || !active || add.isPending}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+          className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
         >
-          <Plus className="h-4 w-4" /> Add item
+          <Plus className="h-4 w-4" /> {add.isPending ? "Adding…" : "Add item"}
         </button>
       </form>
+      </>
+      )}
     </div>
   );
 }
