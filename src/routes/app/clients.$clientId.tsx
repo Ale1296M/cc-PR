@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { toast } from "sonner";
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
 export const Route = createFileRoute("/app/clients/$clientId")({
   component: () => (
@@ -17,7 +19,12 @@ export const Route = createFileRoute("/app/clients/$clientId")({
 function CareRecipientDetail() {
   const { clientId: recipientId } = Route.useParams();
   const { role } = useAuth();
-  const { data: recipient } = useQuery({
+  const {
+    data: recipient,
+    isPending,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["care-recipient", recipientId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -30,20 +37,44 @@ function CareRecipientDetail() {
     },
   });
 
-  const { data: visits } = useQuery({
+  const {
+    data: visits,
+    isPending: visitsPending,
+    error: visitsError,
+    refetch: refetchVisits,
+  } = useQuery({
     queryKey: ["visits", recipientId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error: e } = await supabase
         .from("visit_logs")
         .select("id, clock_in, clock_out, notes, mood, caregiver_id, profiles:caregiver_id(full_name)")
         .eq("care_recipient_id", recipientId)
         .order("clock_in", { ascending: false })
         .limit(10);
+      if (e) throw e;
       return data ?? [];
     },
   });
 
-  if (!recipient) return <p className="text-muted-foreground">Loading…</p>;
+  const back = (
+    <Link to="/app/clients" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+      <ArrowLeft className="h-4 w-4" /> All care recipients
+    </Link>
+  );
+
+  if (isPending) return <div>{back}<LoadingState label="Loading this care recipient…" /></div>;
+  if (error)
+    return <div>{back}<ErrorState what="this care recipient" error={error} onRetry={() => refetch()} /></div>;
+  if (!recipient)
+    return (
+      <div>
+        {back}
+        <EmptyState
+          title="Care recipient not found"
+          hint="They may have been removed. Head back to the roster to pick someone else."
+        />
+      </div>
+    );
 
   const address = [recipient.address_line, recipient.municipality ?? recipient.city, recipient.zip_code]
     .filter(Boolean)
@@ -51,13 +82,11 @@ function CareRecipientDetail() {
 
   return (
     <div>
-      <Link to="/app/clients" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> All care recipients
-      </Link>
+      {back}
 
       <header className="card-soft mb-8 p-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipient</p>
-        <h1 className="mt-1 font-display text-4xl">{recipient.full_name}</h1>
+        <h1 className="mt-1 font-display text-3xl sm:text-4xl">{recipient.full_name}</h1>
         <div className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
           {address && <p>📍 {address}</p>}
           {recipient.date_of_birth && <p>🎂 {new Date(recipient.date_of_birth).toLocaleDateString()}</p>}
@@ -81,10 +110,17 @@ function CareRecipientDetail() {
 
       <section>
         <h2 className="mb-3 font-display text-2xl">Recent visits</h2>
-        <div className="card-soft divide-y divide-border">
-          {(visits ?? []).length === 0 && (
-            <p className="p-4 text-sm text-muted-foreground">No visits logged yet.</p>
-          )}
+        {visitsPending && <LoadingState label="Loading recent visits…" />}
+        {visitsError && (
+          <ErrorState what="recent visits" error={visitsError} onRetry={() => refetchVisits()} />
+        )}
+        {!visitsPending && !visitsError && (visits ?? []).length === 0 && (
+          <EmptyState
+            title="No visits logged yet"
+            hint="Visits appear here once a caregiver clocks in and out for this person."
+          />
+        )}
+        <div className={`card-soft divide-y divide-border ${(visits ?? []).length === 0 ? "hidden" : ""}`}>
           {(visits ?? []).map((v) => (
             <div key={v.id} className="p-4">
               <div className="flex items-center justify-between text-sm">
