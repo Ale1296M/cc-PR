@@ -1,3 +1,4 @@
+import { RoleGate } from "@/lib/role-gate";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,7 +8,11 @@ import { useAuth } from "@/lib/use-auth";
 import { listUsers, setUserRole, type AppRole } from "@/lib/users.functions";
 
 export const Route = createFileRoute("/app/users")({
-  component: UsersPage,
+  component: () => (
+    <RoleGate allow={["admin"]}>
+      <UsersPage />
+    </RoleGate>
+  ),
   head: () => ({
     meta: [
       { title: "Users & roles · Kindred" },

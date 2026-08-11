@@ -31,3 +31,8 @@ export function useRoleGate(allowed: AppRole[]) {
   }
   return null;
 }
+
+export function RoleGate({ allow, children }: { allow: AppRole[]; children: React.ReactNode }) {
+  const gate = useRoleGate(allow);
+  return <>{gate ?? children}</>;
+}
