@@ -31,7 +31,7 @@ const NAV_BY_ROLE: Record<AppRole, NavItem[]> = {
     { to: "/app", label: "Home", icon: Home },
     { to: "/app/schedule", label: "Schedule", icon: CalendarDays },
     { to: "/app/care-plan", label: "Care plan", icon: ClipboardList },
-    { to: "/wellbeing", label: "Log visit", icon: NotebookPen },
+    { to: "/app/visit", label: "Log visit", icon: NotebookPen },
     { to: "/app/messages", label: "Messages", icon: MessageCircle },
   ],
   family_member: [
