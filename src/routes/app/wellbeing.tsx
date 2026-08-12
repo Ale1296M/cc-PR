@@ -495,6 +495,22 @@ function WellbeingTrends() {
           </p>
         ) : (
           <>
+            {(() => {
+              const v = activeDay ? visitByDay.get(activeDay.key) : null;
+              if (!v) return null;
+              return (
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                  <span>
+                    Arrived{" "}
+                    {new Date(v.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
+                    {v.clock_out
+                      ? ` · left ${new Date(v.clock_out).toLocaleTimeString([], { timeStyle: "short" })} · ${formatDuration(v.clock_in, v.clock_out)}`
+                      : " · visit in progress"}
+                  </span>
+                  <VerifiedBadge verified={v.location_verified} />
+                </div>
+              );
+            })()}
             <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <Detail label="Mood" value={moodLabel(activeDay.entry.mood_scale)} />
               <Detail label="Appetite" value={capitalise(activeDay.entry.food_appetite)} />
