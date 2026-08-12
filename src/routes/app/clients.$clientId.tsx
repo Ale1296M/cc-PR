@@ -112,6 +112,8 @@ function CareRecipientDetail() {
         </p>
       </section>
 
+      {role === "admin" && <HomeLocationCard recipient={recipient} />}
+
       <section>
         <h2 className="mb-3 font-display text-2xl">Recent visits</h2>
         {visitsPending && <LoadingState label="Loading recent visits…" />}
@@ -165,6 +167,127 @@ function CareRecipientDetail() {
         )}
       </section>
     </div>
+  );
+}
+
+function HomeLocationCard({
+  recipient,
+}: {
+  recipient: { id: string; home_lat: number | null; home_lng: number | null; geofence_radius_m: number | null };
+}) {
+  const qc = useQueryClient();
+  const [lat, setLat] = useState(recipient.home_lat?.toString() ?? "");
+  const [lng, setLng] = useState(recipient.home_lng?.toString() ?? "");
+  const [radius, setRadius] = useState((recipient.geofence_radius_m ?? 150).toString());
+  const [locating, setLocating] = useState(false);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const latN = Number(lat);
+      const lngN = Number(lng);
+      const radN = Number(radius);
+      if (!Number.isFinite(latN) || latN < -90 || latN > 90) throw new Error("Latitude must be between -90 and 90.");
+      if (!Number.isFinite(lngN) || lngN < -180 || lngN > 180) throw new Error("Longitude must be between -180 and 180.");
+      if (!Number.isFinite(radN) || radN < 25 || radN > 2000) throw new Error("Radius must be between 25 and 2000 metres.");
+      const { error } = await supabase
+        .from("care_recipients")
+        .update({ home_lat: latN, home_lng: lngN, geofence_radius_m: Math.round(radN) })
+        .eq("id", recipient.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Home location saved");
+      qc.invalidateQueries({ queryKey: ["care-recipient", recipient.id] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't save the home location — try again."),
+  });
+
+  async function useMyLocation() {
+    setLocating(true);
+    const pos = await capturePosition().finally(() => setLocating(false));
+    if (!pos) {
+      toast.error("Couldn't read your location — enter the coordinates manually.");
+      return;
+    }
+    setLat(pos.lat.toFixed(6));
+    setLng(pos.lng.toFixed(6));
+  }
+
+  const mapsUrl =
+    recipient.home_lat != null && recipient.home_lng != null
+      ? `https://www.google.com/maps?q=${recipient.home_lat},${recipient.home_lng}`
+      : null;
+
+  return (
+    <section className="mb-10">
+      <h2 className="mb-3 font-display text-2xl">Home location</h2>
+      <div className="card-soft space-y-4 p-5">
+        <p className="text-sm text-muted-foreground">
+          Used to mark caregiver clock-ins as verified visits. Stand at the home and tap
+          &ldquo;Use my current location&rdquo;, or paste coordinates from a map.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="text-sm">
+            Latitude
+            <input
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
+              inputMode="decimal"
+              placeholder="18.4655"
+              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            />
+          </label>
+          <label className="text-sm">
+            Longitude
+            <input
+              value={lng}
+              onChange={(e) => setLng(e.target.value)}
+              inputMode="decimal"
+              placeholder="-66.1057"
+              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            />
+          </label>
+          <label className="text-sm">
+            Radius (m)
+            <input
+              value={radius}
+              onChange={(e) => setRadius(e.target.value)}
+              inputMode="numeric"
+              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            />
+          </label>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => save.mutate()}
+            disabled={save.isPending}
+            className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+          >
+            {save.isPending ? "Saving…" : "Save home location"}
+          </button>
+          <button
+            type="button"
+            onClick={useMyLocation}
+            disabled={locating}
+            className="min-h-10 rounded-full border border-border px-5 text-sm hover:bg-secondary/50 disabled:opacity-50"
+          >
+            {locating ? "Reading location…" : "Use my current location"}
+          </button>
+          {mapsUrl && (
+            <a href={mapsUrl} target="_blank" rel="noreferrer" className="text-sm text-primary underline">
+              View on map
+            </a>
+          )}
+        </div>
+        {recipient.home_lat == null && (
+          <p className="text-xs text-muted-foreground">
+            No home location set yet — visits for this person can&apos;t be location-verified.
+          </p>
+        )}
+      </div>
+    </section>
   );
 }
 

@@ -20,6 +20,7 @@ import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
 import { Route as AppUsersRouteImport } from './routes/app/users'
 import { Route as AppScheduleRouteImport } from './routes/app/schedule'
 import { Route as AppMessagesRouteImport } from './routes/app/messages'
+import { Route as AppExceptionsRouteImport } from './routes/app/exceptions'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
 import { Route as AppCarePlanRouteImport } from './routes/app/care-plan'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -83,6 +84,11 @@ const AppMessagesRoute = AppMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AppRoute,
 } as any)
+const AppExceptionsRoute = AppExceptionsRouteImport.update({
+  id: '/exceptions',
+  path: '/exceptions',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppClientsRoute = AppClientsRouteImport.update({
   id: '/clients',
   path: '/clients',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/exceptions': typeof AppExceptionsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/users': typeof AppUsersRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/exceptions': typeof AppExceptionsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/users': typeof AppUsersRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/exceptions': typeof AppExceptionsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/users': typeof AppUsersRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/app/care-plan'
     | '/app/clients'
+    | '/app/exceptions'
     | '/app/messages'
     | '/app/schedule'
     | '/app/users'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/app/care-plan'
     | '/app/clients'
+    | '/app/exceptions'
     | '/app/messages'
     | '/app/schedule'
     | '/app/users'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/app/care-plan'
     | '/app/clients'
+    | '/app/exceptions'
     | '/app/messages'
     | '/app/schedule'
     | '/app/users'
@@ -336,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMessagesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/exceptions': {
+      id: '/app/exceptions'
+      path: '/exceptions'
+      fullPath: '/app/exceptions'
+      preLoaderRoute: typeof AppExceptionsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/clients': {
       id: '/app/clients'
       path: '/clients'
@@ -403,6 +422,7 @@ const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
 interface AppRouteChildren {
   AppCarePlanRoute: typeof AppCarePlanRoute
   AppClientsRoute: typeof AppClientsRouteWithChildren
+  AppExceptionsRoute: typeof AppExceptionsRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppScheduleRoute: typeof AppScheduleRoute
   AppUsersRoute: typeof AppUsersRoute
@@ -413,6 +433,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCarePlanRoute: AppCarePlanRoute,
   AppClientsRoute: AppClientsRouteWithChildren,
+  AppExceptionsRoute: AppExceptionsRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppScheduleRoute: AppScheduleRoute,
   AppUsersRoute: AppUsersRoute,
