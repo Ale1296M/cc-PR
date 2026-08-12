@@ -15,6 +15,8 @@ import { AlertTriangle, ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
+import { formatDuration } from "@/lib/geo";
 
 export const Route = createFileRoute("/app/wellbeing")({
   component: () => (
@@ -54,7 +56,13 @@ type Entry = {
   hygiene_grooming_completed: boolean | null;
 };
 
-type Visit = { id: string; clock_in: string; wellbeing_entries: Entry | Entry[] | null };
+type Visit = {
+  id: string;
+  clock_in: string;
+  clock_out: string | null;
+  location_verified: boolean | null;
+  wellbeing_entries: Entry | Entry[] | null;
+};
 
 const DAYS = 14;
 
@@ -207,7 +215,7 @@ function WellbeingTrends() {
       const { data, error } = await supabase
         .from("visit_logs")
         .select(
-          "id, clock_in, wellbeing_entries(mood_scale, mood_notes, food_appetite, medicine_taken, movement_assisted, movement_notes, hygiene_bathing_completed, hygiene_grooming_completed)",
+          "id, clock_in, clock_out, location_verified, wellbeing_entries(mood_scale, mood_notes, food_appetite, medicine_taken, movement_assisted, movement_notes, hygiene_bathing_completed, hygiene_grooming_completed)",
         )
         .eq("care_recipient_id", activeId)
         .gte("clock_in", since)
@@ -269,8 +277,10 @@ function WellbeingTrends() {
 
   // One entry per day (most recent visit of that day wins)
   const byDay = new Map<string, Entry>();
+  const visitByDay = new Map<string, Visit>();
   for (const v of visits ?? []) {
     const e = firstEntry(v);
+    visitByDay.set(dayKey(new Date(v.clock_in)), v);
     if (!e) continue;
     byDay.set(dayKey(new Date(v.clock_in)), e);
   }
