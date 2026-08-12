@@ -127,22 +127,42 @@ function CareRecipientDetail() {
         <div className={`card-soft divide-y divide-border ${(visits ?? []).length === 0 ? "hidden" : ""}`}>
           {(visits ?? []).map((v) => (
             <div key={v.id} className="p-4">
-              <div className="flex items-center justify-between text-sm">
-                <p className="font-medium">
-                  {new Date(v.clock_in).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
-                </p>
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-medium">
+                    {new Date(v.clock_in).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
+                    {v.clock_out
+                      ? ` – ${new Date(v.clock_out).toLocaleTimeString([], { timeStyle: "short" })}`
+                      : ""}
+                  </p>
+                  <VerifiedBadge verified={v.location_verified} />
+                </div>
                 {v.mood && <span className="rounded-full bg-gold/20 px-2 py-0.5 text-xs">{v.mood}</span>}
               </div>
               <p className="text-xs text-muted-foreground">
                 by {(v.profiles as unknown as { full_name: string } | null)?.full_name ?? "Caregiver"}
-                {v.clock_out ? ` · ${Math.round((+new Date(v.clock_out) - +new Date(v.clock_in)) / 60000)} min` : " · in progress"}
+                {v.clock_out ? ` · ${formatDuration(v.clock_in, v.clock_out)}` : " · in progress"}
               </p>
+              {v.location_verified === false && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {v.evv_exception === "missing_gps"
+                    ? "Location wasn’t shared for this visit."
+                    : "Recorded away from the home address."}
+                </p>
+              )}
               {v.notes && <p className="mt-2 text-sm">{v.notes}</p>}
             </div>
           ))}
         </div>
 
-        {role === "caregiver" && <ClockInBar careRecipientId={recipientId} />}
+        {role === "caregiver" && (
+          <ClockInBar
+            careRecipientId={recipientId}
+            homeLat={recipient.home_lat}
+            homeLng={recipient.home_lng}
+            radiusM={recipient.geofence_radius_m}
+          />
+        )}
       </section>
     </div>
   );
