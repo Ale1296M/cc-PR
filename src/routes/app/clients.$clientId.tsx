@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { toast } from "sonner";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { capturePosition, formatDuration } from "@/lib/geo";
+import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 
 export const Route = createFileRoute("/app/clients/$clientId")({
   component: () => (
@@ -47,7 +49,9 @@ function CareRecipientDetail() {
     queryFn: async () => {
       const { data, error: e } = await supabase
         .from("visit_logs")
-        .select("id, clock_in, clock_out, notes, mood, caregiver_id, profiles:caregiver_id(full_name)")
+        .select(
+          "id, clock_in, clock_out, notes, mood, caregiver_id, location_verified, evv_exception, profiles:caregiver_id(full_name)",
+        )
         .eq("care_recipient_id", recipientId)
         .order("clock_in", { ascending: false })
         .limit(10);
