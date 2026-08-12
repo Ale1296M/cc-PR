@@ -121,6 +121,9 @@ export type Database = {
           emergency_contact_relationship: string | null
           family_id: string
           full_name: string
+          geofence_radius_m: number | null
+          home_lat: number | null
+          home_lng: number | null
           id: string
           municipality: string | null
           notes: string | null
@@ -137,6 +140,9 @@ export type Database = {
           emergency_contact_relationship?: string | null
           family_id: string
           full_name: string
+          geofence_radius_m?: number | null
+          home_lat?: number | null
+          home_lng?: number | null
           id?: string
           municipality?: string | null
           notes?: string | null
@@ -153,6 +159,9 @@ export type Database = {
           emergency_contact_relationship?: string | null
           family_id?: string
           full_name?: string
+          geofence_radius_m?: number | null
+          home_lat?: number | null
+          home_lng?: number | null
           id?: string
           municipality?: string | null
           notes?: string | null
@@ -173,7 +182,6 @@ export type Database = {
         Row: {
           care_recipient_id: string
           caregiver_id: string | null
-          client_id: string | null
           created_at: string
           created_by_admin_id: string | null
           id: string
@@ -187,7 +195,6 @@ export type Database = {
         Insert: {
           care_recipient_id: string
           caregiver_id?: string | null
-          client_id?: string | null
           created_at?: string
           created_by_admin_id?: string | null
           id?: string
@@ -201,7 +208,6 @@ export type Database = {
         Update: {
           care_recipient_id?: string
           caregiver_id?: string | null
-          client_id?: string | null
           created_at?: string
           created_by_admin_id?: string | null
           id?: string
@@ -225,13 +231,6 @@ export type Database = {
             columns: ["caregiver_id"]
             isOneToOne: false
             referencedRelation: "caregivers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "care_shifts_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
           {
@@ -286,21 +285,21 @@ export type Database = {
       }
       client_family_members: {
         Row: {
-          client_id: string
+          care_recipient_id: string | null
           created_at: string
           id: string
           relationship: string | null
           user_id: string
         }
         Insert: {
-          client_id: string
+          care_recipient_id?: string | null
           created_at?: string
           id?: string
           relationship?: string | null
           user_id: string
         }
         Update: {
-          client_id?: string
+          care_recipient_id?: string | null
           created_at?: string
           id?: string
           relationship?: string | null
@@ -308,49 +307,13 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "client_family_members_client_id_fkey"
-            columns: ["client_id"]
+            foreignKeyName: "client_family_members_care_recipient_id_fkey"
+            columns: ["care_recipient_id"]
             isOneToOne: false
-            referencedRelation: "clients"
+            referencedRelation: "care_recipients"
             referencedColumns: ["id"]
           },
         ]
-      }
-      clients: {
-        Row: {
-          address: string | null
-          created_at: string
-          date_of_birth: string | null
-          full_name: string
-          id: string
-          notes: string | null
-          primary_contact_name: string | null
-          primary_contact_phone: string | null
-          updated_at: string
-        }
-        Insert: {
-          address?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          full_name: string
-          id?: string
-          notes?: string | null
-          primary_contact_name?: string | null
-          primary_contact_phone?: string | null
-          updated_at?: string
-        }
-        Update: {
-          address?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          full_name?: string
-          id?: string
-          notes?: string | null
-          primary_contact_name?: string | null
-          primary_contact_phone?: string | null
-          updated_at?: string
-        }
-        Relationships: []
       }
       families: {
         Row: {
@@ -445,7 +408,6 @@ export type Database = {
       messages: {
         Row: {
           body: string
-          client_id: string | null
           created_at: string
           id: string
           read_at: string | null
@@ -454,7 +416,6 @@ export type Database = {
         }
         Insert: {
           body: string
-          client_id?: string | null
           created_at?: string
           id?: string
           read_at?: string | null
@@ -463,22 +424,13 @@ export type Database = {
         }
         Update: {
           body?: string
-          client_id?: string | null
           created_at?: string
           id?: string
           read_at?: string | null
           recipient_id?: string
           sender_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "messages_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -562,11 +514,20 @@ export type Database = {
         Row: {
           care_recipient_id: string | null
           caregiver_id: string
-          client_id: string | null
           clock_in: string
+          clock_in_accuracy_m: number | null
+          clock_in_lat: number | null
+          clock_in_lng: number | null
+          clock_in_method: string | null
           clock_out: string | null
+          clock_out_accuracy_m: number | null
+          clock_out_lat: number | null
+          clock_out_lng: number | null
+          clock_out_method: string | null
           created_at: string
+          evv_exception: string | null
           id: string
+          location_verified: boolean | null
           mood: string | null
           notes: string | null
           shift_id: string | null
@@ -574,11 +535,20 @@ export type Database = {
         Insert: {
           care_recipient_id?: string | null
           caregiver_id: string
-          client_id?: string | null
           clock_in?: string
+          clock_in_accuracy_m?: number | null
+          clock_in_lat?: number | null
+          clock_in_lng?: number | null
+          clock_in_method?: string | null
           clock_out?: string | null
+          clock_out_accuracy_m?: number | null
+          clock_out_lat?: number | null
+          clock_out_lng?: number | null
+          clock_out_method?: string | null
           created_at?: string
+          evv_exception?: string | null
           id?: string
+          location_verified?: boolean | null
           mood?: string | null
           notes?: string | null
           shift_id?: string | null
@@ -586,11 +556,20 @@ export type Database = {
         Update: {
           care_recipient_id?: string | null
           caregiver_id?: string
-          client_id?: string | null
           clock_in?: string
+          clock_in_accuracy_m?: number | null
+          clock_in_lat?: number | null
+          clock_in_lng?: number | null
+          clock_in_method?: string | null
           clock_out?: string | null
+          clock_out_accuracy_m?: number | null
+          clock_out_lat?: number | null
+          clock_out_lng?: number | null
+          clock_out_method?: string | null
           created_at?: string
+          evv_exception?: string | null
           id?: string
+          location_verified?: boolean | null
           mood?: string | null
           notes?: string | null
           shift_id?: string | null
@@ -601,13 +580,6 @@ export type Database = {
             columns: ["care_recipient_id"]
             isOneToOne: false
             referencedRelation: "care_recipients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "visit_logs_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
           {
@@ -714,6 +686,10 @@ export type Database = {
       is_caregiver_self: {
         Args: { _caregiver_id: string; _uid: string }
         Returns: boolean
+      }
+      meters_between: {
+        Args: { a_lat: number; a_lng: number; b_lat: number; b_lng: number }
+        Returns: number
       }
       profiles_share_care_circle: {
         Args: { _target: string; _viewer: string }
