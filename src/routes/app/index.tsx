@@ -116,7 +116,7 @@ function Dashboard() {
       {(role === "caregiver" || role === "family_member" || role === "admin") && (
         <section className="mt-6">
           <Link
-            to="/wellbeing"
+            to={role === "family_member" ? "/app/wellbeing" : "/app/visit"}
             className="card-soft flex items-center justify-between p-5 transition hover:bg-secondary/40"
           >
             <div>

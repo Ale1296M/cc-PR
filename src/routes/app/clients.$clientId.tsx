@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 import { capturePosition, formatDuration } from "@/lib/geo";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
+import { clockInVisit, clockOutVisit } from "@/lib/visit-clock";
 
 export const Route = createFileRoute("/app/clients/$clientId")({
   component: () => (
@@ -308,18 +309,6 @@ function ClockInBar({
   const [mood, setMood] = useState("");
   const [locating, setLocating] = useState(false);
 
-  async function distanceMeters(lat: number, lng: number) {
-    if (homeLat == null || homeLng == null) return null;
-    const { data, error } = await supabase.rpc("meters_between", {
-      a_lat: lat,
-      a_lng: lng,
-      b_lat: homeLat,
-      b_lng: homeLng,
-    });
-    if (error) return null;
-    return typeof data === "number" ? data : null;
-  }
-
   const { data: active } = useQuery({
     queryKey: ["active-visit", careRecipientId, user?.id],
     enabled: !!user,
@@ -338,31 +327,11 @@ function ClockInBar({
   const clockIn = useMutation({
     mutationFn: async () => {
       setLocating(true);
-      const pos = await capturePosition().finally(() => setLocating(false));
-      let payload: Record<string, unknown> = {
-        care_recipient_id: careRecipientId,
-        caregiver_id: user!.id,
-        clock_in: new Date().toISOString(),
-      };
-      if (!pos) {
-        payload = { ...payload, clock_in_method: "manual", location_verified: false, evv_exception: "missing_gps" };
-      } else {
-        const dist = await distanceMeters(pos.lat, pos.lng);
-        const radius = radiusM ?? 150;
-        const verified = dist != null && dist <= radius;
-        payload = {
-          ...payload,
-          clock_in_lat: pos.lat,
-          clock_in_lng: pos.lng,
-          clock_in_accuracy_m: pos.accuracy,
-          clock_in_method: "gps",
-          location_verified: verified,
-          evv_exception: verified ? null : "out_of_range",
-        };
-      }
-      const { error } = await supabase.from("visit_logs").insert(payload as never);
-      if (error) throw error;
-      return payload as { location_verified?: boolean };
+      return clockInVisit({
+        caregiverId: user!.id,
+        careRecipientId,
+        fence: { homeLat, homeLng, radiusM },
+      }).finally(() => setLocating(false));
     },
     onSuccess: (res) => {
       toast.success(res?.location_verified ? "Clocked in · location verified" : "Clocked in");
@@ -375,26 +344,13 @@ function ClockInBar({
   const clockOut = useMutation({
     mutationFn: async () => {
       setLocating(true);
-      const pos = await capturePosition().finally(() => setLocating(false));
-      const update: Record<string, unknown> = {
-        clock_out: new Date().toISOString(),
-        notes: notes || null,
-        mood: mood || null,
-        clock_out_method: pos ? "gps" : "manual",
-      };
-      if (pos) {
-        update.clock_out_lat = pos.lat;
-        update.clock_out_lng = pos.lng;
-        update.clock_out_accuracy_m = pos.accuracy;
-      } else if (!active!.evv_exception) {
-        update.evv_exception = "missing_gps";
-      }
-      const { error } = await supabase
-        .from("visit_logs")
-        .update(update as never)
-        .eq("id", active!.id);
-      if (error) throw error;
-      return formatDuration(active!.clock_in, update.clock_out as string);
+      const clockedOut = await clockOutVisit({
+        visitLogId: active!.id,
+        existingException: active!.evv_exception,
+        notes,
+        mood,
+      }).finally(() => setLocating(false));
+      return formatDuration(active!.clock_in, clockedOut);
     },
     onSuccess: (duration) => {
       toast.success(`Visit saved · ${duration}`);
