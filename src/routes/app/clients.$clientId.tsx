@@ -112,6 +112,8 @@ function CareRecipientDetail() {
         </p>
       </section>
 
+      {role === "admin" && <HomeLocationCard recipient={recipient} />}
+
       <section>
         <h2 className="mb-3 font-display text-2xl">Recent visits</h2>
         {visitsPending && <LoadingState label="Loading recent visits…" />}
