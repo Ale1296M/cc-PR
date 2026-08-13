@@ -225,7 +225,10 @@ function EventBlock({
         e.dataTransfer.setData("text/plain", event.id);
         onDragStart(event.id);
       }}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       title={event.title}
       className="kindred-event"
       style={{ ...style, backgroundColor: s.bg, color: s.fg }}
