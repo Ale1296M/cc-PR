@@ -1,71 +1,45 @@
 import { useMemo, useState } from "react";
-import { Calendar, dateFnsLocalizer, type View } from "react-big-calendar";
-import withDragAndDrop, { type withDragAndDropProps } from "react-big-calendar/lib/addons/dragAndDrop";
-import { format, parse, startOfWeek, getDay } from "date-fns";
-import { enUS } from "date-fns/locale";
+import {
+  addDays,
+  addMonths,
+  addWeeks,
+  differenceInMinutes,
+  endOfMonth,
+  format,
+  isSameDay,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+} from "date-fns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SHIFT_STATUSES, statusLabel } from "@/components/shifts/shift-utils";
 import { ErrorState, LoadingState } from "@/components/ui/states";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
+import ShiftDialog from "@/components/shifts/ShiftDialog";
+import {
+  STATUS_STYLE,
+  isoDate,
+  isoTime,
+  toDate,
+  type ShiftRow,
+} from "@/components/shifts/shift-types";
 import "./calendar-theme.css";
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 0 }),
-  getDay,
-  locales: { "en-US": enUS },
-});
+const DAY_START = 6; // 6:00
+const DAY_END = 22; // 22:00
+const HOURS = Array.from({ length: DAY_END - DAY_START }, (_, i) => DAY_START + i);
+const PX_PER_HOUR = 56;
 
-type ShiftRow = {
-  id: string;
-  scheduled_date: string;
-  scheduled_start_time: string;
-  scheduled_end_time: string;
-  status: string;
-  notes: string | null;
-  caregiver_id: string | null;
-  care_recipient_id: string;
-  care_recipients: { full_name: string } | null;
-  caregivers: { profiles: { full_name: string | null } | null } | null;
-};
-
-type ShiftEvent = {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  resource: ShiftRow;
-};
-
-const DnDCalendar = withDragAndDrop<ShiftEvent, object>(Calendar as never);
-
-function toDate(date: string, time: string) {
-  return new Date(`${date}T${time.slice(0, 8)}`);
-}
-function isoDate(d: Date) {
-  return format(d, "yyyy-MM-dd");
-}
-function isoTime(d: Date) {
-  return format(d, "HH:mm:ss");
-}
-
-const STATUS_STYLE: Record<string, { bg: string; fg: string }> = {
-  scheduled: { bg: "color-mix(in oklab, var(--color-gold) 45%, var(--color-card))", fg: "var(--color-gold-foreground)" },
-  completed: { bg: "color-mix(in oklab, var(--color-primary) 22%, var(--color-card))", fg: "var(--color-foreground)" },
-  cancelled: { bg: "var(--color-muted)", fg: "var(--color-muted-foreground)" },
-  no_show: { bg: "color-mix(in oklab, var(--color-destructive) 20%, var(--color-card))", fg: "var(--color-destructive)" },
-};
+type ShiftEvent = { id: string; title: string; start: Date; end: Date; resource: ShiftRow };
 
 export default function AdminShiftCalendar({ adminId }: { adminId: string }) {
   const qc = useQueryClient();
-  const [view, setView] = useState<View>("week");
-  const [date, setDate] = useState(new Date());
+  const [view, setView] = useState<"week" | "month">("week");
+  const [cursor, setCursor] = useState(() => new Date());
   const [editing, setEditing] = useState<ShiftRow | null>(null);
   const [creatingAt, setCreatingAt] = useState<{ start: Date; end: Date } | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
 
   const { data, isPending, error, refetch } = useQuery({
     queryKey: ["shifts"],
@@ -115,39 +89,68 @@ export default function AdminShiftCalendar({ adminId }: { adminId: string }) {
       toast.error(e instanceof Error ? e.message : "Couldn't reschedule that shift — try again."),
   });
 
-  const onMove: withDragAndDropProps<ShiftEvent, object>["onEventDrop"] = ({ event, start, end }) =>
-    reschedule.mutate({ id: event.id, start: new Date(start), end: new Date(end) });
+  function dropOn(day: Date, hour: number | null) {
+    const ev = events.find((e) => e.id === dragId);
+    setDragId(null);
+    if (!ev) return;
+    const minutes = Math.max(30, differenceInMinutes(ev.end, ev.start));
+    const start = new Date(day);
+    if (hour === null) {
+      start.setHours(ev.start.getHours(), ev.start.getMinutes(), 0, 0);
+    } else {
+      start.setHours(hour, 0, 0, 0);
+    }
+    const end = new Date(start.getTime() + minutes * 60_000);
+    if (isoDate(start) === ev.resource.scheduled_date && isoTime(start) === ev.resource.scheduled_start_time)
+      return;
+    reschedule.mutate({ id: ev.id, start, end });
+  }
 
   if (isPending) return <LoadingState label="Loading the calendar…" />;
   if (error) return <ErrorState what="the schedule" error={error} onRetry={() => refetch()} />;
 
+  const weekStart = startOfWeek(cursor, { weekStartsOn: 0 });
+  const step = (dir: number) =>
+    setCursor((c) => (view === "week" ? addWeeks(c, dir) : addMonths(c, dir)));
+
   return (
     <div className="kindred-calendar card-soft p-4">
-      <DnDCalendar
-        localizer={localizer}
-        events={events}
-        view={view}
-        onView={(v) => setView(v)}
-        date={date}
-        onNavigate={(d) => setDate(d)}
-        views={["week", "month"]}
-        popup
-        selectable
-        resizable
-        step={30}
-        timeslots={2}
-        style={{ height: 680 }}
-        onEventDrop={onMove}
-        onEventResize={onMove}
-        onSelectEvent={(e) => setEditing(e.resource)}
-        onSelectSlot={({ start, end }) =>
-          setCreatingAt({ start: new Date(start), end: new Date(end) })
-        }
-        eventPropGetter={(e) => {
-          const s = STATUS_STYLE[e.resource.status] ?? STATUS_STYLE.scheduled;
-          return { style: { backgroundColor: s.bg, color: s.fg } };
-        }}
-      />
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="inline-flex gap-1.5">
+          <NavBtn onClick={() => step(-1)}>Back</NavBtn>
+          <NavBtn onClick={() => setCursor(new Date())}>Today</NavBtn>
+          <NavBtn onClick={() => step(1)}>Next</NavBtn>
+        </div>
+        <p className="mx-auto font-display text-xl">
+          {view === "week"
+            ? `${format(weekStart, "MMM d")} – ${format(addDays(weekStart, 6), "MMM d, yyyy")}`
+            : format(cursor, "MMMM yyyy")}
+        </p>
+        <div className="inline-flex gap-1.5">
+          <NavBtn active={view === "week"} onClick={() => setView("week")}>Week</NavBtn>
+          <NavBtn active={view === "month"} onClick={() => setView("month")}>Month</NavBtn>
+        </div>
+      </div>
+
+      {view === "week" ? (
+        <WeekGrid
+          weekStart={weekStart}
+          events={events}
+          onDragStart={setDragId}
+          onDrop={dropOn}
+          onSelectEvent={(e) => setEditing(e.resource)}
+          onSelectSlot={(start, end) => setCreatingAt({ start, end })}
+        />
+      ) : (
+        <MonthGrid
+          cursor={cursor}
+          events={events}
+          onDragStart={setDragId}
+          onDrop={(day) => dropOn(day, null)}
+          onSelectEvent={(e) => setEditing(e.resource)}
+          onSelectSlot={(start, end) => setCreatingAt({ start, end })}
+        />
+      )}
 
       <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
         {SHIFT_STATUSES.map((s) => (
@@ -177,170 +180,205 @@ export default function AdminShiftCalendar({ adminId }: { adminId: string }) {
   );
 }
 
-function ShiftDialog({
-  adminId,
-  shift,
-  slot,
-  onClose,
+function NavBtn({
+  children,
+  onClick,
+  active,
 }: {
-  adminId: string;
-  shift: ShiftRow | null;
-  slot: { start: Date; end: Date } | null;
-  onClose: () => void;
+  children: React.ReactNode;
+  onClick: () => void;
+  active?: boolean;
 }) {
-  const qc = useQueryClient();
-  const [recipientId, setRecipientId] = useState(shift?.care_recipient_id ?? "");
-  const [caregiverId, setCaregiverId] = useState(shift?.caregiver_id ?? "");
-  const [date, setDate] = useState(shift?.scheduled_date ?? (slot ? isoDate(slot.start) : ""));
-  const [start, setStart] = useState(
-    shift ? shift.scheduled_start_time.slice(0, 5) : slot ? format(slot.start, "HH:mm") : "",
-  );
-  const [end, setEnd] = useState(
-    shift ? shift.scheduled_end_time.slice(0, 5) : slot ? format(slot.end, "HH:mm") : "",
-  );
-  const [status, setStatus] = useState(shift?.status ?? "scheduled");
-  const [notes, setNotes] = useState(shift?.notes ?? "");
-
-  const { data: recipients } = useQuery({
-    queryKey: ["all-recipients"],
-    queryFn: async () => {
-      const { data } = await supabase.from("care_recipients").select("id, full_name").order("full_name");
-      return data ?? [];
-    },
-  });
-  const { data: caregivers } = useQuery({
-    queryKey: ["caregivers"],
-    queryFn: async () => {
-      const { data } = await supabase.from("caregivers").select("id, profiles(full_name)").eq("active", true);
-      return (data ?? []).map((r) => ({
-        id: r.id,
-        name: (r.profiles as unknown as { full_name: string } | null)?.full_name ?? "Caregiver",
-      }));
-    },
-  });
-
-  const done = (msg: string) => {
-    toast.success(msg);
-    qc.invalidateQueries({ queryKey: ["shifts"] });
-    onClose();
-  };
-  const fail = (e: unknown) =>
-    toast.error(e instanceof Error ? e.message : "Something went wrong — try again.");
-
-  const save = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        care_recipient_id: recipientId,
-        caregiver_id: caregiverId || null,
-        scheduled_date: date,
-        scheduled_start_time: `${start}:00`,
-        scheduled_end_time: `${end}:00`,
-        status,
-        notes: notes || null,
-      };
-      const { error } = shift
-        ? await supabase.from("care_shifts").update(payload).eq("id", shift.id)
-        : await supabase.from("care_shifts").insert({ ...payload, created_by_admin_id: adminId });
-      if (error) throw error;
-    },
-    onSuccess: () => done(shift ? "Shift updated" : "Shift created"),
-    onError: fail,
-  });
-
-  const cancelShift = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("care_shifts")
-        .update({ status: "cancelled" })
-        .eq("id", shift!.id);
-      if (error) throw error;
-    },
-    onSuccess: () => done("Shift cancelled"),
-    onError: fail,
-  });
-
   return (
-    <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="mb-4 font-display text-2xl">{shift ? "Edit shift" : "New shift"}</h3>
-        <div className="space-y-3">
-          <Select label="Care recipient" value={recipientId} onChange={setRecipientId}>
-            <option value="">Select…</option>
-            {(recipients ?? []).map((c) => (
-              <option key={c.id} value={c.id}>{c.full_name}</option>
-            ))}
-          </Select>
-          <Select label="Caregiver" value={caregiverId} onChange={setCaregiverId}>
-            <option value="">Unassigned</option>
-            {(caregivers ?? []).map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </Select>
-          <TextField label="Date" type="date" value={date} onChange={setDate} />
-          <TextField label="Start time" type="time" value={start} onChange={setStart} />
-          <TextField label="End time" type="time" value={end} onChange={setEnd} />
-          <Select label="Status" value={status} onChange={setStatus}>
-            {SHIFT_STATUSES.map((s) => (
-              <option key={s} value={s}>{statusLabel(s)}</option>
-            ))}
-          </Select>
-          <TextField label="Notes" value={notes} onChange={setNotes} />
+    <button
+      type="button"
+      onClick={onClick}
+      className={`min-h-10 rounded-full border px-4 text-sm ${
+        active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border text-foreground hover:bg-secondary/55"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function EventBlock({
+  event,
+  style,
+  onDragStart,
+  onClick,
+}: {
+  event: ShiftEvent;
+  style?: React.CSSProperties;
+  onDragStart: (id: string) => void;
+  onClick: () => void;
+}) {
+  const s = STATUS_STYLE[event.resource.status] ?? STATUS_STYLE.scheduled;
+  return (
+    <button
+      type="button"
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", event.id);
+        onDragStart(event.id);
+      }}
+      onClick={onClick}
+      title={event.title}
+      className="kindred-event"
+      style={{ ...style, backgroundColor: s.bg, color: s.fg }}
+    >
+      <span className="block truncate font-medium">{format(event.start, "h:mm a")}</span>
+      <span className="block truncate">{event.title}</span>
+    </button>
+  );
+}
+
+function WeekGrid({
+  weekStart,
+  events,
+  onDragStart,
+  onDrop,
+  onSelectEvent,
+  onSelectSlot,
+}: {
+  weekStart: Date;
+  events: ShiftEvent[];
+  onDragStart: (id: string) => void;
+  onDrop: (day: Date, hour: number) => void;
+  onSelectEvent: (e: ShiftEvent) => void;
+  onSelectSlot: (start: Date, end: Date) => void;
+}) {
+  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  return (
+    <div className="kindred-grid overflow-x-auto">
+      <div className="min-w-[720px]">
+        <div className="grid grid-cols-[3.5rem_repeat(7,minmax(0,1fr))] border-b border-border">
+          <div />
+          {days.map((d) => (
+            <div key={d.toISOString()} className="kindred-col-head">
+              <span className="block">{format(d, "EEE")}</span>
+              <span className={isSameDay(d, new Date()) ? "text-primary" : ""}>{format(d, "d")}</span>
+            </div>
+          ))}
         </div>
-        <div className="mt-6 flex flex-wrap justify-end gap-2">
-          {shift && shift.status !== "cancelled" && (
-            <button
-              onClick={() => cancelShift.mutate()}
-              disabled={cancelShift.isPending}
-              className="mr-auto min-h-10 rounded-full border border-destructive px-4 text-sm text-destructive disabled:opacity-50"
-            >
-              Cancel shift
-            </button>
-          )}
-          <button onClick={onClose} className="min-h-10 rounded-full border border-border px-4 text-sm">
-            Close
-          </button>
-          <button
-            disabled={!recipientId || !date || !start || !end || save.isPending}
-            onClick={() => save.mutate()}
-            className="min-h-10 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
-          >
-            {shift ? "Save" : "Create"}
-          </button>
+        <div className="grid grid-cols-[3.5rem_repeat(7,minmax(0,1fr))]">
+          <div>
+            {HOURS.map((h) => (
+              <div key={h} className="kindred-hour-label" style={{ height: PX_PER_HOUR }}>
+                {format(new Date(2020, 0, 1, h), "h a")}
+              </div>
+            ))}
+          </div>
+          {days.map((d) => (
+            <div key={d.toISOString()} className="kindred-day-col">
+              {HOURS.map((h) => (
+                <div
+                  key={h}
+                  className="kindred-slot"
+                  style={{ height: PX_PER_HOUR }}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    onDrop(d, h);
+                  }}
+                  onClick={() => {
+                    const start = new Date(d);
+                    start.setHours(h, 0, 0, 0);
+                    onSelectSlot(start, new Date(start.getTime() + 60 * 60_000));
+                  }}
+                />
+              ))}
+              {events
+                .filter((e) => isSameDay(e.start, d))
+                .map((e) => {
+                  const top =
+                    (e.start.getHours() + e.start.getMinutes() / 60 - DAY_START) * PX_PER_HOUR;
+                  const height = Math.max(
+                    24,
+                    (differenceInMinutes(e.end, e.start) / 60) * PX_PER_HOUR - 2,
+                  );
+                  return (
+                    <EventBlock
+                      key={e.id}
+                      event={e}
+                      onDragStart={onDragStart}
+                      onClick={() => onSelectEvent(e)}
+                      style={{ position: "absolute", top: Math.max(0, top), height, left: 2, right: 2 }}
+                    />
+                  );
+                })}
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function TextField({
-  label, value, onChange, type = "text",
-}: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+function MonthGrid({
+  cursor,
+  events,
+  onDragStart,
+  onDrop,
+  onSelectEvent,
+  onSelectSlot,
+}: {
+  cursor: Date;
+  events: ShiftEvent[];
+  onDragStart: (id: string) => void;
+  onDrop: (day: Date) => void;
+  onSelectEvent: (e: ShiftEvent) => void;
+  onSelectSlot: (start: Date, end: Date) => void;
+}) {
+  const first = startOfWeek(startOfMonth(cursor), { weekStartsOn: 0 });
+  const total = Math.ceil((differenceInMinutes(endOfMonth(cursor), first) / 1440 + 1) / 7) * 7;
+  const days = Array.from({ length: total }, (_, i) => addDays(first, i));
   return (
-    <label className="block">
-      <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-      />
-    </label>
-  );
-}
-
-function Select({
-  label, value, onChange, children,
-}: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-      >
-        {children}
-      </select>
-    </label>
+    <div className="kindred-grid">
+      <div className="grid grid-cols-7 border-b border-border">
+        {days.slice(0, 7).map((d) => (
+          <div key={d.toISOString()} className="kindred-col-head">
+            {format(d, "EEE")}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7">
+        {days.map((d) => (
+          <div
+            key={d.toISOString()}
+            className={`kindred-month-cell ${isSameMonth(d, cursor) ? "" : "kindred-off-range"}`}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              onDrop(d);
+            }}
+            onClick={() => {
+              const start = new Date(d);
+              start.setHours(9, 0, 0, 0);
+              onSelectSlot(start, new Date(start.getTime() + 60 * 60_000));
+            }}
+          >
+            <span className={`kindred-date ${isSameDay(d, new Date()) ? "text-primary" : ""}`}>
+              {format(d, "d")}
+            </span>
+            <div className="mt-1 space-y-1">
+              {events
+                .filter((e) => isSameDay(e.start, d))
+                .map((e) => (
+                  <EventBlock
+                    key={e.id}
+                    event={e}
+                    onDragStart={onDragStart}
+                    onClick={() => onSelectEvent(e)}
+                  />
+                ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
