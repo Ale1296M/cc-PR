@@ -1,79 +1,65 @@
-/* Warm-paper theme for react-big-calendar */
-.kindred-calendar .rbc-calendar,
-.kindred-calendar {
-  font-family: inherit;
-  color: var(--color-foreground);
-}
-.kindred-calendar .rbc-toolbar {
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-.kindred-calendar .rbc-toolbar button {
-  color: var(--color-foreground);
-  border: 1px solid var(--color-border);
-  border-radius: 9999px;
-  padding: 0.4rem 0.9rem;
-  min-height: 2.5rem;
-  background: transparent;
-}
-.kindred-calendar .rbc-toolbar button:hover,
-.kindred-calendar .rbc-toolbar button:focus {
-  background: color-mix(in oklab, var(--color-secondary) 55%, transparent);
-  color: var(--color-foreground);
-}
-.kindred-calendar .rbc-toolbar button.rbc-active {
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
-  border-color: var(--color-primary);
-  box-shadow: none;
-}
-.kindred-calendar .rbc-toolbar-label {
-  font-family: var(--font-display, inherit);
-  font-size: 1.25rem;
-}
-.kindred-calendar .rbc-btn-group { gap: 0.35rem; display: inline-flex; }
-.kindred-calendar .rbc-month-view,
-.kindred-calendar .rbc-time-view,
-.kindred-calendar .rbc-time-header-content,
-.kindred-calendar .rbc-time-content,
-.kindred-calendar .rbc-day-bg + .rbc-day-bg,
-.kindred-calendar .rbc-month-row + .rbc-month-row,
-.kindred-calendar .rbc-header,
-.kindred-calendar .rbc-header + .rbc-header,
-.kindred-calendar .rbc-timeslot-group,
-.kindred-calendar .rbc-time-content > * + * > * {
-  border-color: var(--color-border);
-}
-.kindred-calendar .rbc-month-view,
-.kindred-calendar .rbc-time-view {
+/* Warm-paper theme for the Kindred shift calendar */
+.kindred-calendar .kindred-grid {
   background: var(--color-card);
+  border: 1px solid var(--color-border);
   border-radius: 1rem;
   overflow: hidden;
 }
-.kindred-calendar .rbc-header {
+.kindred-calendar .kindred-col-head {
   padding: 0.6rem 0.25rem;
+  text-align: center;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-muted-foreground);
   font-weight: 500;
 }
-.kindred-calendar .rbc-off-range-bg {
+.kindred-calendar .kindred-hour-label {
+  font-size: 0.68rem;
+  color: var(--color-muted-foreground);
+  text-align: right;
+  padding-right: 0.4rem;
+  border-right: 1px solid var(--color-border);
+  transform: translateY(-0.4em);
+}
+.kindred-calendar .kindred-day-col {
+  position: relative;
+  border-left: 1px solid var(--color-border);
+}
+.kindred-calendar .kindred-slot {
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  cursor: pointer;
+}
+.kindred-calendar .kindred-slot:hover {
+  background: color-mix(in oklab, var(--color-secondary) 40%, transparent);
+}
+.kindred-calendar .kindred-month-cell {
+  min-height: 7rem;
+  padding: 0.4rem;
+  border-left: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+.kindred-calendar .kindred-month-cell:hover {
+  background: color-mix(in oklab, var(--color-secondary) 30%, transparent);
+}
+.kindred-calendar .kindred-off-range {
   background: color-mix(in oklab, var(--color-muted) 55%, transparent);
 }
-.kindred-calendar .rbc-today {
-  background: color-mix(in oklab, var(--color-gold) 18%, transparent);
+.kindred-calendar .kindred-date {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
 }
-.kindred-calendar .rbc-event,
-.kindred-calendar .rbc-day-slot .rbc-event {
+.kindred-calendar .kindred-event {
+  display: block;
+  width: 100%;
+  text-align: left;
+  overflow: hidden;
   border: 1px solid color-mix(in oklab, var(--color-foreground) 12%, transparent);
   border-radius: 0.5rem;
   padding: 2px 6px;
-  font-size: 0.75rem;
-  box-shadow: none;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  cursor: grab;
 }
-.kindred-calendar .rbc-event:focus { outline: 2px solid var(--color-ring); }
-.kindred-calendar .rbc-event.rbc-selected { filter: brightness(0.97); }
-.kindred-calendar .rbc-current-time-indicator { background: var(--color-primary); }
-.kindred-calendar .rbc-show-more { color: var(--color-primary); background: transparent; }
+.kindred-calendar .kindred-event:focus-visible { outline: 2px solid var(--color-ring); }
