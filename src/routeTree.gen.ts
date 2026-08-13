@@ -21,6 +21,7 @@ import { Route as AppVisitRouteImport } from './routes/app/visit'
 import { Route as AppUsersRouteImport } from './routes/app/users'
 import { Route as AppScheduleRouteImport } from './routes/app/schedule'
 import { Route as AppMessagesRouteImport } from './routes/app/messages'
+import { Route as AppIncidentsRouteImport } from './routes/app/incidents'
 import { Route as AppExceptionsRouteImport } from './routes/app/exceptions'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
 import { Route as AppCarePlanRouteImport } from './routes/app/care-plan'
@@ -90,6 +91,11 @@ const AppMessagesRoute = AppMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AppRoute,
 } as any)
+const AppIncidentsRoute = AppIncidentsRouteImport.update({
+  id: '/incidents',
+  path: '/incidents',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppExceptionsRoute = AppExceptionsRouteImport.update({
   id: '/exceptions',
   path: '/exceptions',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/exceptions': typeof AppExceptionsRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/users': typeof AppUsersRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/exceptions': typeof AppExceptionsRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/users': typeof AppUsersRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/exceptions': typeof AppExceptionsRoute
+  '/app/incidents': typeof AppIncidentsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/schedule': typeof AppScheduleRoute
   '/app/users': typeof AppUsersRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/app/care-plan'
     | '/app/clients'
     | '/app/exceptions'
+    | '/app/incidents'
     | '/app/messages'
     | '/app/schedule'
     | '/app/users'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/app/care-plan'
     | '/app/clients'
     | '/app/exceptions'
+    | '/app/incidents'
     | '/app/messages'
     | '/app/schedule'
     | '/app/users'
@@ -257,6 +268,7 @@ export interface FileRouteTypes {
     | '/app/care-plan'
     | '/app/clients'
     | '/app/exceptions'
+    | '/app/incidents'
     | '/app/messages'
     | '/app/schedule'
     | '/app/users'
@@ -367,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMessagesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/incidents': {
+      id: '/app/incidents'
+      path: '/incidents'
+      fullPath: '/app/incidents'
+      preLoaderRoute: typeof AppIncidentsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/exceptions': {
       id: '/app/exceptions'
       path: '/exceptions'
@@ -442,6 +461,7 @@ interface AppRouteChildren {
   AppCarePlanRoute: typeof AppCarePlanRoute
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppExceptionsRoute: typeof AppExceptionsRoute
+  AppIncidentsRoute: typeof AppIncidentsRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppScheduleRoute: typeof AppScheduleRoute
   AppUsersRoute: typeof AppUsersRoute
@@ -454,6 +474,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCarePlanRoute: AppCarePlanRoute,
   AppClientsRoute: AppClientsRouteWithChildren,
   AppExceptionsRoute: AppExceptionsRoute,
+  AppIncidentsRoute: AppIncidentsRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppScheduleRoute: AppScheduleRoute,
   AppUsersRoute: AppUsersRoute,

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { AlertTriangle, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
@@ -10,6 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { formatDuration } from "@/lib/geo";
 import { clockInVisit, clockOutVisit, saveWellbeingEntry } from "@/lib/visit-clock";
+import { ReportIncidentDialog } from "@/components/incidents/ReportIncidentDialog";
 
 export const Route = createFileRoute("/app/visit")({
   component: () => (
@@ -120,6 +121,7 @@ function VisitFlow() {
   const [hygiene, setHygiene] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [done, setDone] = useState<{ name: string; duration: string } | null>(null);
+  const [reporting, setReporting] = useState(false);
 
   const {
     data: recipients,
@@ -390,6 +392,30 @@ function VisitFlow() {
             {finish.isPending ? "Saving…" : "Clock out & save visit"}
           </button>
         </section>
+      )}
+
+      {recipient && (
+        <div className="mt-8">
+          <button
+            type="button"
+            onClick={() => setReporting(true)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-5 text-sm hover:bg-secondary/50"
+          >
+            <AlertTriangle className="h-4 w-4" /> Report an incident
+          </button>
+          <p className="mt-2 text-xs text-muted-foreground">
+            File a fall, medication error or other event for {recipient.full_name}.
+          </p>
+        </div>
+      )}
+
+      {reporting && recipient && (
+        <ReportIncidentDialog
+          careRecipientId={recipient.id}
+          recipientName={recipient.full_name}
+          visitLogId={active?.id ?? null}
+          onClose={() => setReporting(false)}
+        />
       )}
     </div>
   );
