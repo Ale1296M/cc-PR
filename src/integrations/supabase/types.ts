@@ -242,6 +242,51 @@ export type Database = {
           },
         ]
       }
+      caregiver_messages: {
+        Row: {
+          caregiver_profile_id: string
+          content: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          caregiver_profile_id: string
+          content: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          caregiver_profile_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregiver_messages_caregiver_profile_id_fkey"
+            columns: ["caregiver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "caregiver_messages_sender_profile_id_fkey"
+            columns: ["sender_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       caregivers: {
         Row: {
           active: boolean
@@ -820,6 +865,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_family_thread: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
       caregiver_has_shift_with_client: {
         Args: { _client_id: string; _uid: string }
         Returns: boolean
