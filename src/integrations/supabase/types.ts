@@ -315,6 +315,69 @@ export type Database = {
           },
         ]
       }
+      emergency_contacts: {
+        Row: {
+          care_recipient_id: string
+          created_at: string
+          created_by_admin_id: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_primary: boolean
+          notes: string | null
+          phone_primary: string
+          phone_secondary: string | null
+          relationship: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          care_recipient_id: string
+          created_at?: string
+          created_by_admin_id?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          phone_primary: string
+          phone_secondary?: string | null
+          relationship?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          care_recipient_id?: string
+          created_at?: string
+          created_by_admin_id?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_primary?: boolean
+          notes?: string | null
+          phone_primary?: string
+          phone_secondary?: string | null
+          relationship?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_contacts_care_recipient_id_fkey"
+            columns: ["care_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "care_recipients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_contacts_created_by_admin_id_fkey"
+            columns: ["created_by_admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       families: {
         Row: {
           created_at: string
@@ -401,6 +464,92 @@ export type Database = {
             columns: ["sender_profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_reports: {
+        Row: {
+          action_taken: string | null
+          care_recipient_id: string
+          created_at: string
+          description: string
+          id: string
+          incident_type: Database["public"]["Enums"]["incident_type"]
+          occurred_at: string
+          reported_by: string
+          reporter_role: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["incident_severity"]
+          status: Database["public"]["Enums"]["incident_status"]
+          updated_at: string
+          visit_log_id: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          care_recipient_id: string
+          created_at?: string
+          description: string
+          id?: string
+          incident_type?: Database["public"]["Enums"]["incident_type"]
+          occurred_at?: string
+          reported_by: string
+          reporter_role?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["incident_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          updated_at?: string
+          visit_log_id?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          care_recipient_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          incident_type?: Database["public"]["Enums"]["incident_type"]
+          occurred_at?: string
+          reported_by?: string
+          reporter_role?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["incident_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          updated_at?: string
+          visit_log_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_reports_care_recipient_id_fkey"
+            columns: ["care_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "care_recipients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_reports_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_reports_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_reports_visit_log_id_fkey"
+            columns: ["visit_log_id"]
+            isOneToOne: false
+            referencedRelation: "visit_logs"
             referencedColumns: ["id"]
           },
         ]
@@ -583,6 +732,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "visit_logs_caregiver_id_profiles_fkey"
+            columns: ["caregiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "visit_logs_shift_id_fkey"
             columns: ["shift_id"]
             isOneToOne: false
@@ -711,6 +867,16 @@ export type Database = {
     Enums: {
       app_role: "admin" | "caregiver" | "family_member"
       appetite_level: "good" | "fair" | "poor"
+      incident_severity: "low" | "medium" | "high" | "critical"
+      incident_status: "open" | "under_review" | "resolved"
+      incident_type:
+        | "fall"
+        | "medication_error"
+        | "injury"
+        | "hospitalization"
+        | "behavioral"
+        | "property"
+        | "other"
       medicine_taken: "yes" | "no" | "partial"
     }
     CompositeTypes: {
@@ -841,6 +1007,17 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "caregiver", "family_member"],
       appetite_level: ["good", "fair", "poor"],
+      incident_severity: ["low", "medium", "high", "critical"],
+      incident_status: ["open", "under_review", "resolved"],
+      incident_type: [
+        "fall",
+        "medication_error",
+        "injury",
+        "hospitalization",
+        "behavioral",
+        "property",
+        "other",
+      ],
       medicine_taken: ["yes", "no", "partial"],
     },
   },
