@@ -13,7 +13,7 @@ export default defineMcp({
   title: "CareConnect Hub",
   version: "0.1.0",
   instructions:
-    "Tools for the Kindred caregiving coordination app. Read care recipients, shifts, care plan items, and visit logs, and send messages to the care team. All access is scoped to the signed-in user's permissions.",
+    "Tools for the Con Cariño PR caregiving coordination app. Read care recipients, shifts, care plan items, and visit logs, and send messages to the care team. All access is scoped to the signed-in user's permissions.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",

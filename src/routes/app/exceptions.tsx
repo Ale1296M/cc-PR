@@ -14,12 +14,12 @@ export const Route = createFileRoute("/app/exceptions")({
   ),
   head: () => ({
     meta: [
-      { title: "Visit exceptions · Kindred" },
+      { title: "Visit exceptions · Con Cariño PR" },
       {
         name: "description",
         content: "Review visits flagged as out of range or missing location so the care team can follow up.",
       },
-      { property: "og:title", content: "Visit exceptions · Kindred" },
+      { property: "og:title", content: "Visit exceptions · Con Cariño PR" },
       {
         property: "og:description",
         content: "Flagged visits that need a quick review by the care team.",

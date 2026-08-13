@@ -27,12 +27,12 @@ export const Route = createFileRoute("/app/incidents")({
   ),
   head: () => ({
     meta: [
-      { title: "Incidents · Kindred" },
+      { title: "Incidents · Con Cariño PR" },
       {
         name: "description",
         content: "Review, triage and resolve incident reports filed by caregivers and families.",
       },
-      { property: "og:title", content: "Incidents · Kindred" },
+      { property: "og:title", content: "Incidents · Con Cariño PR" },
       {
         property: "og:description",
         content: "Every incident report with its full audit trail, in one admin view.",

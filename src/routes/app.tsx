@@ -8,8 +8,8 @@ export const Route = createFileRoute("/app")({
   component: AppLayout,
   head: () => ({
     meta: [
-      { title: "Workspace · Kindred" },
-      { name: "description", content: "Your Kindred caregiving workspace." },
+      { title: "Workspace · Con Cariño PR" },
+      { name: "description", content: "Your Con Cariño PR caregiving workspace." },
     ],
   }),
 });
@@ -65,7 +65,7 @@ function AppLayout() {
     <div className="min-h-screen md:flex">
       <aside className="hidden md:flex md:w-64 md:flex-col bg-sidebar text-sidebar-foreground">
         <div className="p-6">
-          <Link to="/" className="font-display text-2xl text-sidebar-primary">Kindred</Link>
+          <Link to="/" className="font-display text-2xl text-sidebar-primary">Con Cariño PR</Link>
           <p className="mt-1 text-xs uppercase tracking-widest text-sidebar-foreground/60">
             {role ? role.replace("_", " ") : "awaiting role"}
           </p>

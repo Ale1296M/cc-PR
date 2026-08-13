@@ -5,9 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Kindred — caregiving coordination design system.
+ * Con Cariño PR — caregiving coordination design system.
  * Warm sage green + antique gold on a soft cream canvas.
- * Serif display (Instrument Serif) + humanist sans (Manrope).
+ * Serif display (Newsreader) + humanist sans (Inter).
  */
 
 @theme inline {
@@ -53,8 +53,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-gold: var(--gold);
   --color-gold-foreground: var(--gold-foreground);
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {

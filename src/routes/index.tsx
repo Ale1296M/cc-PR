@@ -5,7 +5,7 @@ export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
-      { title: "Kindred — caregiving coordination for teams and families" },
+      { title: "Con Cariño PR — caregiving coordination for teams and families" },
       {
         name: "description",
         content:
@@ -21,7 +21,7 @@ function Landing() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Link to="/" className="flex items-center gap-2">
           <Logo />
-          <span className="font-display text-2xl">Kindred</span>
+          <span className="font-display text-2xl">Con Cariño PR</span>
         </Link>
         <nav className="flex items-center gap-3 text-sm">
           <Link to="/auth" className="text-muted-foreground hover:text-foreground">
@@ -49,7 +49,7 @@ function Landing() {
               <span className="gold-underline">connected</span>.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Kindred gives home care teams and the families they serve one warm
+              Con Cariño PR gives home care teams and the families they serve one warm
               place to plan visits, share updates, and remember every small
               thing that matters.
             </p>
@@ -117,7 +117,7 @@ function Landing() {
 
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Kindred</p>
+          <p>© {new Date().getFullYear()} Con Cariño PR</p>
           <p>Made with care.</p>
         </div>
       </footer>

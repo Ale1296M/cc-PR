@@ -77,10 +77,10 @@ function Consent() {
   return (
     <main className="grid min-h-screen place-items-center bg-background p-6">
       <div className="card-soft w-full max-w-md p-8">
-        <p className="font-display text-2xl text-primary">Kindred</p>
+        <p className="font-display text-2xl text-primary">Con Cariño PR</p>
         <h1 className="mt-4 font-display text-3xl">Connect {clientName} to your account</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          This lets {clientName} use Kindred as you — reading care recipients, shifts, care plans and
+          This lets {clientName} use Con Cariño PR as you — reading care recipients, shifts, care plans and
           visit logs you can already see, and sending messages on your behalf.
         </p>
         {details?.client?.redirect_uri && (
@@ -92,7 +92,7 @@ function Consent() {
           <p className="mt-2 text-xs text-muted-foreground">Requested: {details.scope}</p>
         )}
         <p className="mt-3 text-xs text-muted-foreground">
-          This does not bypass Kindred's permissions or backend policies.
+          This does not bypass Con Cariño PR's permissions or backend policies.
         </p>
         {error && (
           <p role="alert" className="mt-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
