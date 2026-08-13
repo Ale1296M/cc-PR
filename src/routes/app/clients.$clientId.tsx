@@ -10,6 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 import { capturePosition, formatDuration } from "@/lib/geo";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { clockInVisit, clockOutVisit } from "@/lib/visit-clock";
+import { EmergencyContacts } from "@/components/recipients/EmergencyContacts";
 
 export const Route = createFileRoute("/app/clients/$clientId")({
   component: () => (
@@ -114,6 +115,8 @@ function CareRecipientDetail() {
       </section>
 
       {role === "admin" && <HomeLocationCard recipient={recipient} />}
+
+      <EmergencyContacts careRecipientId={recipientId} canEdit={role === "admin"} />
 
       <section>
         <h2 className="mb-3 font-display text-2xl">Recent visits</h2>
