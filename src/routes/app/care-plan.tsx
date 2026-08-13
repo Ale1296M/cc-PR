@@ -11,9 +11,9 @@ export const Route = createFileRoute("/app/care-plan")({
   component: CarePlanPage,
   head: () => ({
     meta: [
-      { title: "Care plan checklists · Kindred" },
+      { title: "Care plan checklists · Con Cariño PR" },
       { name: "description", content: "Build and complete per-visit care checklists for each care recipient." },
-      { property: "og:title", content: "Care plan checklists · Kindred" },
+      { property: "og:title", content: "Care plan checklists · Con Cariño PR" },
       { property: "og:description", content: "Build and complete per-visit care checklists for each care recipient." },
     ],
   }),

@@ -20,13 +20,13 @@ export const Route = createFileRoute("/app/visit")({
   ),
   head: () => ({
     meta: [
-      { title: "Log a visit · Kindred" },
+      { title: "Log a visit · Con Cariño PR" },
       {
         name: "description",
         content:
           "Clock in with location, record the wellbeing check-in, and clock out — all in one caregiver flow.",
       },
-      { property: "og:title", content: "Log a visit · Kindred" },
+      { property: "og:title", content: "Log a visit · Con Cariño PR" },
       {
         property: "og:description",
         content: "Clock in, record today's wellbeing check-in, and clock out.",

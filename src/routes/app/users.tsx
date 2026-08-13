@@ -15,10 +15,10 @@ export const Route = createFileRoute("/app/users")({
   ),
   head: () => ({
     meta: [
-      { title: "Users & roles · Kindred" },
-      { name: "description", content: "Admins review every Kindred account and assign caregiver, family, or admin roles." },
-      { property: "og:title", content: "Users & roles · Kindred" },
-      { property: "og:description", content: "Review Kindred accounts and assign roles." },
+      { title: "Users & roles · Con Cariño PR" },
+      { name: "description", content: "Admins review every Con Cariño PR account and assign caregiver, family, or admin roles." },
+      { property: "og:title", content: "Users & roles · Con Cariño PR" },
+      { property: "og:description", content: "Review Con Cariño PR accounts and assign roles." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
