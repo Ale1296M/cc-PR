@@ -15,6 +15,7 @@ import {
   statusClass,
   statusLabel,
   typeLabel,
+  type Severity,
   type Status,
 } from "@/components/incidents/incident-meta";
 
@@ -75,7 +76,7 @@ function IncidentsAdmin() {
         )
         .order("occurred_at", { ascending: false });
       if (status !== "all") q = q.eq("status", status);
-      if (severity !== "all") q = q.eq("severity", severity);
+      if (severity !== "all") q = q.eq("severity", severity as Severity);
       const { data, error: e } = await q;
       if (e) throw e;
       return (data ?? []) as unknown as Row[];
