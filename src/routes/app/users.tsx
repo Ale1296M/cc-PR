@@ -111,19 +111,19 @@ function UsersPage() {
         <p className="card-soft p-6 text-sm text-muted-foreground">No users in this view.</p>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {filtered.map((u) => (
           <div
             key={u.id}
-            className="card-soft flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="card-soft flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0">
               <p className="truncate font-medium">{u.full_name || "Unnamed"}</p>
               <p className="truncate text-sm text-muted-foreground">{u.email ?? "No email on file"}</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <span
-                className={`rounded-full px-3 py-1 text-xs capitalize ${
+                className={`rounded-full px-4 py-1 text-xs capitalize ${
                   u.role ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
                 }`}
               >
@@ -135,7 +135,7 @@ function UsersPage() {
                 onChange={(e) =>
                   mutate.mutate({ userId: u.id, role: (e.target.value || null) as AppRole | null })
                 }
-                className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm capitalize"
+                className="rounded-lg border border-border bg-background px-4 py-1.5 text-sm capitalize"
               >
                 <option value="">Pending (no role)</option>
                 {ROLES.map((r) => (

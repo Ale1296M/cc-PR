@@ -152,7 +152,7 @@ export default function AdminShiftCalendar({ adminId }: { adminId: string }) {
         />
       )}
 
-      <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
+      <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
         {SHIFT_STATUSES.map((s) => (
           <span key={s} className="inline-flex items-center gap-2">
             <span

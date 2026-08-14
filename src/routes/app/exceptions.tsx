@@ -73,7 +73,7 @@ function VisitExceptions() {
         </p>
       </header>
 
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-6 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
             key={f.key}

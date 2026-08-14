@@ -381,7 +381,7 @@ function WellbeingTrends() {
             setRecipientId(e.target.value);
             setSelectedDay(null);
           }}
-          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
         >
           {list.map((r) => (
             <option key={r.id} value={r.id}>
@@ -392,7 +392,7 @@ function WellbeingTrends() {
       )}
 
       {flags.length > 0 && (
-        <div className="card-soft mb-6 flex gap-3 border-l-4 border-gold bg-gold/10 p-4">
+        <div className="card-soft mb-6 flex gap-4 border-l-4 border-gold bg-gold/10 p-4">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
           <div>
             <p className="font-medium">Pattern worth a conversation</p>
@@ -405,8 +405,8 @@ function WellbeingTrends() {
         </div>
       )}
 
-      <section className="card-soft p-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
+      <section className="card-soft p-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
           <h2 className="font-display text-2xl">Day by day</h2>
           <DeltaBadge delta={delta} />
         </div>
@@ -440,7 +440,7 @@ function WellbeingTrends() {
         </div>
       </section>
 
-      <section className="card-soft mt-6 p-5">
+      <section className="card-soft mt-6 p-6">
         <h2 className="font-display text-2xl">Overall recorded score</h2>
         {chartData.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
@@ -471,7 +471,7 @@ function WellbeingTrends() {
             </ResponsiveContainer>
           </div>
         )}
-        <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
+        <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
           This screen shows trends and patterns from caregiver-recorded check-ins only. It is not a
           medical assessment and should not be used to make health decisions. If you have questions
           about your family member&apos;s wellbeing, please speak with their care team or a
@@ -479,7 +479,7 @@ function WellbeingTrends() {
         </p>
       </section>
 
-      <section className="card-soft mt-6 p-5">
+      <section className="card-soft mt-6 p-6">
         <h2 className="font-display text-2xl">
           {activeDay
             ? new Date(`${activeDay.key}T00:00:00`).toLocaleDateString(undefined, {
@@ -490,7 +490,7 @@ function WellbeingTrends() {
             : "Day detail"}
         </h2>
         {!activeDay?.entry ? (
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-4 text-sm text-muted-foreground">
             No check-in was recorded on this day. Select another day in the ribbon above.
           </p>
         ) : (
@@ -499,7 +499,7 @@ function WellbeingTrends() {
               const v = activeDay ? visitByDay.get(activeDay.key) : null;
               if (!v) return null;
               return (
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                   <span>
                     Arrived{" "}
                     {new Date(v.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
@@ -511,7 +511,7 @@ function WellbeingTrends() {
                 </div>
               );
             })()}
-            <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <Detail label="Mood" value={moodLabel(activeDay.entry.mood_scale)} />
               <Detail label="Appetite" value={capitalise(activeDay.entry.food_appetite)} />
               <Detail label="Medicine" value={medicineLabel(activeDay.entry.medicine_taken)} />
@@ -544,7 +544,7 @@ function WellbeingTrends() {
         )}
       </section>
 
-      <section className="card-soft mt-6 p-5">
+      <section className="card-soft mt-6 p-6">
         <h2 className="font-display text-2xl">Task completion by category</h2>
         {categories.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
@@ -595,7 +595,7 @@ function DeltaBadge({ delta }: { delta: number | null }) {
 
 function Detail({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="rounded-xl border border-border p-3">
+    <div className="rounded-xl border border-border p-4">
       <dt className="text-xs uppercase tracking-widest text-muted-foreground">{label}</dt>
       <dd className="mt-1 font-display text-xl">{value ?? "Not recorded"}</dd>
     </div>

@@ -83,9 +83,9 @@ function Choice<T extends string | number>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="card-soft p-5">
+    <div className="card-soft p-6">
       <p className="font-display text-xl">{title}</p>
-      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
         {options.map((o) => {
           const active = value === o.value;
           return (
@@ -93,7 +93,7 @@ function Choice<T extends string | number>({
               key={String(o.value)}
               type="button"
               onClick={() => onChange(o.value)}
-              className={`min-h-11 rounded-xl border px-4 py-3 text-sm transition ${
+              className={`min-h-11 rounded-xl border px-4 py-4 text-sm transition ${
                 active
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background hover:bg-secondary/50"
@@ -230,16 +230,16 @@ function VisitFlow() {
 
   if (done) {
     return (
-      <div className="mx-auto max-w-2xl py-10 text-center">
+      <div className="mx-auto max-w-2xl py-12 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Check className="h-7 w-7" />
         </div>
-        <h1 className="mt-5 font-display text-4xl">Visit saved</h1>
+        <h1 className="mt-6 font-display text-4xl">Visit saved</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {done.name ? `${done.name}'s visit` : "This visit"} was recorded · {done.duration}.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/app" className="min-h-11 rounded-xl bg-primary px-5 py-3 text-sm text-primary-foreground">
+        <div className="mt-6 flex flex-wrap justify-center gap-4">
+          <Link to="/app" className="min-h-11 rounded-xl bg-primary px-6 py-4 text-sm text-primary-foreground">
             Back to home
           </Link>
           <button
@@ -254,7 +254,7 @@ function VisitFlow() {
               setHygiene(null);
               setNotes("");
             }}
-            className="min-h-11 rounded-xl border border-border px-5 py-3 text-sm hover:bg-secondary/50"
+            className="min-h-11 rounded-xl border border-border px-6 py-4 text-sm hover:bg-secondary/50"
           >
             Log another visit
           </button>
@@ -292,12 +292,12 @@ function VisitFlow() {
           />
         )}
         {list.length === 1 && (
-          <p className="card-soft p-5 font-display text-2xl">Visiting {list[0].full_name}</p>
+          <p className="card-soft p-6 font-display text-2xl">Visiting {list[0].full_name}</p>
         )}
         {list.length > 1 && (
           <>
-            <h2 className="mb-3 font-display text-2xl">Who are you visiting?</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <h2 className="mb-4 font-display text-2xl">Who are you visiting?</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
               {list.map((r) => {
                 const activeSel = recipientId === r.id;
                 return (
@@ -305,7 +305,7 @@ function VisitFlow() {
                     key={r.id}
                     type="button"
                     onClick={() => setPicked(r.id)}
-                    className={`card-soft min-h-11 p-5 text-left transition ${
+                    className={`card-soft min-h-11 p-6 text-left transition ${
                       activeSel ? "ring-2 ring-primary" : "hover:bg-secondary/40"
                     }`}
                   >
@@ -323,16 +323,16 @@ function VisitFlow() {
 
       {recipient && (
         <section className="mt-8">
-          <h2 className="mb-3 font-display text-2xl">Clock in</h2>
+          <h2 className="mb-4 font-display text-2xl">Clock in</h2>
           {activePending ? (
             <LoadingState label="Checking for an open visit…" />
           ) : !active ? (
-            <div className="card-soft p-5">
+            <div className="card-soft p-6">
               <button
                 type="button"
                 onClick={() => clockIn.mutate()}
                 disabled={clockIn.isPending}
-                className="min-h-11 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+                className="min-h-11 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
               >
                 {clockIn.isPending ? "Checking location…" : "Clock in now"}
               </button>
@@ -342,7 +342,7 @@ function VisitFlow() {
               </p>
             </div>
           ) : (
-            <div className="card-soft flex flex-wrap items-center gap-3 p-5">
+            <div className="card-soft flex flex-wrap items-center gap-4 p-6">
               <p className="text-sm">
                 Clocked in at{" "}
                 {new Date(active.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
@@ -369,7 +369,7 @@ function VisitFlow() {
           <Choice title="Movement" options={MOVEMENT} value={movement} onChange={setMovement} />
           <Choice title="Hygiene" options={HYGIENE} value={hygiene} onChange={setHygiene} />
 
-          <div className="card-soft p-5">
+          <div className="card-soft p-6">
             <label htmlFor="visit-notes" className="font-display text-xl">
               Notes <span className="text-sm text-muted-foreground">(optional)</span>
             </label>
@@ -379,7 +379,7 @@ function VisitFlow() {
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
               placeholder="Anything the family should know about today's visit."
-              className="mt-3 w-full rounded-xl border border-border bg-background p-3 text-sm"
+              className="mt-4 w-full rounded-xl border border-border bg-background p-4 text-sm"
             />
           </div>
 
@@ -387,7 +387,7 @@ function VisitFlow() {
             type="button"
             disabled={!complete || finish.isPending}
             onClick={() => finish.mutate()}
-            className="min-h-11 w-full rounded-xl bg-primary px-5 py-4 text-primary-foreground disabled:opacity-50"
+            className="min-h-11 w-full rounded-xl bg-primary px-6 py-4 text-primary-foreground disabled:opacity-50"
           >
             {finish.isPending ? "Saving…" : "Clock out & save visit"}
           </button>
@@ -399,7 +399,7 @@ function VisitFlow() {
           <button
             type="button"
             onClick={() => setReporting(true)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-5 text-sm hover:bg-secondary/50"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 text-sm hover:bg-secondary/50"
           >
             <AlertTriangle className="h-4 w-4" /> Report an incident
           </button>

@@ -5,7 +5,7 @@ export function LoadingState({ label = "Loading…" }: { label?: string }) {
     <div
       role="status"
       aria-live="polite"
-      className="card-soft flex items-center gap-3 p-6 text-sm text-muted-foreground"
+      className="card-soft flex items-center gap-4 p-6 text-sm text-muted-foreground"
     >
       <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
       <span>{label}</span>

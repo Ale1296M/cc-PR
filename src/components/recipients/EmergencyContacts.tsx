@@ -38,7 +38,7 @@ const emptyDraft: Draft = {
 };
 
 const inputCls =
-  "mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm";
+  "mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm";
 
 export function EmergencyContacts({
   careRecipientId,
@@ -168,9 +168,9 @@ export function EmergencyContacts({
   }
 
   const form = (
-    <div className="card-soft space-y-3 p-5">
+    <div className="card-soft space-y-4 p-6">
       <h3 className="font-display text-xl">{editingId ? "Edit contact" : "New contact"}</h3>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <label className="text-sm">
           Full name
           <input
@@ -224,7 +224,7 @@ export function EmergencyContacts({
           value={draft.notes}
           onChange={(e) => setDraft({ ...draft, notes: e.target.value })}
           rows={2}
-          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
           placeholder="Best reached after 5pm…"
         />
       </label>
@@ -237,19 +237,19 @@ export function EmergencyContacts({
         />
         Primary contact — called first in an emergency
       </label>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-4">
         <button
           type="button"
           onClick={() => save.mutate()}
           disabled={save.isPending}
-          className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+          className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
         >
           {save.isPending ? "Saving…" : editingId ? "Save changes" : "Add contact"}
         </button>
         <button
           type="button"
           onClick={reset}
-          className="min-h-10 rounded-full border border-border px-5 text-sm hover:bg-secondary/50"
+          className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50"
         >
           Cancel
         </button>
@@ -258,8 +258,8 @@ export function EmergencyContacts({
   );
 
   return (
-    <section className="mb-10">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+    <section className="mb-12">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
         <h2 className="font-display text-2xl">Emergency contacts</h2>
         {canEdit && !adding && !editingId && (
           <button
@@ -294,7 +294,7 @@ export function EmergencyContacts({
       {(contacts ?? []).length > 0 && (
         <div className="card-soft divide-y divide-border">
           {(contacts ?? []).map((c) => (
-            <div key={c.id} className="flex flex-wrap items-start justify-between gap-3 p-4">
+            <div key={c.id} className="flex flex-wrap items-start justify-between gap-4 p-4">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium">{c.full_name}</p>
@@ -307,7 +307,7 @@ export function EmergencyContacts({
                     <span className="text-xs text-muted-foreground">{c.relationship}</span>
                   )}
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+                <div className="mt-2 flex flex-wrap items-center gap-4 text-sm">
                   <a
                     href={`tel:${c.phone_primary.replace(/[^+\d]/g, "")}`}
                     className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"

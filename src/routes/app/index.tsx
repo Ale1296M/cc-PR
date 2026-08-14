@@ -117,7 +117,7 @@ function Dashboard() {
         <section className="mt-6">
           <Link
             to={role === "family_member" ? "/app/wellbeing" : "/app/visit"}
-            className="card-soft flex items-center justify-between p-5 transition hover:bg-secondary/40"
+            className="card-soft flex items-center justify-between p-6 transition hover:bg-secondary/40"
           >
             <div>
               <p className="font-display text-2xl">
@@ -134,8 +134,8 @@ function Dashboard() {
         </section>
       )}
 
-      <section className="mt-10">
-        <div className="mb-3 flex items-center justify-between">
+      <section className="mt-12">
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-2xl">Upcoming this week</h2>
           <Link to="/app/schedule" className="text-sm text-primary hover:underline">
             Full schedule →
@@ -163,7 +163,7 @@ function Dashboard() {
             const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
             const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);
             return (
-              <div key={s.id} className="flex items-center gap-3 p-4 sm:gap-4">
+              <div key={s.id} className="flex items-center gap-4 p-4 sm:gap-4">
                 <div className="w-16 shrink-0 text-sm sm:w-20">
                   <p className="font-medium">
                     {d.toLocaleDateString(undefined, { weekday: "short" })}
@@ -181,7 +181,7 @@ function Dashboard() {
                     {Math.round((+e - +d) / 3600000)}h · {s.status}
                   </p>
                 </div>
-                <span className="hidden shrink-0 rounded-full bg-secondary px-3 py-1 text-xs sm:inline">
+                <span className="hidden shrink-0 rounded-full bg-secondary px-4 py-1 text-xs sm:inline">
                   {s.status}
                 </span>
               </div>
@@ -196,7 +196,7 @@ function Dashboard() {
 
 function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
-    <div className={`card-soft p-5 ${accent ? "bg-gold/10" : ""}`}>
+    <div className={`card-soft p-6 ${accent ? "bg-gold/10" : ""}`}>
       <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className="mt-2 font-display text-4xl">{value}</p>
     </div>

@@ -100,12 +100,12 @@ function Landing() {
 
   return (
     <div className="min-h-screen" lang={lang}>
-      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-7">
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
         <Link to="/" className="flex items-center gap-2.5">
           <Logo />
           <span className="font-display text-2xl tracking-tight">Con Cariño PR</span>
         </Link>
-        <nav className="flex items-center gap-3 text-sm">
+        <nav className="flex items-center gap-4 text-sm">
           <LangToggle lang={lang} onChange={setLanguage} />
           <Link
             to="/auth"
@@ -116,7 +116,7 @@ function Landing() {
           <Link
             to="/auth"
             search={{ mode: "signup" }}
-            className="min-h-10 rounded-full bg-primary px-5 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
+            className="min-h-10 rounded-full bg-primary px-6 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
           >
             {t.getStarted}
           </Link>
@@ -124,7 +124,7 @@ function Landing() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 pb-28">
-        <section className="grid gap-16 pt-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-14 md:pt-24">
+        <section className="grid gap-16 pt-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-16 md:pt-24">
           <div>
             <p className="mb-8 flex items-center gap-2.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold" />
@@ -134,20 +134,20 @@ function Landing() {
               {t.headlineLead}{" "}
               <em className="italic text-foreground">{t.headlineAccent}</em>.
             </h1>
-            <p className="mt-10 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+            <p className="mt-12 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
               {t.lede}
             </p>
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-12 flex flex-wrap gap-4">
               <Link
                 to="/auth"
                 search={{ mode: "signup" }}
-                className="min-h-11 rounded-full bg-primary px-7 py-3 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                className="min-h-11 rounded-full bg-primary px-8 py-4 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
               >
                 {t.ctaPrimary}
               </Link>
               <Link
                 to="/auth"
-                className="min-h-11 rounded-full border border-border px-7 py-3 transition-colors hover:border-primary"
+                className="min-h-11 rounded-full border border-border px-8 py-4 transition-colors hover:border-primary"
               >
                 {t.ctaSecondary}
               </Link>
@@ -157,14 +157,14 @@ function Landing() {
           <SchedulePreview t={t} />
         </section>
 
-        <section className="mt-32 border-t border-border pt-14 md:mt-40">
+        <section className="mt-32 border-t border-border pt-16 md:mt-40">
           <div className="grid gap-x-16 gap-y-12 md:grid-cols-2">
             {t.features.map((f, i) => {
               const Icon = FEATURE_ICONS[i];
               return (
                 <div
                   key={f.title}
-                  className="flex gap-4 border-b border-border/70 pb-10 last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0"
+                  className="flex gap-4 border-b border-border/70 pb-12 last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0"
                 >
                   <Icon className="mt-1 h-5 w-5 shrink-0 text-primary/70" aria-hidden="true" />
                   <div>
@@ -203,7 +203,7 @@ function LangToggle({ lang, onChange }: { lang: Lang; onChange: (l: Lang) => voi
           type="button"
           onClick={() => onChange(code)}
           aria-pressed={lang === code}
-          className={`min-h-8 rounded-full px-3 py-1.5 uppercase tracking-wide transition-colors ${
+          className={`min-h-8 rounded-full px-4 py-1.5 uppercase tracking-wide transition-colors ${
             lang === code
               ? "bg-secondary text-secondary-foreground"
               : "text-muted-foreground hover:text-foreground"
@@ -224,9 +224,9 @@ function SchedulePreview({ t }: { t: (typeof COPY)["en"] | (typeof COPY)["es"] }
         className="absolute -inset-6 -z-10 rounded-[2rem] bg-secondary/40 blur-2xl"
       />
       <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_24px_60px_-32px_oklch(0.24_0.035_155/0.45)]">
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between">
           <p className="font-display text-2xl">{t.today}</p>
-          <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+          <span className="rounded-full border border-border px-4 py-1 text-xs text-muted-foreground">
             {t.visits}
           </span>
         </div>
