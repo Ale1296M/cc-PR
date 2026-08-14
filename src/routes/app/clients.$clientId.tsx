@@ -146,7 +146,7 @@ function CareRecipientDetail() {
                   </p>
                   <VerifiedBadge verified={v.location_verified} />
                 </div>
-                {v.mood && <span className="rounded-full bg-gold/20 px-2 py-0.5 text-xs">{v.mood}</span>}
+                {v.mood && <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{v.mood}</span>}
               </div>
               <p className="text-xs text-muted-foreground">
                 by {(v.profiles as unknown as { full_name: string } | null)?.full_name ?? "Caregiver"}

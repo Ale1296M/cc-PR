@@ -32,14 +32,14 @@ export const statusLabel = (v: string) => STATUSES.find((s) => s.value === v)?.l
 
 export const severityClass: Record<string, string> = {
   low: "bg-secondary text-foreground",
-  medium: "bg-gold/20 text-foreground",
+  medium: "bg-secondary text-secondary-foreground",
   high: "bg-destructive/15 text-destructive",
   critical: "bg-destructive text-destructive-foreground",
 };
 
 export const statusClass: Record<string, string> = {
   open: "bg-destructive/15 text-destructive",
-  under_review: "bg-gold/20 text-foreground",
+  under_review: "bg-secondary text-secondary-foreground",
   resolved: "bg-primary/15 text-primary",
 };
 
