@@ -118,6 +118,9 @@
   --gold-foreground: oklch(0.24 0.04 155);
   --destructive: oklch(0.6 0.19 27);
   --destructive-foreground: oklch(0.96 0.014 90);
+  --attention: oklch(0.75 0.09 55);
+  --attention-soft: oklch(0.32 0.05 45);
+  --attention-foreground: oklch(0.94 0.03 60);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.78 0.14 85);
