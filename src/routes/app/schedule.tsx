@@ -103,17 +103,22 @@ function CaregiverSchedule({ uid }: { uid?: string }) {
 
   return (
     <>
-      {isPending && <LoadingState label="Loading the schedule…" />}
-      {error && <ErrorState what="the schedule" error={error} onRetry={() => refetch()} />}
-      {!isPending && !error && Object.keys(groups).length === 0 && (
-        <EmptyState
-          title="No shifts scheduled"
-          hint="Once the care team assigns you a visit, it will appear here."
-        />
-      )}
-
+      <AsyncState
+        isPending={isPending}
+        error={error}
+        data={groups}
+        what="your schedule"
+        onRetry={() => refetch()}
+        skeleton="rows"
+        isEmpty={(g) => Object.keys(g).length === 0}
+        empty={{
+          title: "No visits scheduled yet",
+          hint: "Visits you're assigned will appear here, grouped by day.",
+        }}
+      >
+        {(byDay) => (
       <div className="space-y-8">
-        {Object.entries(groups).map(([day, list]) => (
+        {Object.entries(byDay).map(([day, list]) => (
           <section key={day}>
             <h2 className="type-section mb-4">{formatDay(day)}</h2>
             <div className="card-soft divide-y divide-border">
@@ -150,6 +155,8 @@ function CaregiverSchedule({ uid }: { uid?: string }) {
           </section>
         ))}
       </div>
+        )}
+      </AsyncState>
     </>
   );
 }
