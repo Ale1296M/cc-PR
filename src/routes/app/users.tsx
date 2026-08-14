@@ -1,4 +1,5 @@
 import { RoleGate } from "@/lib/role-gate";
+import { AsyncState } from "@/components/ui/async-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -44,7 +45,7 @@ function UsersPage() {
   const fetchUsers = useServerFn(listUsers);
   const updateRole = useServerFn(setUserRole);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => fetchUsers(),
     enabled: role === "admin",
@@ -150,6 +151,8 @@ function UsersPage() {
           </div>
         ))}
       </div>
+        )}
+      </AsyncState>
     </div>
   );
 }
