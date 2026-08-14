@@ -333,11 +333,7 @@ function ClockInBar({
   const clockIn = useMutation({
     mutationFn: async () => {
       setLocating(true);
-      return clockInVisit({
-        caregiverId: user!.id,
-        careRecipientId,
-        fence: { homeLat, homeLng, radiusM },
-      }).finally(() => setLocating(false));
+      return clockInVisit({ careRecipientId }).finally(() => setLocating(false));
     },
     onSuccess: (res) => {
       toast.success(res?.location_verified ? "Clocked in · location verified" : "Clocked in");
