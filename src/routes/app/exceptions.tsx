@@ -103,7 +103,7 @@ function VisitExceptions() {
         }}
       >
         {(rows) => (
-      <div className="card-soft divide-y divide-border">
+      <div className="divide-y divide-border border-t border-border">
         {rows.map((v) => {
           const recipient = (v.care_recipients as unknown as { full_name: string } | null)?.full_name;
           const caregiver = (v.profiles as unknown as { full_name: string } | null)?.full_name;

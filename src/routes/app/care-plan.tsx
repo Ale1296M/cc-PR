@@ -185,7 +185,7 @@ function AdminCarePlan() {
         }}
       >
         {(list) => (
-      <div className="card-soft mb-6 divide-y divide-border">
+      <div className="mb-6 divide-y divide-border border-t border-border">
         {list.map((item) => (
           <div key={item.id} className="flex flex-wrap items-center gap-4 p-4">
             <div className="min-w-0 flex-1">
@@ -452,7 +452,7 @@ function CaregiverChecklist() {
               hint="An admin can add tasks for this care recipient on the Care plan screen."
             />
           )}
-          <div className={`card-soft divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
+          <div className={`divide-y divide-border border-t border-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
             {(items ?? []).map((item) => {
               const c = completionFor(item.id);
               const checked = !!c?.completed;
@@ -566,7 +566,7 @@ function FamilyCarePlan() {
           hint={`The care team hasn't added visit tasks${activeName ? ` for ${activeName}` : ""} yet.`}
         />
       )}
-      <div className={`card-soft divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
+      <div className={`divide-y divide-border border-t border-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
         {(items ?? []).map((i) => (
           <div key={i.id} className="p-4">
             <p className="text-sm font-medium">{i.task_description}</p>

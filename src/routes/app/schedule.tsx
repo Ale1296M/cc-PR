@@ -121,7 +121,7 @@ function CaregiverSchedule({ uid }: { uid?: string }) {
         {Object.entries(byDay).map(([day, list]) => (
           <section key={day}>
             <h2 className="type-section mb-4">{formatDay(day)}</h2>
-            <div className="card-soft divide-y divide-border">
+            <div className="divide-y divide-border border-t border-border">
               {list.map((s) => (
                 <div
                   key={s.id}

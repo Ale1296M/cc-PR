@@ -76,7 +76,7 @@ export function RecipientIncidents({
       )}
 
       {(data ?? []).length > 0 && (
-        <div className="card-soft divide-y divide-border">
+        <div className="divide-y divide-border border-t border-border">
           {(data ?? []).map((i) => (
             <article key={i.id} className="p-4">
               <div className="flex flex-wrap items-center gap-2">

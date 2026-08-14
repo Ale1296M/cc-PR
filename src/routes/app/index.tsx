@@ -230,7 +230,7 @@ function Dashboard() {
           }}
         >
           {(list) => (
-            <div className="card-soft divide-y divide-border">
+            <div className="divide-y divide-border border-t border-border">
               {list.slice(0, 8).map((s) => {
                 const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
                 const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);

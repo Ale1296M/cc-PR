@@ -133,7 +133,7 @@ function CareRecipientDetail() {
             hint="Visits appear here once a caregiver clocks in and out for this person."
           />
         )}
-        <div className={`card-soft divide-y divide-border ${(visits ?? []).length === 0 ? "hidden" : ""}`}>
+        <div className={`divide-y divide-border border-t border-border ${(visits ?? []).length === 0 ? "hidden" : ""}`}>
           {(visits ?? []).map((v) => (
             <div key={v.id} className="p-4">
               <div className="flex flex-wrap items-center justify-between gap-2 text-sm">

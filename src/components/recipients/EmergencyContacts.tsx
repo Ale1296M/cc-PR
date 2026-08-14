@@ -292,7 +292,7 @@ export function EmergencyContacts({
       )}
 
       {(contacts ?? []).length > 0 && (
-        <div className="card-soft divide-y divide-border">
+        <div className="divide-y divide-border border-t border-border">
           {(contacts ?? []).map((c) => (
             <div key={c.id} className="flex flex-wrap items-start justify-between gap-4 p-4">
               <div className="min-w-0">
