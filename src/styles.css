@@ -77,6 +77,10 @@
   --gold-foreground: oklch(0.24 0.04 155);
   --destructive: oklch(0.55 0.19 27);
   --destructive-foreground: oklch(0.985 0.012 92);
+  /* Soft clay — informs without alarming (family-facing "needs attention") */
+  --attention: oklch(0.62 0.09 45);
+  --attention-soft: oklch(0.93 0.045 60);
+  --attention-foreground: oklch(0.32 0.06 45);
   --border: oklch(0.88 0.022 120);
   --input: oklch(0.9 0.02 120);
   --ring: oklch(0.55 0.09 155);
