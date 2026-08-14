@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { RoleGate } from "@/lib/role-gate";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncState } from "@/components/ui/async-state";
 import { formatDuration } from "@/lib/geo";
 
 export const Route = createFileRoute("/app/exceptions")({
