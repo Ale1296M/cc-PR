@@ -282,7 +282,7 @@ function HeroShell({
   children: React.ReactNode;
   secondary: string;
 }) {
-  if (isPending) return <AsyncSkeleton shape="rows" rows={2} />;
+  if (isPending) return <AsyncSkeleton shape="rows" count={2} />;
   if (error) return <AsyncError what={what} error={error} onRetry={onRetry} />;
   return (
     <section>
