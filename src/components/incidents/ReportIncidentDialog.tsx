@@ -61,18 +61,18 @@ export function ReportIncidentDialog({
   return (
     <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-foreground/30 p-4">
       <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="font-display text-2xl">Report an incident</h3>
+        <h3 className="type-subhead">Report an incident</h3>
         {recipientName && (
           <p className="mt-1 text-sm text-muted-foreground">For {recipientName}</p>
         )}
-        <div className="mt-4 space-y-3">
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-sm">
               What happened
               <select
                 value={incidentType}
                 onChange={(e) => setIncidentType(e.target.value as IncidentType)}
-                className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+                className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
               >
                 {INCIDENT_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>{t.label}</option>
@@ -84,7 +84,7 @@ export function ReportIncidentDialog({
               <select
                 value={severity}
                 onChange={(e) => setSeverity(e.target.value as Severity)}
-                className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+                className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
               >
                 {SEVERITIES.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
@@ -98,7 +98,7 @@ export function ReportIncidentDialog({
               type="datetime-local"
               value={occurredAt}
               onChange={(e) => setOccurredAt(e.target.value)}
-              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
           <label className="block text-sm">
@@ -108,7 +108,7 @@ export function ReportIncidentDialog({
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Describe what happened, where, and who was present."
-              className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
+              className="mt-1 w-full rounded-xl border border-border bg-background p-4 text-sm"
             />
           </label>
           <label className="block text-sm">
@@ -118,7 +118,7 @@ export function ReportIncidentDialog({
               onChange={(e) => setActionTaken(e.target.value)}
               rows={3}
               placeholder="First aid given, family called, 911 contacted…"
-              className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
+              className="mt-1 w-full rounded-xl border border-border bg-background p-4 text-sm"
             />
           </label>
         </div>
@@ -126,7 +126,7 @@ export function ReportIncidentDialog({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-10 rounded-full border border-border px-5 text-sm hover:bg-secondary/50"
+            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50"
           >
             Cancel
           </button>
@@ -134,7 +134,7 @@ export function ReportIncidentDialog({
             type="button"
             disabled={submit.isPending}
             onClick={() => submit.mutate()}
-            className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             {submit.isPending ? "Filing…" : "File report"}
           </button>

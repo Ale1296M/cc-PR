@@ -70,7 +70,7 @@
   --secondary: oklch(0.94 0.02 130);
   --secondary-foreground: oklch(0.3 0.05 155);
   --muted: oklch(0.95 0.014 100);
-  --muted-foreground: oklch(0.48 0.03 150);
+  --muted-foreground: oklch(0.415 0.032 150);
   --accent: oklch(0.82 0.12 88);
   --accent-foreground: oklch(0.28 0.05 155);
   --gold: oklch(0.78 0.14 85);
@@ -107,7 +107,7 @@
   --secondary: oklch(0.3 0.045 155);
   --secondary-foreground: oklch(0.96 0.014 90);
   --muted: oklch(0.28 0.03 155);
-  --muted-foreground: oklch(0.72 0.02 120);
+  --muted-foreground: oklch(0.78 0.022 120);
   --accent: oklch(0.35 0.05 155);
   --accent-foreground: oklch(0.96 0.014 90);
   --gold: oklch(0.78 0.14 85);
@@ -164,4 +164,51 @@
   background-image: linear-gradient(transparent 62%, var(--color-gold) 62%, var(--color-gold) 82%, transparent 82%);
   background-repeat: no-repeat;
   background-size: 100% 100%;
+}
+
+/* ---- Type scale -------------------------------------------------------- */
+/* Display: page hero / person's name */
+@utility type-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 3rem;      /* text-5xl */
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  @media (width >= 48rem) {
+    font-size: 3.75rem; /* md:text-6xl */
+  }
+}
+
+/* Section heading */
+@utility type-section {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.875rem; /* text-3xl */
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+/* Subhead */
+@utility type-subhead {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.25rem; /* text-xl */
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+/* Body — never below 16px */
+@utility type-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Meta / labels */
+@utility type-meta {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.45;
 }

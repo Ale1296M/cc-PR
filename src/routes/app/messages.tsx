@@ -208,7 +208,7 @@ function MessagesPage() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Messages</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">{heading}</h1>
+        <h1 className="type-display mt-1">{heading}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{subheading}</p>
       </header>
 
@@ -246,7 +246,7 @@ function MessagesPage() {
                   <li key={f.id}>
                     <button
                       onClick={() => setThread({ kind: "family", id: f.id })}
-                      className={`min-h-11 w-full px-4 py-3 text-left text-sm hover:bg-secondary ${
+                      className={`min-h-11 w-full px-4 py-4 text-left text-sm hover:bg-secondary ${
                         thread.kind === "family" && thread.id === f.id ? "bg-secondary font-medium" : ""
                       }`}
                     >
@@ -255,7 +255,7 @@ function MessagesPage() {
                   </li>
                 ))}
                 {families.length === 0 && (
-                  <li className="px-4 py-3 text-sm text-muted-foreground">No families yet</li>
+                  <li className="px-4 py-4 text-sm text-muted-foreground">No families yet</li>
                 )}
               </ul>
               <p className="border-t border-border px-4 pt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -266,7 +266,7 @@ function MessagesPage() {
                   <li key={c.id}>
                     <button
                       onClick={() => setThread({ kind: "caregiver", id: c.id })}
-                      className={`min-h-11 w-full px-4 py-3 text-left text-sm hover:bg-secondary ${
+                      className={`min-h-11 w-full px-4 py-4 text-left text-sm hover:bg-secondary ${
                         thread.kind === "caregiver" && thread.id === c.id ? "bg-secondary font-medium" : ""
                       }`}
                     >
@@ -275,14 +275,14 @@ function MessagesPage() {
                   </li>
                 ))}
                 {(caregiverList ?? []).length === 0 && (
-                  <li className="px-4 py-3 text-sm text-muted-foreground">No caregivers yet</li>
+                  <li className="px-4 py-4 text-sm text-muted-foreground">No caregivers yet</li>
                 )}
               </ul>
             </aside>
           )}
 
           <section className="flex min-h-[50vh] flex-col">
-            <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            <div className="flex-1 space-y-4 overflow-y-auto p-4">
               {messagesPending && <p className="text-sm text-muted-foreground">Loading messages…</p>}
               {messagesError && (
                 <ErrorState what="these messages" error={messagesError} onRetry={() => refetchMessages()} />
@@ -295,7 +295,7 @@ function MessagesPage() {
                       <p className="mb-1 text-[11px] text-muted-foreground">{nameOf(m.sender_profile_id)}</p>
                     )}
                     <div
-                      className={`inline-block rounded-2xl px-3 py-2 text-left text-sm ${
+                      className={`inline-block rounded-2xl px-4 py-2 text-left text-sm ${
                         mine ? "bg-primary text-primary-foreground" : "bg-secondary"
                       }`}
                     >
@@ -321,7 +321,7 @@ function MessagesPage() {
                 e.preventDefault();
                 if (body.trim()) send.mutate();
               }}
-              className="flex gap-2 border-t border-border p-3"
+              className="flex gap-2 border-t border-border p-4"
             >
               <input
                 value={body}

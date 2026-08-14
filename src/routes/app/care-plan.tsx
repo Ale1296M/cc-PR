@@ -142,7 +142,7 @@ function AdminCarePlan() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="mt-1 font-display text-4xl">Checklist builder</h1>
+        <h1 className="type-display mt-1">Checklist builder</h1>
       </header>
 
       {recipientsError && (
@@ -165,7 +165,7 @@ function AdminCarePlan() {
         aria-label="Care recipient"
         value={active}
         onChange={(e) => setRecipientId(e.target.value)}
-        className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
+        className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
       >
         {(recipients ?? []).map((r) => (
           <option key={r.id} value={r.id}>{r.full_name}{r.city ? ` · ${r.city}` : ""}</option>
@@ -186,7 +186,7 @@ function AdminCarePlan() {
       )}
       <div className={`card-soft mb-6 divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
         {(items ?? []).map((item) => (
-          <div key={item.id} className="flex flex-wrap items-center gap-3 p-4">
+          <div key={item.id} className="flex flex-wrap items-center gap-4 p-4">
             <div className="min-w-0 flex-1">
               <input
                 defaultValue={item.task_description}
@@ -240,20 +240,20 @@ function AdminCarePlan() {
           onChange={(e) => setTask(e.target.value)}
           placeholder="Task description…"
           aria-label="Task description"
-          className="min-h-10 min-w-[12rem] flex-1 rounded-md border border-border bg-background px-3 text-sm"
+          className="min-h-10 min-w-[12rem] flex-1 rounded-md border border-border bg-background px-4 text-sm"
         />
         <input
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           placeholder="Category"
           aria-label="Category"
-          className="min-h-10 w-40 rounded-md border border-border bg-background px-3 text-sm"
+          className="min-h-10 w-40 rounded-md border border-border bg-background px-4 text-sm"
         />
         <select
           value={frequency}
           onChange={(e) => setFrequency(e.target.value)}
           aria-label="Frequency"
-          className="min-h-10 rounded-md border border-border bg-background px-3 text-sm"
+          className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
         >
           {FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
         </select>
@@ -394,7 +394,7 @@ function CaregiverChecklist() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Today’s visit</p>
-        <h1 className="mt-1 font-display text-4xl">Care checklist</h1>
+        <h1 className="type-display mt-1">Care checklist</h1>
       </header>
 
       {shiftsPending && <LoadingState label="Loading today's visits…" />}
@@ -411,7 +411,7 @@ function CaregiverChecklist() {
           aria-label="Today's visit"
           value={active}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
         >
           {(shifts ?? []).map((s) => (
             <option key={s.id} value={s.care_recipient_id}>
@@ -426,7 +426,7 @@ function CaregiverChecklist() {
         <button
           onClick={() => startVisit.mutate()}
           disabled={startVisit.isPending}
-          className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+          className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
         >
           Start visit to use the checklist
         </button>
@@ -458,7 +458,7 @@ function CaregiverChecklist() {
                   <button
                     onClick={() => toggle.mutate({ itemId: item.id, completed: !checked })}
                     aria-pressed={checked}
-                    className="flex w-full min-h-10 items-start gap-3 py-1 text-left"
+                    className="flex w-full min-h-10 items-start gap-4 py-1 text-left"
                   >
                     <span
                       className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border ${
@@ -483,7 +483,7 @@ function CaregiverChecklist() {
                     onBlur={(e) =>
                       toggle.mutate({ itemId: item.id, completed: checked, notes: e.target.value || null })
                     }
-                    className="mt-3 min-h-10 w-full rounded-md border border-border bg-background px-3 text-xs"
+                    className="mt-4 min-h-10 w-full rounded-md border border-border bg-background px-4 text-xs"
                   />
                 </div>
               );
@@ -493,7 +493,7 @@ function CaregiverChecklist() {
           <button
             onClick={() => endVisit.mutate()}
             disabled={endVisit.isPending}
-            className="mt-6 min-h-10 rounded-full border border-border px-5 text-sm disabled:opacity-50"
+            className="mt-6 min-h-10 rounded-full border border-border px-6 text-sm disabled:opacity-50"
           >
             End visit
           </button>
@@ -522,7 +522,7 @@ function FamilyCarePlan() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">
+        <h1 className="type-display mt-1">
           {activeName ? `${activeName}'s care plan` : "Your loved one's care plan"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -548,7 +548,7 @@ function FamilyCarePlan() {
           aria-label="Choose a person"
           value={active}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-3 text-sm"
+          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
         >
           {(recipients ?? []).map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
         </select>

@@ -83,7 +83,7 @@ function CareRecipientsPage() {
       <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
           <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipients</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl">Who we care for</h1>
+          <h1 className="type-display mt-1">Who we care for</h1>
         </div>
         {role === "admin" && (
           <button
@@ -110,7 +110,7 @@ function CareRecipientsPage() {
             key={c.id}
             to="/app/clients/$clientId"
             params={{ clientId: c.id }}
-            className="card-soft group p-5 transition hover:border-primary"
+            className="card-soft group p-6 transition hover:border-primary"
           >
             <p className="font-display text-2xl group-hover:text-primary">{c.full_name}</p>
             {(c.address_line || c.municipality || c.city) && (
@@ -119,7 +119,7 @@ function CareRecipientsPage() {
               </p>
             )}
             {c.emergency_contact_name && (
-              <p className="mt-3 text-xs text-muted-foreground">
+              <p className="mt-4 text-xs text-muted-foreground">
                 Emergency contact: {c.emergency_contact_name}
                 {c.emergency_contact_phone ? ` · ${c.emergency_contact_phone}` : ""}
               </p>
@@ -161,15 +161,15 @@ function NewCareRecipient({
   return (
     <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
       <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="mb-4 font-display text-2xl">New care recipient</h3>
-        <div className="space-y-3">
+        <h3 className="type-subhead mb-4">New care recipient</h3>
+        <div className="space-y-4">
           <F label="Full name" value={full_name} onChange={setName} />
           <label className="block">
             <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Family</span>
             <select
               value={family_id}
               onChange={(e) => setFamily(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
             >
               <option value="">Select a family…</option>
               {families.map((f) => (
@@ -203,7 +203,7 @@ function F({ label, value, onChange }: { label: string; value: string; onChange:
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
       />
     </label>
   );

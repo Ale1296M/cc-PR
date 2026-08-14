@@ -89,20 +89,20 @@ function IncidentsAdmin() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Safety</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">Incidents</h1>
+        <h1 className="type-display mt-1">Incidents</h1>
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
           Every report filed by a caregiver or family member, with a full record of who reported it
           and who closed it out.
         </p>
       </header>
 
-      <div className="mb-6 flex flex-wrap gap-3">
+      <div className="mb-6 flex flex-wrap gap-4">
         <label className="text-sm">
           Status
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as Status | "all")}
-            className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm sm:w-48"
+            className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
           >
             <option value="all">All statuses</option>
             {STATUSES.map((s) => (
@@ -115,7 +115,7 @@ function IncidentsAdmin() {
           <select
             value={severity}
             onChange={(e) => setSeverity(e.target.value)}
-            className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm sm:w-48"
+            className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
           >
             <option value="all">All severities</option>
             {SEVERITIES.map((s) => (
@@ -179,7 +179,7 @@ function IncidentCard({ row }: { row: Row }) {
   });
 
   return (
-    <article className="card-soft p-5">
+    <article className="card-soft p-6">
       <div className="flex flex-wrap items-center gap-2">
         <p className="font-display text-xl">{typeLabel(row.incident_type)}</p>
         <span className={`rounded-full px-2 py-0.5 text-xs ${severityClass[row.severity] ?? ""}`}>
@@ -201,12 +201,12 @@ function IncidentCard({ row }: { row: Row }) {
         · occurred {formatStamp(row.occurred_at)}
       </p>
 
-      <p className="mt-3 text-sm">{row.description}</p>
+      <p className="mt-4 text-sm">{row.description}</p>
       {row.action_taken && (
         <p className="mt-1 text-sm text-muted-foreground">Action taken: {row.action_taken}</p>
       )}
 
-      <dl className="mt-4 grid gap-1 rounded-xl bg-secondary/40 p-3 text-xs text-muted-foreground sm:grid-cols-2">
+      <dl className="mt-4 grid gap-1 rounded-xl bg-secondary/40 p-4 text-xs text-muted-foreground sm:grid-cols-2">
         <div>
           <dt className="inline font-medium">Reported by: </dt>
           <dd className="inline">
@@ -239,17 +239,17 @@ function IncidentCard({ row }: { row: Row }) {
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
           placeholder="What was done to close this out."
-          className="mt-1 w-full rounded-xl border border-border bg-background p-3 text-sm"
+          className="mt-1 w-full rounded-xl border border-border bg-background p-4 text-sm"
         />
       </label>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         {row.status !== "under_review" && (
           <button
             type="button"
             onClick={() => update.mutate("under_review")}
             disabled={update.isPending}
-            className="min-h-10 rounded-full border border-border px-5 text-sm hover:bg-secondary/50 disabled:opacity-50"
+            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
           >
             Mark under review
           </button>
@@ -259,7 +259,7 @@ function IncidentCard({ row }: { row: Row }) {
             type="button"
             onClick={() => update.mutate("resolved")}
             disabled={update.isPending}
-            className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             Resolve
           </button>
@@ -269,7 +269,7 @@ function IncidentCard({ row }: { row: Row }) {
             type="button"
             onClick={() => update.mutate("open")}
             disabled={update.isPending}
-            className="min-h-10 rounded-full border border-border px-5 text-sm hover:bg-secondary/50 disabled:opacity-50"
+            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
           >
             Reopen
           </button>

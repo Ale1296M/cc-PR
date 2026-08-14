@@ -72,9 +72,9 @@ function Choice<T extends string | number>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="card-soft p-5">
+    <div className="card-soft p-6">
       <p className="font-display text-xl">{title}</p>
-      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
         {options.map((o) => {
           const active = value === o.value;
           return (
@@ -82,7 +82,7 @@ function Choice<T extends string | number>({
               key={String(o.value)}
               type="button"
               onClick={() => onChange(o.value)}
-              className={`rounded-xl border px-4 py-3 text-sm transition ${
+              className={`rounded-xl border px-4 py-4 text-sm transition ${
                 active
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background hover:bg-secondary/50"
@@ -225,12 +225,12 @@ function LogVisit() {
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Check className="h-7 w-7" />
         </div>
-        <h1 className="mt-5 font-display text-4xl">Check-in saved</h1>
+        <h1 className="type-display mt-6">Check-in saved</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Today&apos;s wellbeing check-in has been recorded{savedName ? ` for ${savedName}` : ""}.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/app" className="min-h-11 rounded-xl bg-primary px-5 py-3 text-sm text-primary-foreground">
+        <div className="mt-6 flex flex-wrap justify-center gap-4">
+          <Link to="/app" className="min-h-11 rounded-xl bg-primary px-6 py-4 text-sm text-primary-foreground">
             Back to home
           </Link>
           <button
@@ -245,7 +245,7 @@ function LogVisit() {
               setHygiene(null);
               setNotes("");
             }}
-            className="min-h-11 rounded-xl border border-border px-5 py-3 text-sm hover:bg-secondary/50"
+            className="min-h-11 rounded-xl border border-border px-6 py-4 text-sm hover:bg-secondary/50"
           >
             Log another visit
           </button>
@@ -255,7 +255,7 @@ function LogVisit() {
   }
 
   return (
-      <main className="mx-auto min-h-screen max-w-3xl px-4 py-10 sm:px-6">
+      <main className="mx-auto min-h-screen max-w-3xl px-4 py-12 sm:px-6">
       <Link
         to="/app"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -271,11 +271,11 @@ function LogVisit() {
             day: "numeric",
           })}
         </p>
-        <h1 className="mt-1 font-display text-3xl md:text-5xl">Log a visit</h1>
+        <h1 className="type-display mt-1">Log a visit</h1>
       </header>
 
       <section>
-        <h2 className="mb-3 font-display text-2xl">Who are you visiting?</h2>
+        <h2 className="type-section mb-4">Who are you visiting?</h2>
         {recipientsPending && <LoadingState label="Loading your care recipients…" />}
         {recipientsError && (
           <ErrorState
@@ -290,7 +290,7 @@ function LogVisit() {
             hint="Once the care team assigns you a shift, the people you visit will appear here and you can log their check-in."
           />
         )}
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {(recipients ?? []).map((r) => {
             const active = recipientId === r.id;
             return (
@@ -298,7 +298,7 @@ function LogVisit() {
                 key={r.id}
                 type="button"
                 onClick={() => setRecipientId(r.id)}
-                className={`card-soft p-5 text-left transition ${
+                className={`card-soft p-6 text-left transition ${
                   active ? "ring-2 ring-primary" : "hover:bg-secondary/40"
                 }`}
               >
@@ -320,7 +320,7 @@ function LogVisit() {
           <Choice title="Movement" options={MOVEMENT} value={movement} onChange={setMovement} />
           <Choice title="Hygiene" options={HYGIENE} value={hygiene} onChange={setHygiene} />
 
-          <div className="card-soft p-5">
+          <div className="card-soft p-6">
             <label htmlFor="notes" className="font-display text-xl">
               Notes <span className="text-sm text-muted-foreground">(optional)</span>
             </label>
@@ -330,7 +330,7 @@ function LogVisit() {
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
               placeholder="Anything the family should know about today's visit."
-              className="mt-3 w-full rounded-xl border border-border bg-background p-3 text-sm"
+              className="mt-4 w-full rounded-xl border border-border bg-background p-4 text-sm"
             />
           </div>
 
@@ -340,7 +340,7 @@ function LogVisit() {
             type="button"
             disabled={!complete || saving}
             onClick={save}
-            className="w-full rounded-xl bg-primary px-5 py-4 text-primary-foreground disabled:opacity-50"
+            className="w-full rounded-xl bg-primary px-6 py-4 text-primary-foreground disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save check-in"}
           </button>

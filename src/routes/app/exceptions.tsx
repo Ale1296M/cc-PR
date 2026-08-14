@@ -66,14 +66,14 @@ function VisitExceptions() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">Visit exceptions</h1>
+        <h1 className="type-display mt-1">Visit exceptions</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Visits that couldn&apos;t be location-verified. Review them with the caregiver — a flag on
           its own doesn&apos;t mean anything went wrong.
         </p>
       </header>
 
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-6 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
             key={f.key}

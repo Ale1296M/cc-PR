@@ -69,7 +69,7 @@ function AuthPage() {
 
   return (
     <div className="grid min-h-screen md:grid-cols-2">
-      <div className="hidden flex-col justify-between bg-primary p-10 text-primary-foreground md:flex">
+      <div className="hidden flex-col justify-between bg-primary p-12 text-primary-foreground md:flex">
         <Link to="/" className="font-display text-3xl">Con Cariño PR</Link>
         <div>
           <p className="max-w-md font-display text-4xl leading-tight">
@@ -85,7 +85,7 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <Link to="/" className="mb-6 inline-block font-display text-2xl md:hidden">Con Cariño PR</Link>
-          <h1 className="font-display text-4xl">
+          <h1 className="type-display">
             {mode === "signup" ? "Create your account" : "Welcome back"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -125,7 +125,7 @@ function AuthPage() {
                         type="button"
                         key={o.v}
                         onClick={() => setLanguage(o.v)}
-                        className={`rounded-lg border px-3 py-2 text-sm transition ${
+                        className={`rounded-lg border px-4 py-2 text-sm transition ${
                           language === o.v
                             ? "border-primary bg-primary/5 text-primary"
                             : "border-border hover:border-primary/60"
@@ -136,7 +136,7 @@ function AuthPage() {
                     ))}
                   </div>
                 </Field>
-                <p className="rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                <p className="rounded-md border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
                   New accounts start without access to care data. An agency admin
                   assigns your role (caregiver or family member) after signup.
                 </p>
@@ -165,14 +165,14 @@ function AuthPage() {
             </Field>
 
             {error && (
-              <p className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+              <p className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
                 {error}
               </p>
             )}
 
             <button
               disabled={busy}
-              className="w-full rounded-full bg-primary px-4 py-3 font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+              className="w-full rounded-full bg-primary px-4 py-4 font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
             >
               {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
             </button>

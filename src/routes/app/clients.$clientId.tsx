@@ -93,7 +93,7 @@ function CareRecipientDetail() {
 
       <header className="card-soft mb-8 p-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipient</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">{recipient.full_name}</h1>
+        <h1 className="type-display mt-1">{recipient.full_name}</h1>
         <div className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
           {address && <p>📍 {address}</p>}
           {recipient.date_of_birth && <p>🎂 {new Date(recipient.date_of_birth).toLocaleDateString()}</p>}
@@ -107,8 +107,8 @@ function CareRecipientDetail() {
         {recipient.notes && <p className="mt-4 text-sm">{recipient.notes}</p>}
       </header>
 
-      <section className="mb-10">
-        <h2 className="mb-3 font-display text-2xl">Care plan</h2>
+      <section className="mb-12">
+        <h2 className="type-section mb-4">Care plan</h2>
         <p className="card-soft p-4 text-sm text-muted-foreground">
           Checklists now live per care recipient on the{" "}
           <Link to="/app/care-plan" className="text-primary underline">Care plan</Link> screen.
@@ -122,7 +122,7 @@ function CareRecipientDetail() {
       <RecipientIncidents careRecipientId={recipientId} recipientName={recipient.full_name} />
 
       <section>
-        <h2 className="mb-3 font-display text-2xl">Recent visits</h2>
+        <h2 className="type-section mb-4">Recent visits</h2>
         {visitsPending && <LoadingState label="Loading recent visits…" />}
         {visitsError && (
           <ErrorState what="recent visits" error={visitsError} onRetry={() => refetchVisits()} />
@@ -146,7 +146,7 @@ function CareRecipientDetail() {
                   </p>
                   <VerifiedBadge verified={v.location_verified} />
                 </div>
-                {v.mood && <span className="rounded-full bg-gold/20 px-2 py-0.5 text-xs">{v.mood}</span>}
+                {v.mood && <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{v.mood}</span>}
               </div>
               <p className="text-xs text-muted-foreground">
                 by {(v.profiles as unknown as { full_name: string } | null)?.full_name ?? "Caregiver"}
@@ -227,14 +227,14 @@ function HomeLocationCard({
       : null;
 
   return (
-    <section className="mb-10">
-      <h2 className="mb-3 font-display text-2xl">Home location</h2>
-      <div className="card-soft space-y-4 p-5">
+    <section className="mb-12">
+      <h2 className="type-section mb-4">Home location</h2>
+      <div className="card-soft space-y-4 p-6">
         <p className="text-sm text-muted-foreground">
           Used to mark caregiver clock-ins as verified visits. Stand at the home and tap
           &ldquo;Use my current location&rdquo;, or paste coordinates from a map.
         </p>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-3">
           <label className="text-sm">
             Latitude
             <input
@@ -242,7 +242,7 @@ function HomeLocationCard({
               onChange={(e) => setLat(e.target.value)}
               inputMode="decimal"
               placeholder="18.4655"
-              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
           <label className="text-sm">
@@ -252,7 +252,7 @@ function HomeLocationCard({
               onChange={(e) => setLng(e.target.value)}
               inputMode="decimal"
               placeholder="-66.1057"
-              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
           <label className="text-sm">
@@ -261,16 +261,16 @@ function HomeLocationCard({
               value={radius}
               onChange={(e) => setRadius(e.target.value)}
               inputMode="numeric"
-              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-4">
           <button
             type="button"
             onClick={() => save.mutate()}
             disabled={save.isPending}
-            className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             {save.isPending ? "Saving…" : "Save home location"}
           </button>
@@ -278,7 +278,7 @@ function HomeLocationCard({
             type="button"
             onClick={useMyLocation}
             disabled={locating}
-            className="min-h-10 rounded-full border border-border px-5 text-sm hover:bg-secondary/50 disabled:opacity-50"
+            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
           >
             {locating ? "Reading location…" : "Use my current location"}
           </button>
@@ -369,14 +369,14 @@ function ClockInBar({
   });
 
   return (
-    <div className="card-soft mt-6 p-5">
-      <h3 className="font-display text-xl">Log a visit</h3>
+    <div className="card-soft mt-6 p-6">
+      <h3 className="type-subhead">Log a visit</h3>
       {!active ? (
         <>
           <button
             onClick={() => clockIn.mutate()}
             disabled={clockIn.isPending}
-            className="mt-3 min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+            className="mt-4 min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             {clockIn.isPending ? (locating ? "Checking location…" : "Clocking in…") : "Clock in now"}
           </button>
@@ -386,7 +386,7 @@ function ClockInBar({
           </p>
         </>
       ) : (
-        <div className="mt-3 space-y-3">
+        <div className="mt-4 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs text-muted-foreground">
               Clocked in at {new Date(active.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
@@ -397,7 +397,7 @@ function ClockInBar({
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             aria-label="Mood"
-            className="min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            className="min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
           >
             <option value="">Mood…</option>
             {["Great", "Okay", "Tired", "Unwell", "Concern", "Cheerful"].map((m) => <option key={m}>{m}</option>)}
@@ -407,12 +407,12 @@ function ClockInBar({
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Notes from the visit…"
             rows={3}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
           />
           <button
             onClick={() => clockOut.mutate()}
             disabled={clockOut.isPending}
-            className="min-h-10 rounded-full bg-primary px-5 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             {clockOut.isPending ? (locating ? "Checking location…" : "Saving…") : "Clock out & save"}
           </button>

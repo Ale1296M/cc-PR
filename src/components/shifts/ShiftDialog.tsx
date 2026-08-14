@@ -92,8 +92,8 @@ export default function ShiftDialog({
   return (
     <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="mb-4 font-display text-2xl">{shift ? "Edit shift" : "New shift"}</h3>
-        <div className="space-y-3">
+        <h3 className="type-subhead mb-4">{shift ? "Edit shift" : "New shift"}</h3>
+        <div className="space-y-4">
           <Select label="Care recipient" value={recipientId} onChange={setRecipientId}>
             <option value="">Select…</option>
             {(recipients ?? []).map((c) => (
@@ -152,7 +152,7 @@ function TextField({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
       />
     </label>
   );
@@ -167,7 +167,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
       >
         {children}
       </select>
