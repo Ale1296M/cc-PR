@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { toast } from "sonner";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { capturePosition, formatDuration } from "@/lib/geo";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { clockInVisit, clockOutVisit } from "@/lib/visit-clock";
@@ -69,14 +69,14 @@ function CareRecipientDetail() {
     </Link>
   );
 
-  if (isPending) return <div>{back}<LoadingState label="Loading this care recipient…" /></div>;
+  if (isPending) return <div>{back}<AsyncSkeleton shape="rows" count={4} /></div>;
   if (error)
-    return <div>{back}<ErrorState what="this care recipient" error={error} onRetry={() => refetch()} /></div>;
+    return <div>{back}<AsyncError what="this care recipient" error={error} onRetry={() => refetch()} /></div>;
   if (!recipient)
     return (
       <div>
         {back}
-        <EmptyState
+        <AsyncEmpty
           title="Care recipient not found"
           hint="They may have been removed. Head back to the roster to pick someone else."
         />
@@ -123,12 +123,12 @@ function CareRecipientDetail() {
 
       <section>
         <h2 className="type-section mb-4">Recent visits</h2>
-        {visitsPending && <LoadingState label="Loading recent visits…" />}
+        {visitsPending && <AsyncSkeleton shape="rows" count={4} />}
         {visitsError && (
-          <ErrorState what="recent visits" error={visitsError} onRetry={() => refetchVisits()} />
+          <AsyncError what="recent visits" error={visitsError} onRetry={() => refetchVisits()} />
         )}
         {!visitsPending && !visitsError && (visits ?? []).length === 0 && (
-          <EmptyState
+          <AsyncEmpty
             title="No visits logged yet"
             hint="Visits appear here once a caregiver clocks in and out for this person."
           />

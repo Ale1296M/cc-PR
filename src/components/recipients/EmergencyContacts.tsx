@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { Phone, Mail, Pencil, Trash2, Plus, Star } from "lucide-react";
 
 type Contact = {
@@ -275,13 +275,13 @@ export function EmergencyContacts({
         )}
       </div>
 
-      {isPending && <LoadingState label="Loading emergency contacts…" />}
-      {error && <ErrorState what="emergency contacts" error={error} onRetry={() => refetch()} />}
+      {isPending && <AsyncSkeleton shape="rows" count={4} />}
+      {error && <AsyncError what="emergency contacts" error={error} onRetry={() => refetch()} />}
 
       {(adding || editingId) && <div className="mb-4">{form}</div>}
 
       {!isPending && !error && (contacts ?? []).length === 0 && !adding && (
-        <EmptyState
+        <AsyncEmpty
           title="No emergency contacts yet"
           hint={
             canEdit
