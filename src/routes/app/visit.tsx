@@ -177,15 +177,7 @@ function VisitFlow() {
   const clockIn = useMutation({
     mutationFn: async () => {
       if (!uid || !recipient) throw new Error("Pick a care recipient first.");
-      return clockInVisit({
-        caregiverId: uid,
-        careRecipientId: recipient.id,
-        fence: {
-          homeLat: recipient.home_lat,
-          homeLng: recipient.home_lng,
-          radiusM: recipient.geofence_radius_m,
-        },
-      });
+      return clockInVisit({ careRecipientId: recipient.id });
     },
     onSuccess: (row) => {
       toast.success(row.location_verified ? "Clocked in · location verified" : "Clocked in");
