@@ -14,7 +14,7 @@ import {
 import { AlertTriangle, ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { formatDuration } from "@/lib/geo";
 
@@ -250,10 +250,10 @@ function WellbeingTrends() {
     </div>
   );
 
-  if (recipientsPending) return shell(<LoadingState label="Loading wellbeing check-ins…" />);
+  if (recipientsPending) return shell(<AsyncSkeleton shape="rows" count={4} />);
   if (recipientsError)
     return shell(
-      <ErrorState
+      <AsyncError
         what="the wellbeing trends"
         error={recipientsError}
         onRetry={() => refetchRecipients()}
@@ -261,7 +261,7 @@ function WellbeingTrends() {
     );
   if (list.length === 0)
     return shell(
-      <EmptyState
+      <AsyncEmpty
         title={isFamily ? "No one linked to your account yet" : "No care recipients yet"}
         hint={
           isFamily
@@ -272,7 +272,7 @@ function WellbeingTrends() {
     );
   if (visitsError)
     return shell(
-      <ErrorState what="the wellbeing check-ins" error={visitsError} onRetry={() => refetchVisits()} />,
+      <AsyncError what="the wellbeing check-ins" error={visitsError} onRetry={() => refetchVisits()} />,
     );
 
   // One entry per day (most recent visit of that day wins)
@@ -369,7 +369,7 @@ function WellbeingTrends() {
 
       {visitsPending && (
         <div className="mb-6">
-          <LoadingState label="Loading the last 14 days…" />
+          <AsyncSkeleton shape="rows" count={4} />
         </div>
       )}
 

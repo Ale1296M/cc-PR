@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { ArrowLeft, Check } from "lucide-react";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 
 export const Route = createFileRoute("/wellbeing")({
   component: () => (
@@ -276,16 +276,16 @@ function LogVisit() {
 
       <section>
         <h2 className="type-section mb-4">Who are you visiting?</h2>
-        {recipientsPending && <LoadingState label="Loading your care recipients…" />}
+        {recipientsPending && <AsyncSkeleton shape="rows" count={4} />}
         {recipientsError && (
-          <ErrorState
+          <AsyncError
             what="your care recipients"
             error={recipientsError}
             onRetry={() => refetchRecipients()}
           />
         )}
         {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
-          <EmptyState
+          <AsyncEmpty
             title="No care recipients assigned yet"
             hint="Once the care team assigns you a shift, the people you visit will appear here and you can log their check-in."
           />
