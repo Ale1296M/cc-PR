@@ -7,7 +7,6 @@ import { useAuth } from "@/lib/use-auth";
 import { RoleGate } from "@/lib/role-gate";
 import { AsyncState } from "@/components/ui/async-state";
 import {
-import { ConfirmAction } from "@/components/ui/confirm-action";
   SEVERITIES,
   STATUSES,
   formatStamp,
@@ -19,6 +18,7 @@ import { ConfirmAction } from "@/components/ui/confirm-action";
   type Severity,
   type Status,
 } from "@/components/incidents/incident-meta";
+import { ConfirmAction } from "@/components/ui/confirm-action";
 
 export const Route = createFileRoute("/app/incidents")({
   component: () => (
