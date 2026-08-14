@@ -329,7 +329,7 @@ function VisitFlow() {
           {activePending ? (
             <AsyncSkeleton shape="rows" count={4} />
           ) : !active ? (
-            <div className="card-soft p-6">
+            <div className="border-t border-border pt-6">
               <button
                 type="button"
                 onClick={() => clockIn.mutate()}
@@ -344,7 +344,7 @@ function VisitFlow() {
               </p>
             </div>
           ) : (
-            <div className="card-soft flex flex-wrap items-center gap-4 p-6">
+            <div className="flex flex-wrap items-center gap-4 border-t border-border pt-6">
               <p className="text-sm">
                 Clocked in at{" "}
                 {new Date(active.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
@@ -371,7 +371,7 @@ function VisitFlow() {
           <Choice title="Movement" options={MOVEMENT} value={movement} onChange={setMovement} />
           <Choice title="Hygiene" options={HYGIENE} value={hygiene} onChange={setHygiene} />
 
-          <div className="card-soft p-6">
+          <div className="border-t border-border pt-6">
             <label htmlFor="visit-notes" className="font-display text-xl">
               Notes <span className="text-sm text-muted-foreground">(optional)</span>
             </label>
