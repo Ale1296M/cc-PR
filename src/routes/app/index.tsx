@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncState } from "@/components/ui/async-state";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -141,25 +141,25 @@ function Dashboard() {
             Full schedule →
           </Link>
         </div>
-        {shiftsPending && <LoadingState label="Loading your upcoming visits…" />}
-        {shiftsError && (
-          <ErrorState what="your upcoming visits" error={shiftsError} onRetry={() => refetchShifts()} />
-        )}
-        {!shiftsPending && !shiftsError && (shifts ?? []).length === 0 && (
-          <EmptyState
-            title="Nothing scheduled this week"
-            hint={
-              isFamily
-                ? "Visits booked by the care team for the next 7 days will show up here."
-                : role === "admin"
-                  ? "Create a shift from the Schedule screen and it will appear here."
-                  : "Once the care team assigns you a visit, it will appear here."
-            }
-          />
-        )}
-        {!shiftsPending && !shiftsError && (shifts ?? []).length > 0 && (
+        <AsyncState
+          isPending={shiftsPending}
+          error={shiftsError}
+          data={shifts}
+          what="your upcoming visits"
+          onRetry={() => refetchShifts()}
+          skeleton="rows"
+          empty={{
+            title: "No visits scheduled yet",
+            hint: isFamily
+              ? "Visits booked by the care team for the next 7 days will show up here."
+              : role === "admin"
+                ? "Create a shift from the Schedule screen and it will appear here."
+                : "Visits you're assigned will appear here.",
+          }}
+        >
+          {(rows) => (
         <div className="card-soft divide-y divide-border">
-          {(shifts ?? []).slice(0, 8).map((s) => {
+          {rows.slice(0, 8).map((s) => {
             const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
             const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);
             return (
@@ -188,7 +188,8 @@ function Dashboard() {
             );
           })}
         </div>
-        )}
+          )}
+        </AsyncState>
       </section>
     </div>
   );
