@@ -114,7 +114,7 @@ export default function AdminShiftCalendar({ adminId }: { adminId: string }) {
     setCursor((c) => (view === "week" ? addWeeks(c, dir) : addMonths(c, dir)));
 
   return (
-    <div className="kindred-calendar card-soft p-4">
+    <div className="cc-calendar card-soft p-4">
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="inline-flex gap-1.5">
           <NavBtn onClick={() => step(-1)}>Back</NavBtn>
@@ -230,7 +230,7 @@ function EventBlock({
         onClick();
       }}
       title={event.title}
-      className="kindred-event"
+      className="cc-event"
       style={{ ...style, backgroundColor: s.bg, color: s.fg }}
     >
       <span className="block truncate font-medium">{format(event.start, "h:mm a")}</span>
@@ -256,12 +256,12 @@ function WeekGrid({
 }) {
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   return (
-    <div className="kindred-grid overflow-x-auto">
+    <div className="cc-grid overflow-x-auto">
       <div className="min-w-[720px]">
         <div className="grid grid-cols-[3.5rem_repeat(7,minmax(0,1fr))] border-b border-border">
           <div />
           {days.map((d) => (
-            <div key={d.toISOString()} className="kindred-col-head">
+            <div key={d.toISOString()} className="cc-col-head">
               <span className="block">{format(d, "EEE")}</span>
               <span className={isSameDay(d, new Date()) ? "text-primary" : ""}>{format(d, "d")}</span>
             </div>
@@ -270,17 +270,17 @@ function WeekGrid({
         <div className="grid grid-cols-[3.5rem_repeat(7,minmax(0,1fr))]">
           <div>
             {HOURS.map((h) => (
-              <div key={h} className="kindred-hour-label" style={{ height: PX_PER_HOUR }}>
+              <div key={h} className="cc-hour-label" style={{ height: PX_PER_HOUR }}>
                 {format(new Date(2020, 0, 1, h), "h a")}
               </div>
             ))}
           </div>
           {days.map((d) => (
-            <div key={d.toISOString()} className="kindred-day-col">
+            <div key={d.toISOString()} className="cc-day-col">
               {HOURS.map((h) => (
                 <div
                   key={h}
-                  className="kindred-slot"
+                  className="cc-slot"
                   style={{ height: PX_PER_HOUR }}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
@@ -340,10 +340,10 @@ function MonthGrid({
   const total = Math.ceil((differenceInMinutes(endOfMonth(cursor), first) / 1440 + 1) / 7) * 7;
   const days = Array.from({ length: total }, (_, i) => addDays(first, i));
   return (
-    <div className="kindred-grid">
+    <div className="cc-grid">
       <div className="grid grid-cols-7 border-b border-border">
         {days.slice(0, 7).map((d) => (
-          <div key={d.toISOString()} className="kindred-col-head">
+          <div key={d.toISOString()} className="cc-col-head">
             {format(d, "EEE")}
           </div>
         ))}
@@ -352,7 +352,7 @@ function MonthGrid({
         {days.map((d) => (
           <div
             key={d.toISOString()}
-            className={`kindred-month-cell ${isSameMonth(d, cursor) ? "" : "kindred-off-range"}`}
+            className={`cc-month-cell ${isSameMonth(d, cursor) ? "" : "cc-off-range"}`}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
@@ -364,7 +364,7 @@ function MonthGrid({
               onSelectSlot(start, new Date(start.getTime() + 60 * 60_000));
             }}
           >
-            <span className={`kindred-date ${isSameDay(d, new Date()) ? "text-primary" : ""}`}>
+            <span className={`cc-date ${isSameDay(d, new Date()) ? "text-primary" : ""}`}>
               {format(d, "d")}
             </span>
             <div className="mt-1 space-y-1">
