@@ -231,6 +231,8 @@ function AdminCarePlan() {
           </div>
         ))}
       </div>
+        )}
+      </AsyncState>
 
       <form
         onSubmit={(e) => { e.preventDefault(); if (task && active) add.mutate(); }}
