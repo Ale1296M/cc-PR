@@ -400,12 +400,12 @@ function CaregiverChecklist() {
         <h1 className="type-display mt-1">Care checklist</h1>
       </header>
 
-      {shiftsPending && <LoadingState label="Loading today's visits…" />}
+      {shiftsPending && <AsyncSkeleton shape="rows" count={4} />}
       {shiftsError && (
-        <ErrorState what="today's visits" error={shiftsError} onRetry={() => refetchShifts()} />
+        <AsyncError what="today's visits" error={shiftsError} onRetry={() => refetchShifts()} />
       )}
       {!shiftsPending && !shiftsError && (shifts ?? []).length === 0 ? (
-        <EmptyState
+        <AsyncEmpty
           title="No visits scheduled for you today"
           hint="When the care team assigns you a shift for today, the checklist for that person will appear here."
         />
@@ -442,12 +442,12 @@ function CaregiverChecklist() {
             <span>{done}/{(items ?? []).length} checked</span>
           </div>
 
-          {itemsPending && <LoadingState label="Loading the checklist…" />}
+          {itemsPending && <AsyncSkeleton shape="rows" count={4} />}
           {itemsError && (
-            <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+            <AsyncError what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
           )}
           {!itemsPending && !itemsError && (items ?? []).length === 0 && (
-            <EmptyState
+            <AsyncEmpty
               title="No active checklist items"
               hint="An admin can add tasks for this care recipient on the Care plan screen."
             />
@@ -532,16 +532,16 @@ function FamilyCarePlan() {
           What the care team does during each visit.
         </p>
       </header>
-      {recipientsPending && <LoadingState label="Loading the care plan…" />}
+      {recipientsPending && <AsyncSkeleton shape="rows" count={4} />}
       {recipientsError && (
-        <ErrorState
+        <AsyncError
           what="the care plan"
           error={recipientsError}
           onRetry={() => refetchRecipients()}
         />
       )}
       {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
-        <EmptyState
+        <AsyncEmpty
           title="No care plan yet"
           hint="Once the care team sets up your loved one's plan, the visit checklist will appear here."
         />
@@ -556,12 +556,12 @@ function FamilyCarePlan() {
           {(recipients ?? []).map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
         </select>
       )}
-      {active && itemsPending && <LoadingState label="Loading the checklist…" />}
+      {active && itemsPending && <AsyncSkeleton shape="rows" count={4} />}
       {itemsError && (
-        <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
+        <AsyncError what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
       )}
       {active && !itemsPending && !itemsError && (items ?? []).length === 0 && (
-        <EmptyState
+        <AsyncEmpty
           title="No checklist items yet"
           hint={`The care team hasn't added visit tasks${activeName ? ` for ${activeName}` : ""} yet.`}
         />
