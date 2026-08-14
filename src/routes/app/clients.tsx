@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { toast } from "sonner";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncState } from "@/components/ui/async-state";
 
 export const Route = createFileRoute("/app/clients")({
   component: () => (
@@ -95,17 +95,21 @@ function CareRecipientsPage() {
         )}
       </header>
 
-      {isPending && <LoadingState label="Loading care recipients…" />}
-      {error && <ErrorState what="care recipients" error={error} onRetry={() => refetch()} />}
-      {!isPending && !error && (recipients ?? []).length === 0 && (
-        <EmptyState
-          title="No care recipients yet"
-          hint="Use “Add care recipient” to create the first person on the roster and link them to a family."
-        />
-      )}
-
+      <AsyncState
+        isPending={isPending}
+        error={error}
+        data={recipients}
+        what="care recipients"
+        onRetry={() => refetch()}
+        skeleton="cards"
+        empty={{
+          title: "No care recipients yet",
+          hint: "Use “Add care recipient” to create the first person on the roster and link them to a family.",
+        }}
+      >
+        {(rows) => (
       <div className="grid gap-4 sm:grid-cols-2">
-        {(recipients ?? []).map((c) => (
+        {rows.map((c) => (
           <Link
             key={c.id}
             to="/app/clients/$clientId"
@@ -127,6 +131,8 @@ function CareRecipientsPage() {
           </Link>
         ))}
       </div>
+        )}
+      </AsyncState>
 
       {showNew && (
         <NewCareRecipient
