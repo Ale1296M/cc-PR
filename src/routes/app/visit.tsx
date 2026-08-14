@@ -292,7 +292,9 @@ function VisitFlow() {
           />
         )}
         {list.length === 1 && (
-          <p className="card-soft p-6 font-display text-2xl">Visiting {list[0].full_name}</p>
+          <p className="type-meta text-muted-foreground">
+            Visiting <span className="font-display text-xl text-foreground">{list[0].full_name}</span>
+          </p>
         )}
         {list.length > 1 && (
           <>
@@ -305,8 +307,8 @@ function VisitFlow() {
                     key={r.id}
                     type="button"
                     onClick={() => setPicked(r.id)}
-                    className={`card-soft min-h-11 p-6 text-left transition ${
-                      activeSel ? "ring-2 ring-primary" : "hover:bg-secondary/40"
+                    className={`min-h-11 rounded-lg border border-border p-6 text-left transition ${
+                      activeSel ? "border-primary bg-secondary/40" : "hover:bg-secondary/30"
                     }`}
                   >
                     <p className="font-display text-xl">{r.full_name}</p>
