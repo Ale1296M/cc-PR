@@ -90,17 +90,21 @@ function VisitExceptions() {
         ))}
       </div>
 
-      {isPending && <LoadingState label="Loading flagged visits…" />}
-      {error && <ErrorState what="flagged visits" error={error} onRetry={() => refetch()} />}
-      {!isPending && !error && (data ?? []).length === 0 && (
-        <EmptyState
-          title="No flagged visits"
-          hint="Visits appear here when a caregiver clocks in away from the home address or without sharing location."
-        />
-      )}
-
-      <div className={`card-soft divide-y divide-border ${(data ?? []).length === 0 ? "hidden" : ""}`}>
-        {(data ?? []).map((v) => {
+      <AsyncState
+        isPending={isPending}
+        error={error}
+        data={data}
+        what="flagged visits"
+        onRetry={() => refetch()}
+        skeleton="rows"
+        empty={{
+          title: "No flagged visits",
+          hint: "Visits appear here when a caregiver clocks in away from the home address or without sharing location.",
+        }}
+      >
+        {(rows) => (
+      <div className="card-soft divide-y divide-border">
+        {rows.map((v) => {
           const recipient = (v.care_recipients as unknown as { full_name: string } | null)?.full_name;
           const caregiver = (v.profiles as unknown as { full_name: string } | null)?.full_name;
           return (
@@ -133,6 +137,8 @@ function VisitExceptions() {
           );
         })}
       </div>
+        )}
+      </AsyncState>
     </div>
   );
 }
