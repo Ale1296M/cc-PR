@@ -115,7 +115,7 @@ function band(score: number | null) {
 const BAND_CLASS: Record<string, string> = {
   good: "bg-primary",
   usual: "bg-gold",
-  attention: "bg-destructive",
+  attention: "bg-attention",
   none: "bg-secondary",
 };
 const BAND_LABEL: Record<string, string> = {
@@ -418,8 +418,8 @@ function WellbeingTrends() {
       )}
 
       {flags.length > 0 && (
-        <div className="card-soft mb-6 flex gap-4 border-l-4 border-gold bg-gold/10 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
+        <div className="mb-6 flex gap-4 rounded-lg border-l-2 border-attention bg-attention-soft/60 p-4">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-attention" />
           <div>
             <p className="font-medium">Pattern worth a conversation</p>
             <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-muted-foreground">
@@ -505,7 +505,7 @@ function WellbeingTrends() {
         </p>
       </section>
 
-      <section className="card-soft mt-6 p-6">
+      <section className="mt-8 border-t border-border pt-8">
         <h2 className="type-section">
           {activeDay
             ? new Date(`${activeDay.key}T00:00:00`).toLocaleDateString(undefined, {
@@ -570,7 +570,7 @@ function WellbeingTrends() {
         )}
       </section>
 
-      <section className="card-soft mt-6 p-6">
+      <section className="mt-8 border-t border-border pt-8">
         <h2 className="type-section">Task completion by category</h2>
         {categories.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">

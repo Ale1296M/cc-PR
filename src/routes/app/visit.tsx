@@ -292,7 +292,9 @@ function VisitFlow() {
           />
         )}
         {list.length === 1 && (
-          <p className="card-soft p-6 font-display text-2xl">Visiting {list[0].full_name}</p>
+          <p className="type-meta text-muted-foreground">
+            Visiting <span className="font-display text-xl text-foreground">{list[0].full_name}</span>
+          </p>
         )}
         {list.length > 1 && (
           <>
@@ -305,8 +307,8 @@ function VisitFlow() {
                     key={r.id}
                     type="button"
                     onClick={() => setPicked(r.id)}
-                    className={`card-soft min-h-11 p-6 text-left transition ${
-                      activeSel ? "ring-2 ring-primary" : "hover:bg-secondary/40"
+                    className={`min-h-11 rounded-lg border border-border p-6 text-left transition ${
+                      activeSel ? "border-primary bg-secondary/40" : "hover:bg-secondary/30"
                     }`}
                   >
                     <p className="font-display text-xl">{r.full_name}</p>
@@ -327,7 +329,7 @@ function VisitFlow() {
           {activePending ? (
             <AsyncSkeleton shape="rows" count={4} />
           ) : !active ? (
-            <div className="card-soft p-6">
+            <div className="border-t border-border pt-6">
               <button
                 type="button"
                 onClick={() => clockIn.mutate()}
@@ -342,7 +344,7 @@ function VisitFlow() {
               </p>
             </div>
           ) : (
-            <div className="card-soft flex flex-wrap items-center gap-4 p-6">
+            <div className="flex flex-wrap items-center gap-4 border-t border-border pt-6">
               <p className="text-sm">
                 Clocked in at{" "}
                 {new Date(active.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
@@ -369,7 +371,7 @@ function VisitFlow() {
           <Choice title="Movement" options={MOVEMENT} value={movement} onChange={setMovement} />
           <Choice title="Hygiene" options={HYGIENE} value={hygiene} onChange={setHygiene} />
 
-          <div className="card-soft p-6">
+          <div className="border-t border-border pt-6">
             <label htmlFor="visit-notes" className="font-display text-xl">
               Notes <span className="text-sm text-muted-foreground">(optional)</span>
             </label>

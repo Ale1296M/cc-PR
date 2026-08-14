@@ -61,7 +61,7 @@ function UsersPage() {
   });
 
   if (role && role !== "admin") {
-    return <p className="card-soft p-6 text-sm text-muted-foreground">Only admins can manage users.</p>;
+    return <p className="border-t border-border py-8 text-sm text-muted-foreground">Only admins can manage users.</p>;
   }
 
   const users = data ?? [];
@@ -114,11 +114,11 @@ function UsersPage() {
         }}
       >
         {(list) => (
-      <div className="space-y-4">
+      <div className="divide-y divide-border border-t border-border">
         {list.map((u) => (
           <div
             key={u.id}
-            className="card-soft flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0">
               <p className="truncate font-medium">{u.full_name || "Unnamed"}</p>

@@ -27,7 +27,7 @@ function bandFromMood(avg: number | null) {
   if (avg == null) return { label: "No check-ins yet", tone: "text-muted-foreground" };
   if (avg >= 4) return { label: "Good this week", tone: "text-primary" };
   if (avg >= 2.6) return { label: "Steady this week", tone: "text-foreground" };
-  return { label: "Worth a conversation", tone: "text-destructive" };
+  return { label: "Worth a conversation", tone: "text-attention" };
 }
 
 function Dashboard() {
@@ -230,7 +230,7 @@ function Dashboard() {
           }}
         >
           {(list) => (
-            <div className="card-soft divide-y divide-border">
+            <div className="divide-y divide-border border-t border-border">
               {list.slice(0, 8).map((s) => {
                 const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
                 const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);
