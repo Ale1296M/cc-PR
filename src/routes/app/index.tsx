@@ -2,15 +2,39 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { AsyncState } from "@/components/ui/async-state";
+import { AsyncState, AsyncSkeleton, AsyncError } from "@/components/ui/async-state";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
 });
 
+type ShiftRow = {
+  id: string;
+  scheduled_date: string;
+  scheduled_start_time: string;
+  scheduled_end_time: string;
+  status: string;
+  notes: string | null;
+  care_recipients: { id: string; full_name: string } | null;
+};
+
+function todayKeyLocal() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function bandFromMood(avg: number | null) {
+  if (avg == null) return { label: "No check-ins yet", tone: "text-muted-foreground" };
+  if (avg >= 4) return { label: "Good this week", tone: "text-primary" };
+  if (avg >= 2.6) return { label: "Steady this week", tone: "text-foreground" };
+  return { label: "Worth a conversation", tone: "text-destructive" };
+}
+
 function Dashboard() {
   const { user, role } = useAuth();
   const uid = user?.id;
+  const isFamily = role === "family_member";
+  const today = new Date();
 
   const { data: caregiverId } = useQuery({
     queryKey: ["dash-caregiver-id", uid],
@@ -33,13 +57,14 @@ function Dashboard() {
   } = useQuery({
     queryKey: ["dash-shifts", uid, role, caregiverId],
     enabled: !!uid && (role !== "caregiver" || caregiverId !== undefined),
-    queryFn: async () => {
+    queryFn: async (): Promise<ShiftRow[]> => {
       if (role === "caregiver" && !caregiverId) return [];
       const from = new Date();
       from.setHours(0, 0, 0, 0);
       const to = new Date(from);
       to.setDate(to.getDate() + 7);
-      const iso = (d: Date) => d.toISOString().slice(0, 10);
+      const iso = (d: Date) =>
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       let q = supabase
         .from("care_shifts")
         .select(
@@ -52,48 +77,93 @@ function Dashboard() {
       if (role === "caregiver" && caregiverId) q = q.eq("caregiver_id", caregiverId);
       const { data, error } = await q;
       if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const { data: clientCount } = useQuery({
-    queryKey: ["dash-recipients", role, caregiverId],
-    enabled: role !== "caregiver" || caregiverId !== undefined,
-    queryFn: async () => {
-      if (role === "caregiver") {
-        if (!caregiverId) return 0;
-        const { data } = await supabase
-          .from("care_shifts")
-          .select("care_recipient_id")
-          .eq("caregiver_id", caregiverId);
-        return new Set((data ?? []).map((r) => r.care_recipient_id)).size;
-      }
-      const { count } = await supabase
-        .from("care_recipients")
-        .select("*", { count: "exact", head: true });
-      return count ?? 0;
+      return (data ?? []) as unknown as ShiftRow[];
     },
   });
 
   const { data: unread } = useQuery({
-    queryKey: ["dash-unread", uid],
-    enabled: !!uid,
+    queryKey: ["dash-unread", uid, role],
+    enabled: !!uid && !!role,
     queryFn: async () => {
+      if (role === "caregiver") {
+        const { count } = await supabase
+          .from("caregiver_messages")
+          .select("*", { count: "exact", head: true })
+          .eq("caregiver_profile_id", uid!)
+          .neq("sender_profile_id", uid!)
+          .is("read_at", null);
+        return count ?? 0;
+      }
       const { count } = await supabase
-        .from("messages")
+        .from("family_messages")
         .select("*", { count: "exact", head: true })
-        .eq("recipient_id", uid!)
+        .neq("sender_profile_id", uid!)
         .is("read_at", null);
       return count ?? 0;
     },
   });
 
-  const today = new Date();
-  const todayKey = new Date(today.getTime() - today.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 10);
-  const todayShifts = (shifts ?? []).filter((s) => s.scheduled_date === todayKey);
-  const isFamily = role === "family_member";
+  // Family: their loved one + recent mood
+  const {
+    data: loved,
+    isPending: lovedPending,
+    error: lovedError,
+    refetch: refetchLoved,
+  } = useQuery({
+    queryKey: ["dash-loved", uid],
+    enabled: !!uid && isFamily,
+    queryFn: async () => {
+      const { data: fam, error } = await supabase
+        .from("families")
+        .select("care_recipients(id, full_name)")
+        .eq("profile_id", uid!);
+      if (error) throw error;
+      const recipients = (fam ?? []).flatMap(
+        (f) => (f.care_recipients ?? []) as unknown as { id: string; full_name: string }[],
+      );
+      const person = recipients[0] ?? null;
+      if (!person) return null;
+      const since = new Date();
+      since.setDate(since.getDate() - 7);
+      const { data: visits } = await supabase
+        .from("visit_logs")
+        .select("clock_in, wellbeing_entries(mood_scale)")
+        .eq("care_recipient_id", person.id)
+        .gte("clock_in", since.toISOString())
+        .order("clock_in");
+      const moods = (visits ?? [])
+        .flatMap((v) => {
+          const e = v.wellbeing_entries as unknown as { mood_scale: number | null } | { mood_scale: number | null }[] | null;
+          if (!e) return [];
+          return Array.isArray(e) ? e : [e];
+        })
+        .map((e) => e.mood_scale)
+        .filter((m): m is number => m != null);
+      const avg = moods.length ? moods.reduce((a, b) => a + b, 0) / moods.length : null;
+      return { person, avg, checkIns: moods.length };
+    },
+  });
+
+  // Admin: open incidents
+  const { data: openIncidents } = useQuery({
+    queryKey: ["dash-open-incidents"],
+    enabled: role === "admin",
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("incident_reports")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "open");
+      return count ?? 0;
+    },
+  });
+
+  const todayKey = todayKeyLocal();
+  const rows = shifts ?? [];
+  const todayShifts = rows.filter((s) => s.scheduled_date === todayKey);
+  const nowMs = Date.now();
+  const nextShift =
+    rows.find((s) => new Date(`${s.scheduled_date}T${s.scheduled_end_time}`).getTime() >= nowMs) ??
+    null;
 
   return (
     <div>
@@ -101,37 +171,39 @@ function Dashboard() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">
           {today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
         </p>
-        <h1 className="type-display mt-1">Good to see you.</h1>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Today's visits" value={todayShifts.length} />
-        <Stat
-          label={isFamily ? "Your loved ones" : "Active care recipients"}
-          value={clientCount ?? 0}
+      {role === "caregiver" && (
+        <CaregiverHero
+          isPending={shiftsPending}
+          error={shiftsError}
+          onRetry={() => refetchShifts()}
+          nextShift={nextShift}
+          todayCount={todayShifts.length}
+          unread={unread ?? 0}
         />
-        <Stat label="Unread messages" value={unread ?? 0} accent />
-      </section>
+      )}
 
-      {(role === "caregiver" || role === "family_member" || role === "admin") && (
-        <section className="mt-6">
-          <Link
-            to={role === "family_member" ? "/app/wellbeing" : "/app/visit"}
-            className="card-soft flex items-center justify-between p-6 transition hover:bg-secondary/40"
-          >
-            <div>
-              <p className="font-display text-2xl">
-                {role === "family_member" ? "Wellbeing history" : "Log visit"}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {isFamily
-                  ? "See the last 14 days of daily wellbeing check-ins for your loved one."
-                  : "Record today's mood, appetite, medicine, movement and hygiene."}
-              </p>
-            </div>
-            <span className="text-primary">→</span>
-          </Link>
-        </section>
+      {isFamily && (
+        <FamilyHero
+          isPending={lovedPending}
+          error={lovedError}
+          onRetry={() => refetchLoved()}
+          loved={loved ?? null}
+          todayCount={todayShifts.length}
+          unread={unread ?? 0}
+        />
+      )}
+
+      {role === "admin" && (
+        <AdminHero
+          isPending={shiftsPending}
+          error={shiftsError}
+          onRetry={() => refetchShifts()}
+          openIncidents={openIncidents ?? 0}
+          todayCount={todayShifts.length}
+          unread={unread ?? 0}
+        />
       )}
 
       <section className="mt-12">
@@ -157,37 +229,37 @@ function Dashboard() {
                 : "Visits you're assigned will appear here.",
           }}
         >
-          {(rows) => (
-        <div className="card-soft divide-y divide-border">
-          {rows.slice(0, 8).map((s) => {
-            const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
-            const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);
-            return (
-              <div key={s.id} className="flex items-center gap-4 p-4 sm:gap-4">
-                <div className="w-16 shrink-0 text-sm sm:w-20">
-                  <p className="font-medium">
-                    {d.toLocaleDateString(undefined, { weekday: "short" })}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                  </p>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">
-                    {(s.care_recipients as unknown as { full_name: string } | null)?.full_name ??
-                      (isFamily ? "Your loved one" : "Care recipient")}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {Math.round((+e - +d) / 3600000)}h · {s.status}
-                  </p>
-                </div>
-                <span className="hidden shrink-0 rounded-full bg-secondary px-4 py-1 text-xs sm:inline">
-                  {s.status}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+          {(list) => (
+            <div className="card-soft divide-y divide-border">
+              {list.slice(0, 8).map((s) => {
+                const d = new Date(`${s.scheduled_date}T${s.scheduled_start_time}`);
+                const e = new Date(`${s.scheduled_date}T${s.scheduled_end_time}`);
+                return (
+                  <div key={s.id} className="flex items-center gap-4 p-4">
+                    <div className="w-16 shrink-0 text-sm sm:w-20">
+                      <p className="font-medium">
+                        {d.toLocaleDateString(undefined, { weekday: "short" })}
+                      </p>
+                      <p className="text-muted-foreground">
+                        {d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                      </p>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">
+                        {s.care_recipients?.full_name ??
+                          (isFamily ? "Your loved one" : "Care recipient")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {Math.round((+e - +d) / 3600000)}h · {s.status}
+                      </p>
+                    </div>
+                    <span className="hidden shrink-0 rounded-full bg-secondary px-4 py-1 text-xs sm:inline">
+                      {s.status}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </AsyncState>
       </section>
@@ -195,11 +267,202 @@ function Dashboard() {
   );
 }
 
-function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+function HeroShell({
+  isPending,
+  error,
+  onRetry,
+  what,
+  children,
+  secondary,
+}: {
+  isPending: boolean;
+  error: unknown;
+  onRetry: () => void;
+  what: string;
+  children: React.ReactNode;
+  secondary: string;
+}) {
+  if (isPending) return <AsyncSkeleton shape="rows" rows={2} />;
+  if (error) return <AsyncError what={what} error={error} onRetry={onRetry} />;
   return (
-    <div className={`card-soft p-6 ${accent ? "bg-gold/10" : ""}`}>
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="mt-2 font-display text-4xl">{value}</p>
-    </div>
+    <section>
+      {children}
+      <p className="mt-4 text-sm text-muted-foreground">{secondary}</p>
+    </section>
+  );
+}
+
+function plural(n: number, one: string, many: string) {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+function CaregiverHero({
+  isPending,
+  error,
+  onRetry,
+  nextShift,
+  todayCount,
+  unread,
+}: {
+  isPending: boolean;
+  error: unknown;
+  onRetry: () => void;
+  nextShift: ShiftRow | null;
+  todayCount: number;
+  unread: number;
+}) {
+  const secondary = `${plural(todayCount, "visit", "visits")} today · ${plural(unread, "unread message", "unread messages")}`;
+  return (
+    <HeroShell
+      isPending={isPending}
+      error={error}
+      onRetry={onRetry}
+      what="your next visit"
+      secondary={secondary}
+    >
+      {nextShift ? (
+        <>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">Your next visit</p>
+          <h1 className="type-display mt-2">
+            {nextShift.care_recipients?.full_name ?? "Care recipient"}
+          </h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            {new Date(`${nextShift.scheduled_date}T${nextShift.scheduled_start_time}`).toLocaleDateString(
+              undefined,
+              { weekday: "long", month: "long", day: "numeric" },
+            )}
+            {" · "}
+            {new Date(`${nextShift.scheduled_date}T${nextShift.scheduled_start_time}`).toLocaleTimeString(
+              [],
+              { hour: "numeric", minute: "2-digit" },
+            )}
+            {" – "}
+            {new Date(`${nextShift.scheduled_date}T${nextShift.scheduled_end_time}`).toLocaleTimeString(
+              [],
+              { hour: "numeric", minute: "2-digit" },
+            )}
+          </p>
+          <Link
+            to="/app/visit"
+            className="mt-6 inline-flex min-h-11 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            Clock in &amp; log visit
+          </Link>
+        </>
+      ) : (
+        <>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">Your next visit</p>
+          <h1 className="type-display mt-2">Nothing scheduled</h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            Visits you're assigned will appear here as soon as the care team books them.
+          </p>
+          <Link
+            to="/app/visit"
+            className="mt-6 inline-flex min-h-11 items-center rounded-full border border-border px-8 text-base font-medium transition hover:bg-secondary/50"
+          >
+            Clock in &amp; log visit
+          </Link>
+        </>
+      )}
+    </HeroShell>
+  );
+}
+
+function FamilyHero({
+  isPending,
+  error,
+  onRetry,
+  loved,
+  todayCount,
+  unread,
+}: {
+  isPending: boolean;
+  error: unknown;
+  onRetry: () => void;
+  loved: { person: { id: string; full_name: string }; avg: number | null; checkIns: number } | null;
+  todayCount: number;
+  unread: number;
+}) {
+  const b = bandFromMood(loved?.avg ?? null);
+  const secondary = `${plural(todayCount, "visit", "visits")} today · ${plural(unread, "unread message", "unread messages")}`;
+  return (
+    <HeroShell
+      isPending={isPending}
+      error={error}
+      onRetry={onRetry}
+      what="your loved one's wellbeing"
+      secondary={secondary}
+    >
+      <p className="text-sm uppercase tracking-widest text-muted-foreground">How they're doing</p>
+      {loved ? (
+        <>
+          <h1 className="type-display mt-2">
+            {loved.person.full_name} — <span className={b.tone}>{b.label}</span>
+          </h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            {loved.checkIns > 0
+              ? `Based on ${plural(loved.checkIns, "check-in", "check-ins")} in the last 7 days.`
+              : `No check-ins recorded yet for ${loved.person.full_name}.`}
+          </p>
+          <Link
+            to="/app/wellbeing"
+            className="mt-6 inline-flex min-h-11 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            See wellbeing history
+          </Link>
+        </>
+      ) : (
+        <>
+          <h1 className="type-display mt-2">No loved one linked yet</h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            Once an admin links your family to a care recipient, their wellbeing appears here.
+          </p>
+        </>
+      )}
+    </HeroShell>
+  );
+}
+
+function AdminHero({
+  isPending,
+  error,
+  onRetry,
+  openIncidents,
+  todayCount,
+  unread,
+}: {
+  isPending: boolean;
+  error: unknown;
+  onRetry: () => void;
+  openIncidents: number;
+  todayCount: number;
+  unread: number;
+}) {
+  const calm = openIncidents === 0;
+  const secondary = `${plural(todayCount, "visit", "visits")} today · ${plural(unread, "unread message", "unread messages")}`;
+  return (
+    <HeroShell
+      isPending={isPending}
+      error={error}
+      onRetry={onRetry}
+      what="what needs attention"
+      secondary={secondary}
+    >
+      <p className="text-sm uppercase tracking-widest text-muted-foreground">Needs attention</p>
+      <h1 className="type-display mt-2">
+        {calm ? "All clear today" : `${plural(openIncidents, "open incident", "open incidents")}`}
+      </h1>
+      <p className="mt-2 text-lg text-muted-foreground">
+        {calm
+          ? `No open incidents · ${plural(todayCount, "visit", "visits")} scheduled today.`
+          : `Plus ${plural(todayCount, "visit", "visits")} scheduled today.`}
+      </p>
+      <Link
+        to={calm ? "/app/schedule" : "/app/incidents"}
+        className="mt-6 inline-flex min-h-11 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
+      >
+        {calm ? "Review today's schedule" : "Review incidents"}
+      </Link>
+    </HeroShell>
   );
 }
