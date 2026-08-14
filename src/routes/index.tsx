@@ -127,7 +127,7 @@ function Landing() {
         <section className="grid gap-16 pt-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-16 md:pt-24">
           <div>
             <p className="mb-8 flex items-center gap-2.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/50" />
               {t.eyebrow}
             </p>
             <h1 className="type-display text-primary">
@@ -243,7 +243,7 @@ function SchedulePreview({ t }: { t: (typeof COPY)["en"] | (typeof COPY)["es"] }
                 <p className="truncate font-medium">{s.name}</p>
                 <p className="truncate text-xs text-muted-foreground">{s.detail}</p>
                 {i === 0 && (
-                  <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-gold-foreground">
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-gold-foreground">
                     <MapPin className="h-3 w-3 text-gold" aria-hidden="true" />
                     {t.verified}
                   </span>
