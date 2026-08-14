@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/use-auth";
 import { RoleGate } from "@/lib/role-gate";
 import { AsyncState } from "@/components/ui/async-state";
 import {
+import { ConfirmAction } from "@/components/ui/confirm-action";
   SEVERITIES,
   STATUSES,
   formatStamp,
@@ -261,14 +262,21 @@ function IncidentCard({ row }: { row: Row }) {
           </button>
         )}
         {row.status !== "resolved" && (
-          <button
-            type="button"
-            onClick={() => update.mutate("resolved")}
+          <ConfirmAction
+            title="Resolve this incident?"
+            description="Resolving records you as the resolver with today's date and closes the report. Your resolution notes are saved with it."
+            confirmLabel="Resolve incident"
             disabled={update.isPending}
-            className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+            onConfirm={() => update.mutate("resolved")}
           >
-            Resolve
-          </button>
+            <button
+              type="button"
+              disabled={update.isPending}
+              className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+            >
+              Resolve
+            </button>
+          </ConfirmAction>
         )}
         {row.status !== "open" && (
           <button

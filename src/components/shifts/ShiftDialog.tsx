@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SHIFT_STATUSES, statusLabel } from "@/components/shifts/shift-utils";
 import type { ShiftRow } from "@/components/shifts/shift-types";
 import { isoDate } from "@/components/shifts/shift-types";
+import { ConfirmAction } from "@/components/ui/confirm-action";
 
 export default function ShiftDialog({
   adminId,
@@ -118,13 +119,23 @@ export default function ShiftDialog({
         </div>
         <div className="mt-6 flex flex-wrap justify-end gap-2">
           {shift && shift.status !== "cancelled" && (
-            <button
-              onClick={() => cancelShift.mutate()}
+            <ConfirmAction
+              title="Cancel this shift?"
+              description="The caregiver and the family will see this visit as cancelled. You can set it back to scheduled afterwards."
+              confirmLabel="Cancel shift"
+              cancelLabel="Keep shift"
+              destructive
               disabled={cancelShift.isPending}
-              className="mr-auto min-h-10 rounded-full border border-destructive px-4 text-sm text-destructive disabled:opacity-50"
+              onConfirm={() => cancelShift.mutate()}
             >
-              Cancel shift
-            </button>
+              <button
+                type="button"
+                disabled={cancelShift.isPending}
+                className="mr-auto min-h-10 rounded-full border border-destructive px-4 text-sm text-destructive disabled:opacity-50"
+              >
+                Cancel shift
+              </button>
+            </ConfirmAction>
           )}
           <button onClick={onClose} className="min-h-10 rounded-full border border-border px-4 text-sm">
             Close

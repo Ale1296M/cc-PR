@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { Phone, Mail, Pencil, Trash2, Plus, Star } from "lucide-react";
+import { ConfirmAction } from "@/components/ui/confirm-action";
 
 type Contact = {
   id: string;
@@ -354,17 +355,24 @@ export function EmergencyContacts({
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (confirm(`Remove ${c.full_name} from emergency contacts?`)) remove.mutate(c.id);
-                    }}
+                  <ConfirmAction
+                    title={`Remove ${c.full_name}?`}
+                    description="This emergency contact will no longer be visible to caregivers or the family. You can add them again later."
+                    confirmLabel="Remove contact"
+                    cancelLabel="Keep contact"
+                    destructive
                     disabled={remove.isPending}
-                    aria-label={`Remove ${c.full_name}`}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border hover:bg-secondary/50 disabled:opacity-50"
+                    onConfirm={() => remove.mutate(c.id)}
                   >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                    <button
+                      type="button"
+                      disabled={remove.isPending}
+                      aria-label={`Remove ${c.full_name}`}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border hover:bg-secondary/50 disabled:opacity-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </ConfirmAction>
                 </div>
               )}
             </div>
