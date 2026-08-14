@@ -274,6 +274,32 @@ function WellbeingTrends() {
     return shell(
       <AsyncError what="the wellbeing check-ins" error={visitsError} onRetry={() => refetchVisits()} />,
     );
+  if (!visitsPending && (visits ?? []).length === 0)
+    return shell(
+      <>
+        {list.length > 1 && (
+          <select
+            aria-label="Choose a person"
+            value={activeId}
+            onChange={(e) => {
+              setRecipientId(e.target.value);
+              setSelectedDay(null);
+            }}
+            className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
+          >
+            {list.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.full_name}
+              </option>
+            ))}
+          </select>
+        )}
+        <AsyncEmpty
+          title={`No check-ins recorded yet${activeName ? ` for ${activeName}` : ""}.`}
+          hint="Caregivers record mood, medicine, food, movement and hygiene during each visit — those check-ins will show up here."
+        />
+      </>,
+    );
 
   // One entry per day (most recent visit of that day wins)
   const byDay = new Map<string, Entry>();
