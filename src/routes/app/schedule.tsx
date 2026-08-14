@@ -6,8 +6,7 @@ import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { SHIFT_STATUSES, formatDay, formatTime, statusLabel } from "@/components/shifts/shift-utils";
-import { LoadingState } from "@/components/ui/states";
-import { AsyncState } from "@/components/ui/async-state";
+import { AsyncSkeleton, AsyncState } from "@/components/ui/async-state";
 import { toast } from "sonner";
 
 const AdminShiftCalendar = lazy(() => import("@/components/shifts/AdminShiftCalendar"));
@@ -32,8 +31,8 @@ function SchedulePage() {
       </header>
 
       {role === "admin" ? (
-        <ClientOnly fallback={<LoadingState label="Loading the calendar…" />}>
-          <Suspense fallback={<LoadingState label="Loading the calendar…" />}>
+        <ClientOnly fallback={<AsyncSkeleton shape="rows" count={6} />}>
+          <Suspense fallback={<AsyncSkeleton shape="rows" count={6} />}>
             <AdminShiftCalendar adminId={uid!} />
           </Suspense>
         </ClientOnly>
