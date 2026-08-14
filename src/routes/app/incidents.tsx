@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { RoleGate } from "@/lib/role-gate";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncState } from "@/components/ui/async-state";
 import {
   SEVERITIES,
   STATUSES,
@@ -125,20 +125,26 @@ function IncidentsAdmin() {
         </label>
       </div>
 
-      {isPending && <LoadingState label="Loading incident reports…" />}
-      {error && <ErrorState what="incident reports" error={error} onRetry={() => refetch()} />}
-      {!isPending && !error && rows.length === 0 && (
-        <EmptyState
-          title="No incidents match these filters"
-          hint="Try widening the status or severity filter above."
-        />
-      )}
-
-      <div className="space-y-4">
-        {rows.map((row) => (
-          <IncidentCard key={row.id} row={row} />
-        ))}
-      </div>
+      <AsyncState
+        isPending={isPending}
+        error={error}
+        data={rows}
+        what="incident reports"
+        onRetry={() => refetch()}
+        skeleton="cards"
+        empty={{
+          title: "No incidents to review",
+          hint: "Reports filed by caregivers and family members show up here. Try widening the status or severity filter above.",
+        }}
+      >
+        {(list) => (
+          <div className="space-y-4">
+            {list.map((row) => (
+              <IncidentCard key={row.id} row={row} />
+            ))}
+          </div>
+        )}
+      </AsyncState>
     </div>
   );
 }
