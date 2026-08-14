@@ -1,11 +1,11 @@
 /* Warm-paper theme for the Con Cariño PR shift calendar */
-.kindred-calendar .kindred-grid {
+.cc-calendar .cc-grid {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 1rem;
   overflow: hidden;
 }
-.kindred-calendar .kindred-col-head {
+.cc-calendar .cc-col-head {
   padding: 0.6rem 0.25rem;
   text-align: center;
   font-size: 0.72rem;
@@ -14,7 +14,7 @@
   color: var(--color-muted-foreground);
   font-weight: 500;
 }
-.kindred-calendar .kindred-hour-label {
+.cc-calendar .cc-hour-label {
   font-size: 0.68rem;
   color: var(--color-muted-foreground);
   text-align: right;
@@ -22,35 +22,35 @@
   border-right: 1px solid var(--color-border);
   transform: translateY(-0.4em);
 }
-.kindred-calendar .kindred-day-col {
+.cc-calendar .cc-day-col {
   position: relative;
   border-left: 1px solid var(--color-border);
 }
-.kindred-calendar .kindred-slot {
+.cc-calendar .cc-slot {
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
   cursor: pointer;
 }
-.kindred-calendar .kindred-slot:hover {
+.cc-calendar .cc-slot:hover {
   background: color-mix(in oklab, var(--color-secondary) 40%, transparent);
 }
-.kindred-calendar .kindred-month-cell {
+.cc-calendar .cc-month-cell {
   min-height: 7rem;
   padding: 0.4rem;
   border-left: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
   cursor: pointer;
 }
-.kindred-calendar .kindred-month-cell:hover {
+.cc-calendar .cc-month-cell:hover {
   background: color-mix(in oklab, var(--color-secondary) 30%, transparent);
 }
-.kindred-calendar .kindred-off-range {
+.cc-calendar .cc-off-range {
   background: color-mix(in oklab, var(--color-muted) 55%, transparent);
 }
-.kindred-calendar .kindred-date {
+.cc-calendar .cc-date {
   font-size: 0.75rem;
   color: var(--color-muted-foreground);
 }
-.kindred-calendar .kindred-event {
+.cc-calendar .cc-event {
   display: block;
   width: 100%;
   text-align: left;
@@ -62,4 +62,4 @@
   line-height: 1.25;
   cursor: grab;
 }
-.kindred-calendar .kindred-event:focus-visible { outline: 2px solid var(--color-ring); }
+.cc-calendar .cc-event:focus-visible { outline: 2px solid var(--color-ring); }
