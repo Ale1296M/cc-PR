@@ -6,7 +6,8 @@ import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { SHIFT_STATUSES, formatDay, formatTime, statusLabel } from "@/components/shifts/shift-utils";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { LoadingState } from "@/components/ui/states";
+import { AsyncState } from "@/components/ui/async-state";
 import { toast } from "sonner";
 
 const AdminShiftCalendar = lazy(() => import("@/components/shifts/AdminShiftCalendar"));
