@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Check, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton, AsyncState } from "@/components/ui/async-state";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/care-plan")({
@@ -60,7 +60,7 @@ function useItems(recipientId: string, onlyActive: boolean) {
 
 function CarePlanPage() {
   const { role, loading } = useAuth();
-  if (loading) return <LoadingState label="Loading your care plan…" />;
+  if (loading) return <AsyncSkeleton shape="rows" count={4} />;
   if (role === "admin") return <AdminCarePlan />;
   if (role === "caregiver") return <CaregiverChecklist />;
   return <FamilyCarePlan />;
@@ -145,16 +145,16 @@ function AdminCarePlan() {
         <h1 className="type-display mt-1">Checklist builder</h1>
       </header>
 
-      {recipientsError && (
-        <ErrorState
+      {recipientsPending && <AsyncSkeleton shape="rows" count={3} />}
+      {!recipientsPending && recipientsError && (
+        <AsyncError
           what="the care recipients"
           error={recipientsError}
           onRetry={() => refetchRecipients()}
         />
       )}
-      {recipientsPending && <LoadingState label="Loading care recipients…" />}
       {!recipientsPending && !recipientsError && (recipients ?? []).length === 0 && (
-        <EmptyState
+        <AsyncEmpty
           title="No care recipients yet"
           hint="Add a care recipient on the Care recipients screen, then build their checklist here."
         />
@@ -172,20 +172,21 @@ function AdminCarePlan() {
         ))}
       </select>
 
-      {itemsPending && <LoadingState label="Loading checklist items…" />}
-      {itemsError && (
-        <ErrorState what="the checklist" error={itemsError} onRetry={() => refetchItems()} />
-      )}
-      {!itemsPending && !itemsError && (items ?? []).length === 0 && (
-        <div className="mb-6">
-          <EmptyState
-            title="No checklist items yet"
-            hint="Add the first task below — for example “Morning medication” — and it will appear on the caregiver's visit checklist."
-          />
-        </div>
-      )}
-      <div className={`card-soft mb-6 divide-y divide-border ${(items ?? []).length === 0 ? "hidden" : ""}`}>
-        {(items ?? []).map((item) => (
+      <AsyncState
+        isPending={itemsPending}
+        error={itemsError}
+        data={items}
+        what="the checklist"
+        onRetry={() => refetchItems()}
+        skeleton="rows"
+        empty={{
+          title: "No checklist items yet",
+          hint: "Add the first task below — for example “Morning medication” — and it will appear on the caregiver's visit checklist.",
+        }}
+      >
+        {(list) => (
+      <div className="card-soft mb-6 divide-y divide-border">
+        {list.map((item) => (
           <div key={item.id} className="flex flex-wrap items-center gap-4 p-4">
             <div className="min-w-0 flex-1">
               <input
