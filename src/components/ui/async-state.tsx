@@ -48,7 +48,7 @@ export function AsyncSkeleton({
         <Bar className="h-4 w-1/3" />
         <div className="mt-6 flex h-40 items-end gap-2">
           {Array.from({ length: 14 }).map((_, i) => (
-            <Bar key={i} className="flex-1" style={undefined as never} />
+            <Bar key={i} className="flex-1" />
           ))}
         </div>
         <Bar className="mt-6 h-3 w-1/2" />
