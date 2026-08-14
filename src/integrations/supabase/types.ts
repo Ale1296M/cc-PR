@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          after: Json | null
+          before: Json | null
+          created_at: string
+          id: number
+          row_id: string | null
+          table_name: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          id?: never
+          row_id?: string | null
+          table_name: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          id?: never
+          row_id?: string | null
+          table_name?: string
+        }
+        Relationships: []
+      }
       care_plan_completions: {
         Row: {
           care_plan_item_id: string
@@ -66,10 +99,13 @@ export type Database = {
           category: string | null
           created_at: string
           created_by_admin_id: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           frequency: string
           id: string
           task_description: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           active?: boolean
@@ -77,10 +113,13 @@ export type Database = {
           category?: string | null
           created_at?: string
           created_by_admin_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           frequency?: string
           id?: string
           task_description: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           active?: boolean
@@ -88,10 +127,13 @@ export type Database = {
           category?: string | null
           created_at?: string
           created_by_admin_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           frequency?: string
           id?: string
           task_description?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -116,6 +158,8 @@ export type Database = {
           city: string | null
           created_at: string
           date_of_birth: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           emergency_contact_relationship: string | null
@@ -128,6 +172,7 @@ export type Database = {
           municipality: string | null
           notes: string | null
           updated_at: string
+          updated_by: string | null
           zip_code: string | null
         }
         Insert: {
@@ -135,6 +180,8 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           emergency_contact_relationship?: string | null
@@ -147,6 +194,7 @@ export type Database = {
           municipality?: string | null
           notes?: string | null
           updated_at?: string
+          updated_by?: string | null
           zip_code?: string | null
         }
         Update: {
@@ -154,6 +202,8 @@ export type Database = {
           city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           emergency_contact_relationship?: string | null
@@ -166,6 +216,7 @@ export type Database = {
           municipality?: string | null
           notes?: string | null
           updated_at?: string
+          updated_by?: string | null
           zip_code?: string | null
         }
         Relationships: [
@@ -365,6 +416,8 @@ export type Database = {
           care_recipient_id: string
           created_at: string
           created_by_admin_id: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           email: string | null
           full_name: string
           id: string
@@ -375,11 +428,14 @@ export type Database = {
           relationship: string | null
           sort_order: number
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           care_recipient_id: string
           created_at?: string
           created_by_admin_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           full_name: string
           id?: string
@@ -390,11 +446,14 @@ export type Database = {
           relationship?: string | null
           sort_order?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           care_recipient_id?: string
           created_at?: string
           created_by_admin_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           full_name?: string
           id?: string
@@ -405,6 +464,7 @@ export type Database = {
           relationship?: string | null
           sort_order?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -518,6 +578,8 @@ export type Database = {
           action_taken: string | null
           care_recipient_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string
           id: string
           incident_type: Database["public"]["Enums"]["incident_type"]
@@ -530,12 +592,15 @@ export type Database = {
           severity: Database["public"]["Enums"]["incident_severity"]
           status: Database["public"]["Enums"]["incident_status"]
           updated_at: string
+          updated_by: string | null
           visit_log_id: string | null
         }
         Insert: {
           action_taken?: string | null
           care_recipient_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description: string
           id?: string
           incident_type?: Database["public"]["Enums"]["incident_type"]
@@ -548,12 +613,15 @@ export type Database = {
           severity?: Database["public"]["Enums"]["incident_severity"]
           status?: Database["public"]["Enums"]["incident_status"]
           updated_at?: string
+          updated_by?: string | null
           visit_log_id?: string | null
         }
         Update: {
           action_taken?: string | null
           care_recipient_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string
           id?: string
           incident_type?: Database["public"]["Enums"]["incident_type"]
@@ -566,6 +634,7 @@ export type Database = {
           severity?: Database["public"]["Enums"]["incident_severity"]
           status?: Database["public"]["Enums"]["incident_status"]
           updated_at?: string
+          updated_by?: string | null
           visit_log_id?: string | null
         }
         Relationships: [
@@ -719,12 +788,16 @@ export type Database = {
           clock_out_lng: number | null
           clock_out_method: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           evv_exception: string | null
           id: string
           location_verified: boolean | null
           mood: string | null
           notes: string | null
           shift_id: string | null
+          updated_by: string | null
+          visit_date: string | null
         }
         Insert: {
           care_recipient_id?: string | null
@@ -740,12 +813,16 @@ export type Database = {
           clock_out_lng?: number | null
           clock_out_method?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           evv_exception?: string | null
           id?: string
           location_verified?: boolean | null
           mood?: string | null
           notes?: string | null
           shift_id?: string | null
+          updated_by?: string | null
+          visit_date?: string | null
         }
         Update: {
           care_recipient_id?: string | null
@@ -761,12 +838,16 @@ export type Database = {
           clock_out_lng?: number | null
           clock_out_method?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           evv_exception?: string | null
           id?: string
           location_verified?: boolean | null
           mood?: string | null
           notes?: string | null
           shift_id?: string | null
+          updated_by?: string | null
+          visit_date?: string | null
         }
         Relationships: [
           {
@@ -795,6 +876,8 @@ export type Database = {
       wellbeing_entries: {
         Row: {
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           food_appetite: Database["public"]["Enums"]["appetite_level"] | null
           food_meals_offered: string | null
           food_notes: string | null
@@ -810,10 +893,13 @@ export type Database = {
           movement_assisted: boolean | null
           movement_notes: string | null
           updated_at: string
+          updated_by: string | null
           visit_log_id: string
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           food_appetite?: Database["public"]["Enums"]["appetite_level"] | null
           food_meals_offered?: string | null
           food_notes?: string | null
@@ -829,10 +915,13 @@ export type Database = {
           movement_assisted?: boolean | null
           movement_notes?: string | null
           updated_at?: string
+          updated_by?: string | null
           visit_log_id: string
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           food_appetite?: Database["public"]["Enums"]["appetite_level"] | null
           food_meals_offered?: string | null
           food_notes?: string | null
@@ -848,6 +937,7 @@ export type Database = {
           movement_assisted?: boolean | null
           movement_notes?: string | null
           updated_at?: string
+          updated_by?: string | null
           visit_log_id?: string
         }
         Relationships: [
@@ -869,13 +959,48 @@ export type Database = {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
       }
-      caregiver_has_shift_with_client: {
-        Args: { _client_id: string; _uid: string }
-        Returns: boolean
-      }
       caregiver_has_shift_with_recipient: {
         Args: { _recipient_id: string; _uid: string }
         Returns: boolean
+      }
+      clock_in_visit: {
+        Args: {
+          _accuracy?: number
+          _care_recipient_id: string
+          _lat?: number
+          _lng?: number
+        }
+        Returns: {
+          care_recipient_id: string | null
+          caregiver_id: string
+          clock_in: string
+          clock_in_accuracy_m: number | null
+          clock_in_lat: number | null
+          clock_in_lng: number | null
+          clock_in_method: string | null
+          clock_out: string | null
+          clock_out_accuracy_m: number | null
+          clock_out_lat: number | null
+          clock_out_lng: number | null
+          clock_out_method: string | null
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          evv_exception: string | null
+          id: string
+          location_verified: boolean | null
+          mood: string | null
+          notes: string | null
+          shift_id: string | null
+          updated_by: string | null
+          visit_date: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "visit_logs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       current_user_role: {
         Args: never
@@ -902,10 +1027,6 @@ export type Database = {
       }
       user_can_access_family: {
         Args: { _family_id: string; _user_id: string }
-        Returns: boolean
-      }
-      user_can_view_client: {
-        Args: { _client_id: string; _user_id: string }
         Returns: boolean
       }
       user_can_view_recipient: {

@@ -177,18 +177,18 @@ function VisitFlow() {
   const clockIn = useMutation({
     mutationFn: async () => {
       if (!uid || !recipient) throw new Error("Pick a care recipient first.");
-      return clockInVisit({
-        caregiverId: uid,
-        careRecipientId: recipient.id,
-        fence: {
-          homeLat: recipient.home_lat,
-          homeLng: recipient.home_lng,
-          radiusM: recipient.geofence_radius_m,
-        },
-      });
+      return clockInVisit({ careRecipientId: recipient.id });
     },
     onSuccess: (row) => {
-      toast.success(row.location_verified ? "Clocked in · location verified" : "Clocked in");
+      toast.success(
+        row.location_verified
+          ? "Clocked in · location verified"
+          : row.evv_exception === "missing_gps"
+            ? "Clocked in · location not shared"
+            : row.evv_exception === "out_of_range"
+              ? "Clocked in · recorded away from the home address"
+              : "Clocked in",
+      );
       qc.invalidateQueries({ queryKey: ["visit-flow-active", recipientId, uid] });
     },
     onError: (e: unknown) =>

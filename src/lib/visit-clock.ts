@@ -20,45 +20,28 @@ export async function distanceToHome(lat: number, lng: number, fence: Geofence) 
   return typeof data === "number" ? data : null;
 }
 
-/** Clock in a caregiver, capturing GPS and computing verification. Never blocks on GPS. */
-export async function clockInVisit(opts: {
-  caregiverId: string;
-  careRecipientId: string;
-  fence: Geofence;
-}) {
+/**
+ * Clock in a caregiver via the clock_in_visit RPC. The server sets the timestamp,
+ * verifies the location and returns the visit row. If a visit already exists today
+ * it returns that one — treat it as resuming today's visit.
+ */
+export async function clockInVisit(opts: { careRecipientId: string }) {
   const pos = await capturePosition();
-  let payload: Record<string, unknown> = {
-    care_recipient_id: opts.careRecipientId,
-    caregiver_id: opts.caregiverId,
-    clock_in: new Date().toISOString(),
-  };
-  if (!pos) {
-    payload = {
-      ...payload,
-      clock_in_method: "manual",
-      location_verified: false,
-      evv_exception: "missing_gps",
-    };
-  } else {
-    const dist = await distanceToHome(pos.lat, pos.lng, opts.fence);
-    const verified = dist != null && dist <= (opts.fence.radiusM ?? 150);
-    payload = {
-      ...payload,
-      clock_in_lat: pos.lat,
-      clock_in_lng: pos.lng,
-      clock_in_accuracy_m: pos.accuracy,
-      clock_in_method: "gps",
-      location_verified: verified,
-      evv_exception: verified ? null : "out_of_range",
-    };
-  }
-  const { data, error } = await supabase
-    .from("visit_logs")
-    .insert(payload as never)
-    .select("id, clock_in, location_verified, evv_exception")
-    .single();
+  const { data, error } = await supabase.rpc("clock_in_visit", {
+    _care_recipient_id: opts.careRecipientId,
+    _lat: pos?.lat ?? undefined,
+    _lng: pos?.lng ?? undefined,
+    _accuracy: pos?.accuracy ?? undefined,
+  });
   if (error) throw error;
-  return data;
+  const row = (Array.isArray(data) ? data[0] : data) as {
+    id: string;
+    clock_in: string;
+    location_verified: boolean | null;
+    evv_exception: string | null;
+  } | null;
+  if (!row) throw new Error("Couldn't clock in — try again.");
+  return row;
 }
 
 /** Clock out an open visit, capturing GPS again. */
