@@ -70,7 +70,7 @@ export function AsyncSkeleton({
   }
   if (shape === "list") {
     return (
-      <div role="status" aria-busy="true" aria-live="polite" className="card-soft divide-y divide-border">
+      <div role="status" aria-busy="true" aria-live="polite" className="divide-y divide-border border-t border-border">
         <span className="sr-only">Loading…</span>
         {items.map((_, i) => (
           <div key={i} className="flex items-center gap-4 p-4">
@@ -85,7 +85,7 @@ export function AsyncSkeleton({
     );
   }
   return (
-    <div role="status" aria-busy="true" aria-live="polite" className="card-soft divide-y divide-border">
+    <div role="status" aria-busy="true" aria-live="polite" className="divide-y divide-border border-t border-border">
       <span className="sr-only">Loading…</span>
       {items.map((_, i) => (
         <div key={i} className="flex items-center gap-4 p-4">
@@ -114,7 +114,7 @@ export function AsyncEmpty({
   action?: ReactNode;
 }) {
   return (
-    <div className="card-soft flex flex-col items-start gap-2 p-6">
+    <div className="flex flex-col items-start gap-2 border-t border-border py-8">
       <Inbox className="h-5 w-5 text-muted-foreground" aria-hidden />
       <p className="type-subhead">{title}</p>
       {hint && <p className="max-w-prose type-meta font-normal text-muted-foreground">{hint}</p>}
@@ -138,7 +138,7 @@ export function AsyncError({
   return (
     <div
       role="alert"
-      className="card-soft flex flex-col items-start gap-2 border-l-4 border-destructive p-6"
+      className="flex flex-col items-start gap-2 border-l-2 border-destructive bg-muted/40 py-6 pl-4"
     >
       <div className="flex items-center gap-2">
         <AlertCircle className="h-5 w-5 shrink-0 text-destructive" aria-hidden />
