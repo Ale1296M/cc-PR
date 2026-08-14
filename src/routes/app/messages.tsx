@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { toast } from "sonner";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 
 export const Route = createFileRoute("/app/messages")({
   component: MessagesPage,
@@ -212,9 +212,9 @@ function MessagesPage() {
         <p className="mt-2 text-sm text-muted-foreground">{subheading}</p>
       </header>
 
-      {(loading || listsPending) && <LoadingState label="Loading your conversations…" />}
-      {listsError && (
-        <ErrorState
+      {(loading || listsPending) && <AsyncSkeleton shape="chat" count={5} />}
+      {!loading && !listsPending && listsError && (
+        <AsyncError
           what="your conversations"
           error={listsError}
           onRetry={() => {
@@ -223,8 +223,8 @@ function MessagesPage() {
           }}
         />
       )}
-      {noThreads && (
-        <EmptyState
+      {!loading && !listsPending && !listsError && noThreads && (
+        <AsyncEmpty
           title="No conversations yet"
           hint="A thread appears here as soon as a family or a caregiver is set up."
         />
@@ -283,11 +283,17 @@ function MessagesPage() {
 
           <section className="flex min-h-[50vh] flex-col">
             <div className="flex-1 space-y-4 overflow-y-auto p-4">
-              {messagesPending && <p className="text-sm text-muted-foreground">Loading messages…</p>}
-              {messagesError && (
-                <ErrorState what="these messages" error={messagesError} onRetry={() => refetchMessages()} />
+              {messagesPending && <AsyncSkeleton shape="chat" count={4} />}
+              {!messagesPending && messagesError && (
+                <AsyncError what="these messages" error={messagesError} onRetry={() => refetchMessages()} />
               )}
-              {(messages ?? []).map((m) => {
+              {!messagesPending && !messagesError && (messages ?? []).length === 0 && (
+                <AsyncEmpty
+                  title="No messages yet"
+                  hint="Say hello — messages you send appear here right away."
+                />
+              )}
+              {!messagesPending && !messagesError && (messages ?? []).map((m) => {
                 const mine = m.sender_profile_id === uid;
                 return (
                   <div key={m.id} className={`max-w-[80%] ${mine ? "ml-auto text-right" : ""}`}>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { ReportIncidentDialog } from "./ReportIncidentDialog";
 import {
   formatStamp,
@@ -66,10 +66,10 @@ export function RecipientIncidents({
         </button>
       </div>
 
-      {isPending && <LoadingState label="Loading incident reports…" />}
-      {error && <ErrorState what="incident reports" error={error} onRetry={() => refetch()} />}
+      {isPending && <AsyncSkeleton shape="rows" count={4} />}
+      {error && <AsyncError what="incident reports" error={error} onRetry={() => refetch()} />}
       {!isPending && !error && (data ?? []).length === 0 && (
-        <EmptyState
+        <AsyncEmpty
           title="No incidents reported"
           hint="Falls, medication errors and other events filed by the care team will appear here."
         />

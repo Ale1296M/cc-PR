@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SHIFT_STATUSES, statusLabel } from "@/components/shifts/shift-utils";
-import { ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import ShiftDialog from "@/components/shifts/ShiftDialog";
 import {
   STATUS_STYLE,
@@ -106,8 +106,8 @@ export default function AdminShiftCalendar({ adminId }: { adminId: string }) {
     reschedule.mutate({ id: ev.id, start, end });
   }
 
-  if (isPending) return <LoadingState label="Loading the calendar…" />;
-  if (error) return <ErrorState what="the schedule" error={error} onRetry={() => refetch()} />;
+  if (isPending) return <AsyncSkeleton shape="rows" count={4} />;
+  if (error) return <AsyncError what="the schedule" error={error} onRetry={() => refetch()} />;
 
   const weekStart = startOfWeek(cursor, { weekStartsOn: 0 });
   const step = (dir: number) =>

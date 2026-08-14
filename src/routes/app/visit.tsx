@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { RoleGate } from "@/lib/role-gate";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { formatDuration } from "@/lib/geo";
 import { clockInVisit, clockOutVisit, saveWellbeingEntry } from "@/lib/visit-clock";
@@ -277,16 +277,16 @@ function VisitFlow() {
       </header>
 
       <section>
-        {recipientsPending && <LoadingState label="Loading your care recipients…" />}
+        {recipientsPending && <AsyncSkeleton shape="rows" count={4} />}
         {recipientsError && (
-          <ErrorState
+          <AsyncError
             what="your care recipients"
             error={recipientsError}
             onRetry={() => refetchRecipients()}
           />
         )}
         {!recipientsPending && !recipientsError && list.length === 0 && (
-          <EmptyState
+          <AsyncEmpty
             title="No care recipients assigned yet"
             hint="Once the care team assigns you a shift, the people you visit appear here and you can log their visit."
           />
@@ -325,7 +325,7 @@ function VisitFlow() {
         <section className="mt-8">
           <h2 className="type-section mb-4">Clock in</h2>
           {activePending ? (
-            <LoadingState label="Checking for an open visit…" />
+            <AsyncSkeleton shape="rows" count={4} />
           ) : !active ? (
             <div className="card-soft p-6">
               <button

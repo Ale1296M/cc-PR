@@ -1,4 +1,5 @@
 import { RoleGate } from "@/lib/role-gate";
+import { AsyncState } from "@/components/ui/async-state";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -44,7 +45,7 @@ function UsersPage() {
   const fetchUsers = useServerFn(listUsers);
   const updateRole = useServerFn(setUserRole);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => fetchUsers(),
     enabled: role === "admin",
@@ -100,19 +101,21 @@ function UsersPage() {
         })}
       </div>
 
-      {isLoading && <p className="card-soft p-6 text-sm text-muted-foreground">Loading users…</p>}
-      {error && (
-        <p className="card-soft p-6 text-sm text-destructive">
-          {error instanceof Error ? error.message : "Could not load users."}
-        </p>
-      )}
-
-      {!isLoading && !error && filtered.length === 0 && (
-        <p className="card-soft p-6 text-sm text-muted-foreground">No users in this view.</p>
-      )}
-
+      <AsyncState
+        isPending={isLoading}
+        error={error}
+        data={filtered}
+        what="users"
+        onRetry={() => refetch()}
+        skeleton="list"
+        empty={{
+          title: "No users in this view",
+          hint: "New people appear here as soon as they sign up — assign them a role to give them access.",
+        }}
+      >
+        {(list) => (
       <div className="space-y-4">
-        {filtered.map((u) => (
+        {list.map((u) => (
           <div
             key={u.id}
             className="card-soft flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"
@@ -148,6 +151,8 @@ function UsersPage() {
           </div>
         ))}
       </div>
+        )}
+      </AsyncState>
     </div>
   );
 }

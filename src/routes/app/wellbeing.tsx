@@ -14,7 +14,7 @@ import {
 import { AlertTriangle, ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
+import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { formatDuration } from "@/lib/geo";
 
@@ -250,10 +250,10 @@ function WellbeingTrends() {
     </div>
   );
 
-  if (recipientsPending) return shell(<LoadingState label="Loading wellbeing check-ins…" />);
+  if (recipientsPending) return shell(<AsyncSkeleton shape="rows" count={4} />);
   if (recipientsError)
     return shell(
-      <ErrorState
+      <AsyncError
         what="the wellbeing trends"
         error={recipientsError}
         onRetry={() => refetchRecipients()}
@@ -261,7 +261,7 @@ function WellbeingTrends() {
     );
   if (list.length === 0)
     return shell(
-      <EmptyState
+      <AsyncEmpty
         title={isFamily ? "No one linked to your account yet" : "No care recipients yet"}
         hint={
           isFamily
@@ -272,7 +272,33 @@ function WellbeingTrends() {
     );
   if (visitsError)
     return shell(
-      <ErrorState what="the wellbeing check-ins" error={visitsError} onRetry={() => refetchVisits()} />,
+      <AsyncError what="the wellbeing check-ins" error={visitsError} onRetry={() => refetchVisits()} />,
+    );
+  if (!visitsPending && (visits ?? []).length === 0)
+    return shell(
+      <>
+        {list.length > 1 && (
+          <select
+            aria-label="Choose a person"
+            value={activeId}
+            onChange={(e) => {
+              setRecipientId(e.target.value);
+              setSelectedDay(null);
+            }}
+            className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
+          >
+            {list.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.full_name}
+              </option>
+            ))}
+          </select>
+        )}
+        <AsyncEmpty
+          title={`No check-ins recorded yet${activeName ? ` for ${activeName}` : ""}.`}
+          hint="Caregivers record mood, medicine, food, movement and hygiene during each visit — those check-ins will show up here."
+        />
+      </>,
     );
 
   // One entry per day (most recent visit of that day wins)
@@ -369,7 +395,7 @@ function WellbeingTrends() {
 
       {visitsPending && (
         <div className="mb-6">
-          <LoadingState label="Loading the last 14 days…" />
+          <AsyncSkeleton shape="rows" count={4} />
         </div>
       )}
 
