@@ -78,7 +78,7 @@ function Consent() {
     <main className="grid min-h-screen place-items-center bg-background p-6">
       <div className="card-soft w-full max-w-md p-8">
         <p className="font-display text-2xl text-primary">Con Cariño PR</p>
-        <h1 className="mt-4 font-display text-3xl">Connect {clientName} to your account</h1>
+        <h1 className="type-display mt-4">Connect {clientName} to your account</h1>
         <p className="mt-4 text-sm text-muted-foreground">
           This lets {clientName} use Con Cariño PR as you — reading care recipients, shifts, care plans and
           visit logs you can already see, and sending messages on your behalf.

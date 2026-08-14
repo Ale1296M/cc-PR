@@ -56,7 +56,7 @@ export function RecipientIncidents({
   return (
     <section className="mb-12">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-display text-2xl">Incidents</h2>
+        <h2 className="type-section">Incidents</h2>
         <button
           type="button"
           onClick={() => setReporting(true)}

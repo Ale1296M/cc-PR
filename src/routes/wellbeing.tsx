@@ -225,7 +225,7 @@ function LogVisit() {
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Check className="h-7 w-7" />
         </div>
-        <h1 className="mt-6 font-display text-4xl">Check-in saved</h1>
+        <h1 className="type-display mt-6">Check-in saved</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Today&apos;s wellbeing check-in has been recorded{savedName ? ` for ${savedName}` : ""}.
         </p>
@@ -271,11 +271,11 @@ function LogVisit() {
             day: "numeric",
           })}
         </p>
-        <h1 className="mt-1 font-display text-3xl md:text-5xl">Log a visit</h1>
+        <h1 className="type-display mt-1">Log a visit</h1>
       </header>
 
       <section>
-        <h2 className="mb-4 font-display text-2xl">Who are you visiting?</h2>
+        <h2 className="type-section mb-4">Who are you visiting?</h2>
         {recipientsPending && <LoadingState label="Loading your care recipients…" />}
         {recipientsError && (
           <ErrorState

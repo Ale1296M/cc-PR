@@ -27,7 +27,7 @@ function SchedulePage() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Schedule</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">Shifts &amp; visits</h1>
+        <h1 className="type-display mt-1">Shifts &amp; visits</h1>
       </header>
 
       {role === "admin" ? (
@@ -115,7 +115,7 @@ function CaregiverSchedule({ uid }: { uid?: string }) {
       <div className="space-y-8">
         {Object.entries(groups).map(([day, list]) => (
           <section key={day}>
-            <h2 className="mb-4 font-display text-xl">{formatDay(day)}</h2>
+            <h2 className="type-section mb-4">{formatDay(day)}</h2>
             <div className="card-soft divide-y divide-border">
               {list.map((s) => (
                 <div

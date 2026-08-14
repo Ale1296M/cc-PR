@@ -134,7 +134,7 @@ function AppLayout() {
 function AwaitingRole({ email }: { email: string }) {
   return (
     <div className="card-soft mx-auto max-w-xl p-8 text-center">
-      <h1 className="font-display text-3xl">Your account is set up</h1>
+      <h1 className="type-display">Your account is set up</h1>
       <p className="mt-4 text-sm text-muted-foreground">
         An admin will assign your role shortly. Once that's done, your schedule, care plans and
         messages will appear here automatically.

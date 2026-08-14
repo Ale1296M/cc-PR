@@ -83,7 +83,7 @@ function CareRecipientsPage() {
       <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
           <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipients</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl">Who we care for</h1>
+          <h1 className="type-display mt-1">Who we care for</h1>
         </div>
         {role === "admin" && (
           <button
@@ -161,7 +161,7 @@ function NewCareRecipient({
   return (
     <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
       <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="mb-4 font-display text-2xl">New care recipient</h3>
+        <h3 className="type-subhead mb-4">New care recipient</h3>
         <div className="space-y-4">
           <F label="Full name" value={full_name} onChange={setName} />
           <label className="block">

@@ -89,7 +89,7 @@ function IncidentsAdmin() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Safety</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">Incidents</h1>
+        <h1 className="type-display mt-1">Incidents</h1>
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
           Every report filed by a caregiver or family member, with a full record of who reported it
           and who closed it out.

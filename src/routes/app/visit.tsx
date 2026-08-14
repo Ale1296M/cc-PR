@@ -234,7 +234,7 @@ function VisitFlow() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Check className="h-7 w-7" />
         </div>
-        <h1 className="mt-6 font-display text-4xl">Visit saved</h1>
+        <h1 className="type-display mt-6">Visit saved</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {done.name ? `${done.name}'s visit` : "This visit"} was recorded · {done.duration}.
         </p>
@@ -273,7 +273,7 @@ function VisitFlow() {
             day: "numeric",
           })}
         </p>
-        <h1 className="mt-1 font-display text-4xl md:text-5xl">Log a visit</h1>
+        <h1 className="type-display mt-1">Log a visit</h1>
       </header>
 
       <section>
@@ -296,7 +296,7 @@ function VisitFlow() {
         )}
         {list.length > 1 && (
           <>
-            <h2 className="mb-4 font-display text-2xl">Who are you visiting?</h2>
+            <h2 className="type-section mb-4">Who are you visiting?</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {list.map((r) => {
                 const activeSel = recipientId === r.id;
@@ -323,7 +323,7 @@ function VisitFlow() {
 
       {recipient && (
         <section className="mt-8">
-          <h2 className="mb-4 font-display text-2xl">Clock in</h2>
+          <h2 className="type-section mb-4">Clock in</h2>
           {activePending ? (
             <LoadingState label="Checking for an open visit…" />
           ) : !active ? (
@@ -362,7 +362,7 @@ function VisitFlow() {
 
       {recipient && active && (
         <section className="mt-8 space-y-4">
-          <h2 className="font-display text-2xl">Wellbeing check-in</h2>
+          <h2 className="type-section">Wellbeing check-in</h2>
           <Choice title="Mood" options={MOOD} value={mood} onChange={setMood} />
           <Choice title="Appetite" options={APPETITE} value={appetite} onChange={setAppetite} />
           <Choice title="Medicine" options={MEDICINE} value={medicine} onChange={setMedicine} />

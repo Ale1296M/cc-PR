@@ -244,7 +244,7 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Last 14 days</p>
-        <h1 className="mt-1 font-display text-3xl md:text-5xl">Wellbeing trends</h1>
+        <h1 className="type-display mt-1">Wellbeing trends</h1>
       </header>
       {children}
     </div>
@@ -357,7 +357,7 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Last 14 days</p>
-        <h1 className="mt-1 font-display text-3xl md:text-5xl">Wellbeing trends</h1>
+        <h1 className="type-display mt-1">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           {activeName
             ? `A descriptive summary of what caregivers recorded for ${activeName}.`
@@ -407,7 +407,7 @@ function WellbeingTrends() {
 
       <section className="card-soft p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="font-display text-2xl">Day by day</h2>
+          <h2 className="type-section">Day by day</h2>
           <DeltaBadge delta={delta} />
         </div>
         <div className="mt-4 grid grid-cols-7 gap-2 sm:[grid-template-columns:repeat(14,minmax(0,1fr))]">
@@ -441,7 +441,7 @@ function WellbeingTrends() {
       </section>
 
       <section className="card-soft mt-6 p-6">
-        <h2 className="font-display text-2xl">Overall recorded score</h2>
+        <h2 className="type-section">Overall recorded score</h2>
         {chartData.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
             No wellbeing check-ins recorded in the last 14 days.
@@ -480,7 +480,7 @@ function WellbeingTrends() {
       </section>
 
       <section className="card-soft mt-6 p-6">
-        <h2 className="font-display text-2xl">
+        <h2 className="type-section">
           {activeDay
             ? new Date(`${activeDay.key}T00:00:00`).toLocaleDateString(undefined, {
                 weekday: "long",
@@ -545,7 +545,7 @@ function WellbeingTrends() {
       </section>
 
       <section className="card-soft mt-6 p-6">
-        <h2 className="font-display text-2xl">Task completion by category</h2>
+        <h2 className="type-section">Task completion by category</h2>
         {categories.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
             No checklist items were recorded in the last 14 days.

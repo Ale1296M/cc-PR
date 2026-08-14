@@ -130,7 +130,7 @@ function Landing() {
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-gold" />
               {t.eyebrow}
             </p>
-            <h1 className="font-display text-[clamp(3rem,8vw,6.5rem)] font-normal leading-[0.98] tracking-[-0.02em] text-primary">
+            <h1 className="type-display text-primary">
               {t.headlineLead}{" "}
               <em className="italic text-foreground">{t.headlineAccent}</em>.
             </h1>
@@ -168,7 +168,7 @@ function Landing() {
                 >
                   <Icon className="mt-1 h-5 w-5 shrink-0 text-primary/70" aria-hidden="true" />
                   <div>
-                    <h2 className="font-display text-2xl leading-tight">{f.title}</h2>
+                    <h2 className="type-section">{f.title}</h2>
                     <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
                       {f.body}
                     </p>

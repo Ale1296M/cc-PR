@@ -61,7 +61,7 @@ export function ReportIncidentDialog({
   return (
     <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-foreground/30 p-4">
       <div className="w-full max-w-lg rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="font-display text-2xl">Report an incident</h3>
+        <h3 className="type-subhead">Report an incident</h3>
         {recipientName && (
           <p className="mt-1 text-sm text-muted-foreground">For {recipientName}</p>
         )}

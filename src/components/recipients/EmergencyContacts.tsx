@@ -169,7 +169,7 @@ export function EmergencyContacts({
 
   const form = (
     <div className="card-soft space-y-4 p-6">
-      <h3 className="font-display text-xl">{editingId ? "Edit contact" : "New contact"}</h3>
+      <h3 className="type-subhead">{editingId ? "Edit contact" : "New contact"}</h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="text-sm">
           Full name
@@ -260,7 +260,7 @@ export function EmergencyContacts({
   return (
     <section className="mb-12">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-display text-2xl">Emergency contacts</h2>
+        <h2 className="type-section">Emergency contacts</h2>
         {canEdit && !adding && !editingId && (
           <button
             type="button"

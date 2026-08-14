@@ -101,7 +101,7 @@ function Dashboard() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">
           {today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
         </p>
-        <h1 className="mt-1 font-display text-4xl md:text-5xl">Good to see you.</h1>
+        <h1 className="type-display mt-1">Good to see you.</h1>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-3">
@@ -136,7 +136,7 @@ function Dashboard() {
 
       <section className="mt-12">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-2xl">Upcoming this week</h2>
+          <h2 className="type-section">Upcoming this week</h2>
           <Link to="/app/schedule" className="text-sm text-primary hover:underline">
             Full schedule →
           </Link>

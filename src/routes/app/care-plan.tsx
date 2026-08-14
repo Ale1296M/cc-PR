@@ -142,7 +142,7 @@ function AdminCarePlan() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="mt-1 font-display text-4xl">Checklist builder</h1>
+        <h1 className="type-display mt-1">Checklist builder</h1>
       </header>
 
       {recipientsError && (
@@ -394,7 +394,7 @@ function CaregiverChecklist() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Today’s visit</p>
-        <h1 className="mt-1 font-display text-4xl">Care checklist</h1>
+        <h1 className="type-display mt-1">Care checklist</h1>
       </header>
 
       {shiftsPending && <LoadingState label="Loading today's visits…" />}
@@ -522,7 +522,7 @@ function FamilyCarePlan() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">
+        <h1 className="type-display mt-1">
           {activeName ? `${activeName}'s care plan` : "Your loved one's care plan"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">

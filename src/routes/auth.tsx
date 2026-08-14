@@ -85,7 +85,7 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <Link to="/" className="mb-6 inline-block font-display text-2xl md:hidden">Con Cariño PR</Link>
-          <h1 className="font-display text-4xl">
+          <h1 className="type-display">
             {mode === "signup" ? "Create your account" : "Welcome back"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">

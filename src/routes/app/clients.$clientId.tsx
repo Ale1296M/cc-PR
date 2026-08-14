@@ -93,7 +93,7 @@ function CareRecipientDetail() {
 
       <header className="card-soft mb-8 p-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipient</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">{recipient.full_name}</h1>
+        <h1 className="type-display mt-1">{recipient.full_name}</h1>
         <div className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
           {address && <p>📍 {address}</p>}
           {recipient.date_of_birth && <p>🎂 {new Date(recipient.date_of_birth).toLocaleDateString()}</p>}
@@ -108,7 +108,7 @@ function CareRecipientDetail() {
       </header>
 
       <section className="mb-12">
-        <h2 className="mb-4 font-display text-2xl">Care plan</h2>
+        <h2 className="type-section mb-4">Care plan</h2>
         <p className="card-soft p-4 text-sm text-muted-foreground">
           Checklists now live per care recipient on the{" "}
           <Link to="/app/care-plan" className="text-primary underline">Care plan</Link> screen.
@@ -122,7 +122,7 @@ function CareRecipientDetail() {
       <RecipientIncidents careRecipientId={recipientId} recipientName={recipient.full_name} />
 
       <section>
-        <h2 className="mb-4 font-display text-2xl">Recent visits</h2>
+        <h2 className="type-section mb-4">Recent visits</h2>
         {visitsPending && <LoadingState label="Loading recent visits…" />}
         {visitsError && (
           <ErrorState what="recent visits" error={visitsError} onRetry={() => refetchVisits()} />
@@ -228,7 +228,7 @@ function HomeLocationCard({
 
   return (
     <section className="mb-12">
-      <h2 className="mb-4 font-display text-2xl">Home location</h2>
+      <h2 className="type-section mb-4">Home location</h2>
       <div className="card-soft space-y-4 p-6">
         <p className="text-sm text-muted-foreground">
           Used to mark caregiver clock-ins as verified visits. Stand at the home and tap
@@ -370,7 +370,7 @@ function ClockInBar({
 
   return (
     <div className="card-soft mt-6 p-6">
-      <h3 className="font-display text-xl">Log a visit</h3>
+      <h3 className="type-subhead">Log a visit</h3>
       {!active ? (
         <>
           <button

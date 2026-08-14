@@ -72,7 +72,7 @@ function UsersPage() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
-        <h1 className="mt-1 font-display text-4xl">Users &amp; roles</h1>
+        <h1 className="type-display mt-1">Users &amp; roles</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Everyone with an account. New signups stay pending until you assign a role.
         </p>
