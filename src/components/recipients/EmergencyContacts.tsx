@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { softDelete, withUpdatedBy } from "@/lib/soft-delete";
 import { toast } from "sonner";
 import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { Phone, Mail, Pencil, Trash2, Plus, Star } from "lucide-react";
