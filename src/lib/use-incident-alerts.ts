@@ -58,15 +58,6 @@ export function usePendingUsers(role: AppRole | null) {
   });
 }
 
-async function unusedRecipientName(id: string) {
-  const { data } = await supabase
-    .from("care_recipients")
-    .select("full_name")
-    .eq("id", id)
-    .maybeSingle();
-  return data?.full_name ?? "a care recipient";
-}
-
 /**
  * Realtime in-app alerts for new incident reports.
  * Admins are alerted on every new incident; family members only on
