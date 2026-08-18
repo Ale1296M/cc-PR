@@ -13,7 +13,7 @@ const AdminShiftCalendar = lazy(() => import("@/components/shifts/AdminShiftCale
 
 export const Route = createFileRoute("/app/schedule")({
   component: () => (
-    <RoleGate allow={["admin", "caregiver"]}>
+    <RoleGate allow={["admin", "caregiver", "family_member"]}>
       <SchedulePage />
     </RoleGate>
   ),
@@ -36,10 +36,112 @@ function SchedulePage() {
             <AdminShiftCalendar adminId={uid!} />
           </Suspense>
         </ClientOnly>
+      ) : role === "family_member" ? (
+        <FamilySchedule uid={uid} />
       ) : (
         <CaregiverSchedule uid={uid} />
       )}
     </div>
+  );
+}
+
+/** Read-only upcoming schedule for family members, scoped to their linked recipients. */
+function FamilySchedule({ uid }: { uid?: string }) {
+  const { data: recipientIds } = useQuery({
+    queryKey: ["family-recipient-ids", uid],
+    enabled: !!uid,
+    queryFn: async () => {
+      const ids = new Set<string>();
+      const { data: fam } = await supabase
+        .from("families")
+        .select("care_recipients(id)")
+        .eq("profile_id", uid!);
+      for (const f of fam ?? []) {
+        const rs = (f.care_recipients ?? []) as unknown as { id: string }[];
+        rs.forEach((r) => r?.id && ids.add(r.id));
+      }
+      const { data: links } = await supabase
+        .from("client_family_members")
+        .select("care_recipient_id")
+        .eq("user_id", uid!);
+      (links ?? []).forEach((l) => l.care_recipient_id && ids.add(l.care_recipient_id));
+      return [...ids];
+    },
+  });
+
+  const {
+    data: shifts,
+    isPending,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["family-shifts", uid, recipientIds],
+    enabled: !!uid && recipientIds !== undefined,
+    queryFn: async () => {
+      if (!recipientIds || recipientIds.length === 0) return [];
+      const today = new Date().toISOString().slice(0, 10);
+      const { data, error } = await supabase
+        .from("care_shifts")
+        .select(
+          "id, scheduled_date, scheduled_start_time, scheduled_end_time, status, notes, care_recipient_id, care_recipients(id, full_name)",
+        )
+        .in("care_recipient_id", recipientIds)
+        .gte("scheduled_date", today)
+        .order("scheduled_date")
+        .order("scheduled_start_time");
+      if (error) throw error;
+      return (data ?? []).filter((s) => recipientIds.includes(s.care_recipient_id));
+    },
+  });
+
+  type FamilyShift = NonNullable<typeof shifts>[number];
+  const byDay = (shifts ?? []).reduce<Record<string, FamilyShift[]>>((acc, s) => {
+    (acc[s.scheduled_date] ||= []).push(s);
+    return acc;
+  }, {});
+
+  return (
+    <AsyncState
+      isPending={isPending}
+      error={error}
+      data={byDay}
+      what="the schedule"
+      onRetry={() => refetch()}
+      skeleton="rows"
+      isEmpty={(g) => Object.keys(g).length === 0}
+      empty={{
+        title: "No upcoming visits yet",
+        hint: "Once visits are scheduled for your loved one, they'll appear here day by day.",
+      }}
+    >
+      {(groups) => (
+        <div className="space-y-8">
+          {Object.entries(groups).map(([day, list]) => (
+            <section key={day}>
+              <h2 className="type-section mb-4">{formatDay(day)}</h2>
+              <div className="divide-y divide-border border-t border-border">
+                {list.map((s) => (
+                  <div key={s.id} className="flex flex-col gap-1 p-4 sm:flex-row sm:items-center sm:gap-4">
+                    <div className="text-sm sm:w-32 sm:shrink-0">
+                      {formatTime(s.scheduled_start_time)} – {formatTime(s.scheduled_end_time)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">
+                        {(s.care_recipients as unknown as { full_name: string } | null)?.full_name}
+                      </p>
+                      {s.notes && <p className="text-xs text-muted-foreground">{s.notes}</p>}
+                    </div>
+                    <span className="w-fit rounded-full bg-secondary px-3 py-1 text-xs capitalize text-secondary-foreground">
+                      {statusLabel(s.status)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
+    </AsyncState>
   );
 }
 

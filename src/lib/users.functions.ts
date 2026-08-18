@@ -67,6 +67,7 @@ export const setUserRole = createServerFn({ method: "POST" })
       .object({
         userId: z.string().uuid(),
         role: z.enum(["admin", "caregiver", "family_member"]).nullable(),
+        careRecipientIds: z.array(z.string().uuid()).optional(),
       })
       .parse(data),
   )
@@ -80,6 +81,22 @@ export const setUserRole = createServerFn({ method: "POST" })
     if (data.role) {
       const { error } = await supabaseAdmin.from("user_roles").insert({ user_id: data.userId, role: data.role });
       if (error) throw error;
+    }
+
+    if (data.role === "family_member" && data.careRecipientIds?.length) {
+      const { data: existing, error: exErr } = await supabaseAdmin
+        .from("client_family_members")
+        .select("care_recipient_id")
+        .eq("user_id", data.userId);
+      if (exErr) throw exErr;
+      const have = new Set((existing ?? []).map((r: any) => r.care_recipient_id));
+      const rows = data.careRecipientIds
+        .filter((id) => !have.has(id))
+        .map((id) => ({ user_id: data.userId, care_recipient_id: id }));
+      if (rows.length > 0) {
+        const { error } = await supabaseAdmin.from("client_family_members").insert(rows);
+        if (error) throw error;
+      }
     }
     return { ok: true };
   });
