@@ -83,19 +83,33 @@ export const setUserRole = createServerFn({ method: "POST" })
       if (error) throw error;
     }
 
-    if (data.role === "family_member" && data.careRecipientIds?.length) {
-      const { data: existing, error: exErr } = await supabaseAdmin
-        .from("client_family_members")
-        .select("care_recipient_id")
-        .eq("user_id", data.userId);
-      if (exErr) throw exErr;
-      const have = new Set((existing ?? []).map((r: any) => r.care_recipient_id));
-      const rows = data.careRecipientIds
-        .filter((id) => !have.has(id))
-        .map((id) => ({ user_id: data.userId, care_recipient_id: id }));
-      if (rows.length > 0) {
-        const { error } = await supabaseAdmin.from("client_family_members").insert(rows);
-        if (error) throw error;
+    if (data.role === "family_member") {
+      const { data: existingFamily, error: familyCheckErr } = await supabaseAdmin
+        .from("families")
+        .select("id")
+        .eq("profile_id", data.userId)
+        .maybeSingle();
+      if (familyCheckErr) throw familyCheckErr;
+
+      if (!existingFamily) {
+        const { error: familyInsertErr } = await supabaseAdmin.from("families").insert({ profile_id: data.userId });
+        if (familyInsertErr) throw familyInsertErr;
+      }
+
+      if (data.careRecipientIds?.length) {
+        const { data: existing, error: exErr } = await supabaseAdmin
+          .from("client_family_members")
+          .select("care_recipient_id")
+          .eq("user_id", data.userId);
+        if (exErr) throw exErr;
+        const have = new Set((existing ?? []).map((r: any) => r.care_recipient_id));
+        const rows = data.careRecipientIds
+          .filter((id) => !have.has(id))
+          .map((id) => ({ user_id: data.userId, care_recipient_id: id }));
+        if (rows.length > 0) {
+          const { error } = await supabaseAdmin.from("client_family_members").insert(rows);
+          if (error) throw error;
+        }
       }
     }
     return { ok: true };
