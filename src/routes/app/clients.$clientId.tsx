@@ -56,6 +56,7 @@ function CareRecipientDetail() {
           "id, clock_in, clock_out, notes, mood, caregiver_id, location_verified, evv_exception, profiles:caregiver_id(full_name)",
         )
         .eq("care_recipient_id", recipientId)
+        .is("deleted_at", null)
         .order("clock_in", { ascending: false })
         .limit(10);
       if (e) throw e;
@@ -325,6 +326,7 @@ function ClockInBar({
         .eq("care_recipient_id", careRecipientId)
         .eq("caregiver_id", user!.id)
         .is("clock_out", null)
+        .is("deleted_at", null)
         .maybeSingle();
       return data;
     },
