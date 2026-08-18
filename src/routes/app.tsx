@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Activity, AlertTriangle, CalendarDays, ClipboardList, Home, LogOut, MapPinOff, MessageCircle, NotebookPen, ShieldCheck, Users } from "lucide-react";
+import { Activity, AlertTriangle, CalendarDays, ClipboardList, History, Home, LogOut, MapPinOff, MessageCircle, NotebookPen, ShieldCheck, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/use-auth";
 import { useIncidentAlerts, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
@@ -28,6 +28,7 @@ const NAV_BY_ROLE: Record<AppRole, NavItem[]> = {
     { to: "/app/incidents", label: "Incidents", icon: AlertTriangle },
     { to: "/app/exceptions", label: "Exceptions", icon: MapPinOff },
     { to: "/app/messages", label: "Messages", icon: MessageCircle },
+    { to: "/app/activity", label: "Activity log", icon: History },
   ],
   caregiver: [
     { to: "/app", label: "Home", icon: Home },

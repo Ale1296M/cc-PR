@@ -25,6 +25,7 @@ import { Route as AppIncidentsRouteImport } from './routes/app/incidents'
 import { Route as AppExceptionsRouteImport } from './routes/app/exceptions'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
 import { Route as AppCarePlanRouteImport } from './routes/app/care-plan'
+import { Route as AppActivityRouteImport } from './routes/app/activity'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AppClientsClientIdRouteImport } from './routes/app/clients.$clientId'
@@ -111,6 +112,11 @@ const AppCarePlanRoute = AppCarePlanRouteImport.update({
   path: '/care-plan',
   getParentRoute: () => AppRoute,
 } as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRoute,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/exceptions': typeof AppExceptionsRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/exceptions': typeof AppExceptionsRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/care-plan': typeof AppCarePlanRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/exceptions': typeof AppExceptionsRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/wellbeing'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/app/activity'
     | '/app/care-plan'
     | '/app/clients'
     | '/app/exceptions'
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/wellbeing'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/app/activity'
     | '/app/care-plan'
     | '/app/clients'
     | '/app/exceptions'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/wellbeing'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/app/activity'
     | '/app/care-plan'
     | '/app/clients'
     | '/app/exceptions'
@@ -407,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCarePlanRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/activity': {
+      id: '/app/activity'
+      path: '/activity'
+      fullPath: '/app/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -458,6 +477,7 @@ const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppActivityRoute: typeof AppActivityRoute
   AppCarePlanRoute: typeof AppCarePlanRoute
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppExceptionsRoute: typeof AppExceptionsRoute
@@ -471,6 +491,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppActivityRoute: AppActivityRoute,
   AppCarePlanRoute: AppCarePlanRoute,
   AppClientsRoute: AppClientsRouteWithChildren,
   AppExceptionsRoute: AppExceptionsRoute,
