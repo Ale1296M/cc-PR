@@ -18,6 +18,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as DashboardCaregiverRouteImport } from './routes/dashboard/caregiver'
 import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
 import { Route as AppVisitRouteImport } from './routes/app/visit'
 import { Route as AppUsersRouteImport } from './routes/app/users'
@@ -79,6 +80,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const DashboardCaregiverRoute = DashboardCaregiverRouteImport.update({
+  id: '/dashboard/caregiver',
+  path: '/dashboard/caregiver',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppWellbeingRoute = AppWellbeingRouteImport.update({
   id: '/wellbeing',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/app/users': typeof AppUsersRoute
   '/app/visit': typeof AppVisitRoute
   '/app/wellbeing': typeof AppWellbeingRoute
+  '/dashboard/caregiver': typeof DashboardCaregiverRoute
   '/app/': typeof AppIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/app/users': typeof AppUsersRoute
   '/app/visit': typeof AppVisitRoute
   '/app/wellbeing': typeof AppWellbeingRoute
+  '/dashboard/caregiver': typeof DashboardCaregiverRoute
   '/app': typeof AppIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/app/users': typeof AppUsersRoute
   '/app/visit': typeof AppVisitRoute
   '/app/wellbeing': typeof AppWellbeingRoute
+  '/dashboard/caregiver': typeof DashboardCaregiverRoute
   '/app/': typeof AppIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/app/visit'
     | '/app/wellbeing'
+    | '/dashboard/caregiver'
     | '/app/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/app/visit'
     | '/app/wellbeing'
+    | '/dashboard/caregiver'
     | '/app'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/app/visit'
     | '/app/wellbeing'
+    | '/dashboard/caregiver'
     | '/app/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -339,6 +351,7 @@ export interface RootRouteChildren {
   WellbeingRoute: typeof WellbeingRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DashboardCaregiverRoute: typeof DashboardCaregiverRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -407,6 +420,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/dashboard/caregiver': {
+      id: '/dashboard/caregiver'
+      path: '/dashboard/caregiver'
+      fullPath: '/dashboard/caregiver'
+      preLoaderRoute: typeof DashboardCaregiverRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/wellbeing': {
       id: '/app/wellbeing'
@@ -579,6 +599,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DashboardCaregiverRoute: DashboardCaregiverRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
