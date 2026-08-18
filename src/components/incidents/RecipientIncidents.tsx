@@ -47,6 +47,7 @@ export function RecipientIncidents({
           "id, incident_type, severity, status, occurred_at, created_at, description, action_taken, reporter_role, resolved_at, resolution_notes, reporter:reported_by(full_name), resolver:resolved_by(full_name)",
         )
         .eq("care_recipient_id", careRecipientId)
+        .is("deleted_at", null)
         .order("occurred_at", { ascending: false });
       if (e) throw e;
       return (data ?? []) as unknown as Row[];
