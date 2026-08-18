@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { softDelete, withUpdatedBy } from "@/lib/soft-delete";
 import { AsyncEmpty, AsyncError, AsyncSkeleton, AsyncState } from "@/components/ui/async-state";
 import { toast } from "sonner";
 
