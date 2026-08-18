@@ -61,6 +61,7 @@ export function EmergencyContacts({
         .from("emergency_contacts")
         .select("*")
         .eq("care_recipient_id", careRecipientId)
+        .is("deleted_at", null)
         .order("is_primary", { ascending: false })
         .order("sort_order", { ascending: true })
         .order("full_name", { ascending: true });
@@ -94,7 +95,7 @@ export function EmergencyContacts({
       if (draft.is_primary) {
         const clear = supabase
           .from("emergency_contacts")
-          .update({ is_primary: false })
+          .update(await withUpdatedBy({ is_primary: false }))
           .eq("care_recipient_id", careRecipientId);
         const { error: ce } = editingId ? await clear.neq("id", editingId) : await clear;
         if (ce) throw ce;
@@ -102,7 +103,7 @@ export function EmergencyContacts({
       if (editingId) {
         const { error: e } = await supabase
           .from("emergency_contacts")
-          .update(payload)
+          .update(await withUpdatedBy(payload))
           .eq("id", editingId);
         if (e) throw e;
       } else {
@@ -121,8 +122,7 @@ export function EmergencyContacts({
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error: e } = await supabase.from("emergency_contacts").delete().eq("id", id);
-      if (e) throw e;
+      await softDelete("emergency_contacts", id);
     },
     onSuccess: () => {
       toast.success("Contact removed");
@@ -136,13 +136,13 @@ export function EmergencyContacts({
     mutationFn: async (id: string) => {
       const { error: ce } = await supabase
         .from("emergency_contacts")
-        .update({ is_primary: false })
+        .update(await withUpdatedBy({ is_primary: false }))
         .eq("care_recipient_id", careRecipientId)
         .neq("id", id);
       if (ce) throw ce;
       const { error: e } = await supabase
         .from("emergency_contacts")
-        .update({ is_primary: true })
+        .update(await withUpdatedBy({ is_primary: true }))
         .eq("id", id);
       if (e) throw e;
     },
