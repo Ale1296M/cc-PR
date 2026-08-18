@@ -68,7 +68,7 @@ export async function clockOutVisit(opts: {
   }
   const { error } = await supabase
     .from("visit_logs")
-    .update(update as never)
+    .update((await withUpdatedBy(update)) as never)
     .eq("id", opts.visitLogId);
   if (error) throw error;
   return clockOut;
