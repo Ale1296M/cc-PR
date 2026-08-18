@@ -19,6 +19,7 @@ import {
   type Status,
 } from "@/components/incidents/incident-meta";
 import { ConfirmAction } from "@/components/ui/confirm-action";
+import { softDelete, withUpdatedBy } from "@/lib/soft-delete";
 
 export const Route = createFileRoute("/app/incidents")({
   component: () => (
@@ -75,6 +76,7 @@ function IncidentsAdmin() {
         .select(
           "id, care_recipient_id, incident_type, severity, status, occurred_at, created_at, updated_at, description, action_taken, reporter_role, resolved_at, resolution_notes, recipient:care_recipient_id(full_name), reporter:reported_by(full_name), resolver:resolved_by(full_name)",
         )
+        .is("deleted_at", null)
         .order("occurred_at", { ascending: false });
       if (status !== "all") q = q.eq("status", status);
       if (severity !== "all") q = q.eq("severity", severity as Severity);
@@ -174,7 +176,10 @@ function IncidentCard({ row }: { row: Row }) {
               resolved_by: null,
               resolved_at: null,
             };
-      const { error } = await supabase.from("incident_reports").update(patch).eq("id", row.id);
+      const { error } = await supabase
+        .from("incident_reports")
+        .update(await withUpdatedBy(patch))
+        .eq("id", row.id);
       if (error) throw error;
     },
     onSuccess: (_d, next) => {
@@ -183,6 +188,16 @@ function IncidentCard({ row }: { row: Row }) {
     },
     onError: (e: unknown) =>
       toast.error(e instanceof Error ? e.message : "Couldn't update this incident — try again."),
+  });
+
+  const remove = useMutation({
+    mutationFn: () => softDelete("incident_reports", row.id),
+    onSuccess: () => {
+      toast.success("Incident moved to recently deleted");
+      qc.invalidateQueries({ queryKey: ["incidents"] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn't remove this incident — try again."),
   });
 
   return (
@@ -288,6 +303,22 @@ function IncidentCard({ row }: { row: Row }) {
             Reopen
           </button>
         )}
+        <ConfirmAction
+          title="Remove this incident report?"
+          description="It moves to Recently deleted, where an admin can restore it. Nothing is erased."
+          confirmLabel="Remove report"
+          destructive
+          disabled={remove.isPending}
+          onConfirm={() => remove.mutate()}
+        >
+          <button
+            type="button"
+            disabled={remove.isPending}
+            className="min-h-10 rounded-full border border-border px-6 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+          >
+            Remove
+          </button>
+        </ConfirmAction>
       </div>
     </article>
   );
