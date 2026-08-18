@@ -365,49 +365,25 @@ function WellbeingTrends() {
 
   const scored = ribbon.filter((d) => d.score != null);
 
-  const weekly = (() => {
-    const groups = new Map<string, number[]>();
-    for (const d of scored) {
-      const k = weekKey(d.key);
-      const arr = groups.get(k) ?? [];
-      arr.push(d.score as number);
-      groups.set(k, arr);
-    }
-    return [...groups.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([k, scores]) => {
-        const value = Math.round((avg(scores) as number) * 10) / 10;
-        return { key: k, score: value, band: band(value) };
-      });
-  })();
+  const chartData = ribbon
+    .filter((d) => d.score != null)
+    .map((d) => ({
+      date: new Date(`${d.key}T00:00:00`).toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+      }),
+      score: d.score as number,
+      label: BAND_LABEL[d.band],
+    }));
 
-  const chartData = showRibbon
-    ? scored.map((d) => ({
-        date: new Date(`${d.key}T00:00:00`).toLocaleDateString([], {
-          month: "short",
-          day: "numeric",
-        }),
-        score: d.score as number,
-        label: BAND_LABEL[d.band],
-      }))
-    : weekly.map((w) => ({
-        date: `Wk of ${new Date(`${w.key}T00:00:00`).toLocaleDateString([], {
-          month: "short",
-          day: "numeric",
-        })}`,
-        score: w.score,
-        label: BAND_LABEL[w.band],
-      }));
-
-  const half = Math.max(1, Math.floor(ribbon.length / 2));
-  const recent = avg(
-    ribbon.slice(-half).map((d) => d.score).filter((s): s is number => s != null),
+  const thisWeek = avg(
+    ribbon.slice(7).map((d) => d.score).filter((s): s is number => s != null),
   );
-  const previous = avg(
-    ribbon.slice(0, ribbon.length - half).map((d) => d.score).filter((s): s is number => s != null),
+  const lastWeek = avg(
+    ribbon.slice(0, 7).map((d) => d.score).filter((s): s is number => s != null),
   );
   const delta =
-    recent != null && previous != null ? Math.round((recent - previous) * 10) / 10 : null;
+    thisWeek != null && lastWeek != null ? Math.round((thisWeek - lastWeek) * 10) / 10 : null;
 
   const activeDay =
     ribbon.find((d) => d.key === selectedDay) ??
