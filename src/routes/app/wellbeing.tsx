@@ -218,6 +218,7 @@ function WellbeingTrends() {
           "id, clock_in, clock_out, location_verified, wellbeing_entries(mood_scale, mood_notes, food_appetite, medicine_taken, movement_assisted, movement_notes, hygiene_bathing_completed, hygiene_grooming_completed)",
         )
         .eq("care_recipient_id", activeId)
+        .is("deleted_at", null)
         .gte("clock_in", since)
         .order("clock_in");
       if (error) throw error;
