@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { AsyncState, AsyncSkeleton, AsyncError } from "@/components/ui/async-state";
+import { useFamilyIncidentAlerts, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
+import { severityLabel, typeLabel, formatStamp } from "@/components/incidents/incident-meta";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -157,6 +159,9 @@ function Dashboard() {
     },
   });
 
+  const { data: unreviewed } = useUnreviewedIncidents(role);
+  const { data: familyAlerts } = useFamilyIncidentAlerts(role, uid);
+
   const todayKey = todayKeyLocal();
   const rows = shifts ?? [];
   const todayShifts = rows.filter((s) => s.scheduled_date === todayKey);
@@ -195,12 +200,30 @@ function Dashboard() {
         />
       )}
 
+      {isFamily && (familyAlerts ?? []).length > 0 && (
+        <section className="mt-8 rounded-2xl bg-attention-soft p-6 text-attention-foreground">
+          <h2 className="type-subhead">Recent alerts</h2>
+          <ul className="mt-4 divide-y divide-attention-foreground/15">
+            {(familyAlerts ?? []).map((a) => (
+              <li key={a.id} className="py-2 text-sm">
+                <span className="font-medium">{typeLabel(a.incident_type)}</span> ·{" "}
+                {severityLabel(a.severity)} · {a.care_recipients?.full_name ?? "your loved one"}
+                <p className="text-xs opacity-80">
+                  {formatStamp(a.occurred_at)} — {a.description}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {role === "admin" && (
         <AdminHero
           isPending={shiftsPending}
           error={shiftsError}
           onRetry={() => refetchShifts()}
           openIncidents={openIncidents ?? 0}
+          unreviewed={unreviewed ?? 0}
           todayCount={todayShifts.length}
           unread={unread ?? 0}
         />
@@ -428,6 +451,7 @@ function AdminHero({
   error,
   onRetry,
   openIncidents,
+  unreviewed,
   todayCount,
   unread,
 }: {
@@ -435,11 +459,12 @@ function AdminHero({
   error: unknown;
   onRetry: () => void;
   openIncidents: number;
+  unreviewed: number;
   todayCount: number;
   unread: number;
 }) {
   const calm = openIncidents === 0;
-  const secondary = `${plural(todayCount, "visit", "visits")} today · ${plural(unread, "unread message", "unread messages")}`;
+  const secondary = `${plural(unreviewed, "unreviewed incident", "unreviewed incidents")} · ${plural(todayCount, "visit", "visits")} today · ${plural(unread, "unread message", "unread messages")}`;
   return (
     <HeroShell
       isPending={isPending}
