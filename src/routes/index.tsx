@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarHeart, ClipboardList, MapPin, MessagesSquare, ShieldCheck } from "lucide-react";
+import {
+  CalendarHeart,
+  ClipboardList,
+  MapPin,
+  Menu,
+  MessagesSquare,
+  ShieldCheck,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -30,6 +39,7 @@ const COPY = {
   en: {
     signIn: "Sign in",
     getStarted: "Get started",
+    menu: "Menu",
     eyebrow: "Caregiving coordination",
     headlineLead: "Care that stays",
     headlineAccent: "connected",
@@ -40,6 +50,8 @@ const COPY = {
     today: "Today · Tuesday",
     visits: "3 visits",
     verified: "Location verified",
+    pending: "Location pending",
+    demoHint: "Try it: tap a visit to focus it, tap the badge to change its state.",
     shifts: [
       { time: "8:30 AM", name: "Eleanor Ramírez", detail: "Morning care · Maya" },
       { time: "12:00 PM", name: "Harold Pagán", detail: "Lunch & meds · Sam" },
@@ -56,6 +68,7 @@ const COPY = {
   es: {
     signIn: "Iniciar sesión",
     getStarted: "Comenzar",
+    menu: "Menú",
     eyebrow: "Coordinación de cuidado",
     headlineLead: "Cuidado que permanece",
     headlineAccent: "conectado",
@@ -66,6 +79,8 @@ const COPY = {
     today: "Hoy · martes",
     visits: "3 visitas",
     verified: "Ubicación verificada",
+    pending: "Ubicación pendiente",
+    demoHint: "Pruébalo: toca una visita para enfocarla y el distintivo para cambiar su estado.",
     shifts: [
       { time: "8:30 AM", name: "Eleanor Ramírez", detail: "Cuidado matutino · Maya" },
       { time: "12:00 PM", name: "Harold Pagán", detail: "Almuerzo y medicinas · Sam" },
@@ -80,6 +95,8 @@ const COPY = {
     footer: "Hecho con cariño.",
   },
 } as const;
+
+type Copy = (typeof COPY)["en"] | (typeof COPY)["es"];
 
 const FEATURE_ICONS = [CalendarHeart, ClipboardList, MessagesSquare, ShieldCheck];
 
@@ -99,55 +116,75 @@ function Landing() {
   const t = COPY[lang];
 
   return (
-    <div className="min-h-screen" lang={lang}>
-      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8">
-        <Link to="/" className="flex items-center gap-2.5">
-          <Logo />
-          <span className="font-display text-2xl tracking-tight">Con Cariño PR</span>
-        </Link>
-        <nav className="flex items-center gap-4 text-sm">
-          <LangToggle lang={lang} onChange={setLanguage} />
-          <Link
-            to="/auth"
-            className="min-h-10 px-2 py-2 text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {t.signIn}
+    <div className="min-h-dvh" lang={lang}>
+      <header className="border-b border-border/70">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5 md:px-8">
+          <Link to="/" className="flex items-center gap-2.5">
+            <Logo />
+            <span className="font-display text-2xl tracking-tight">Con Cariño PR</span>
           </Link>
-          <Link
-            to="/auth"
-            search={{ mode: "signup" }}
-            className="min-h-10 rounded-full bg-primary px-6 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            {t.getStarted}
-          </Link>
-        </nav>
+
+          {/* Desktop nav — brand, language, sign in, get started. Nothing else. */}
+          <nav className="hidden items-center gap-4 text-sm md:flex">
+            <LangToggle lang={lang} onChange={setLanguage} />
+            <Link
+              to="/login"
+              className="min-h-11 rounded-md px-3 py-2 font-medium text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {t.signIn}
+            </Link>
+            <Button asChild className="min-h-11 rounded-full px-6">
+              <Link to="/signup">{t.getStarted}</Link>
+            </Button>
+          </nav>
+
+          {/* Mobile — everything lives in the drawer */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="h-11 w-11" aria-label={t.menu}>
+                  <Menu />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[85vw] max-w-sm">
+                <SheetHeader>
+                  <SheetTitle className="font-display text-2xl">Con Cariño PR</SheetTitle>
+                </SheetHeader>
+                <div className="mt-8 flex flex-col gap-4">
+                  <LangToggle lang={lang} onChange={setLanguage} />
+                  <Button asChild variant="outline" className="min-h-12 w-full">
+                    <Link to="/login">{t.signIn}</Link>
+                  </Button>
+                  <Button asChild className="min-h-12 w-full">
+                    <Link to="/signup">{t.getStarted}</Link>
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 pb-28">
-        <section className="grid gap-16 pt-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-16 md:pt-24">
+      <main className="mx-auto max-w-6xl px-4 pb-24 md:px-8">
+        <section className="grid gap-12 pt-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-16 md:pt-20">
           <div>
-            <p className="mb-8 flex items-center gap-2.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/50" />
+            <p className="mb-6 flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-foreground/80">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
               {t.eyebrow}
             </p>
             <h1 className="type-display text-primary">
-              {t.headlineLead}{" "}
-              <em className="italic text-foreground">{t.headlineAccent}</em>.
+              {t.headlineLead} <em className="italic text-foreground">{t.headlineAccent}</em>.
             </h1>
-            <p className="mt-12 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+            <p className="mt-8 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
               {t.lede}
             </p>
-            <div className="mt-12 flex flex-wrap gap-4">
+            <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
+              <Button asChild className="min-h-12 w-full rounded-full px-8 text-base sm:w-auto">
+                <Link to="/signup">{t.ctaPrimary}</Link>
+              </Button>
               <Link
-                to="/auth"
-                search={{ mode: "signup" }}
-                className="min-h-11 rounded-full bg-primary px-8 py-4 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-              >
-                {t.ctaPrimary}
-              </Link>
-              <Link
-                to="/auth"
-                className="min-h-11 rounded-full border border-border px-8 py-4 transition-colors hover:border-primary"
+                to="/login"
+                className="min-h-11 py-2 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {t.ctaSecondary}
               </Link>
@@ -157,22 +194,15 @@ function Landing() {
           <SchedulePreview t={t} />
         </section>
 
-        <section className="mt-32 border-t border-border pt-16 md:mt-40">
-          <div className="grid gap-x-16 gap-y-12 md:grid-cols-2">
+        <section className="mt-20 md:mt-28">
+          <div className="grid gap-4 sm:grid-cols-2 md:gap-6">
             {t.features.map((f, i) => {
-              const Icon = FEATURE_ICONS[i];
+              const Icon = FEATURE_ICONS[i]!;
               return (
-                <div
-                  key={f.title}
-                  className="flex gap-4 border-b border-border/70 pb-12 last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0"
-                >
-                  <Icon className="mt-1 h-5 w-5 shrink-0 text-primary/70" aria-hidden="true" />
-                  <div>
-                    <h2 className="type-section">{f.title}</h2>
-                    <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                      {f.body}
-                    </p>
-                  </div>
+                <div key={f.title} className="rounded-xl border bg-card p-6 shadow-sm">
+                  <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <h2 className="mt-4 type-subhead">{f.title}</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
                 </div>
               );
             })}
@@ -181,7 +211,7 @@ function Landing() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-6 py-8 text-sm text-muted-foreground">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-8 text-sm text-muted-foreground md:px-8">
           <p>© {new Date().getFullYear()} Con Cariño PR</p>
           <p>{t.footer}</p>
         </div>
@@ -195,64 +225,93 @@ function LangToggle({ lang, onChange }: { lang: Lang; onChange: (l: Lang) => voi
     <div
       role="group"
       aria-label="Language"
-      className="flex items-center rounded-full border border-border p-0.5 text-xs"
+      className="flex items-center gap-1 rounded-full border border-border p-1 text-xs"
     >
-      {(["en", "es"] as const).map((code) => (
-        <button
-          key={code}
-          type="button"
-          onClick={() => onChange(code)}
-          aria-pressed={lang === code}
-          className={`min-h-8 rounded-full px-4 py-1.5 uppercase tracking-wide transition-colors ${
-            lang === code
-              ? "bg-secondary text-secondary-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {code}
-        </button>
-      ))}
+      {(["en", "es"] as const).map((code) => {
+        const active = lang === code;
+        return (
+          <button
+            key={code}
+            type="button"
+            onClick={() => onChange(code)}
+            aria-pressed={active}
+            className={`min-h-9 rounded-full px-4 py-1.5 font-semibold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              active
+                ? "bg-primary text-primary-foreground"
+                : "border border-border bg-transparent text-foreground hover:bg-secondary"
+            }`}
+          >
+            {code}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function SchedulePreview({ t }: { t: (typeof COPY)["en"] | (typeof COPY)["es"] }) {
+const BADGE_CYCLE = ["verified", "pending", "none"] as const;
+
+function SchedulePreview({ t }: { t: Copy }) {
+  const [selected, setSelected] = useState(0);
+  const [badge, setBadge] = useState<(typeof BADGE_CYCLE)[number]>("verified");
+
+  const cycleBadge = () =>
+    setBadge((b) => BADGE_CYCLE[(BADGE_CYCLE.indexOf(b) + 1) % BADGE_CYCLE.length]!);
+
   return (
-    <div className="relative">
-      <div
-        aria-hidden="true"
-        className="absolute -inset-6 -z-10 rounded-[2rem] bg-secondary/40 blur-2xl"
-      />
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_24px_60px_-32px_oklch(0.24_0.035_155/0.45)]">
-        <div className="mb-6 flex items-center justify-between">
-          <p className="font-display text-2xl">{t.today}</p>
-          <span className="rounded-full border border-border px-4 py-1 text-xs text-muted-foreground">
-            {t.visits}
-          </span>
-        </div>
-        <ul className="space-y-1">
-          {t.shifts.map((s, i) => (
-            <li
-              key={s.name}
-              className={`flex items-start gap-4 py-3.5 ${i > 0 ? "border-t border-border/70" : ""}`}
+    <div className="rounded-xl border bg-card p-6 shadow-sm">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <p className="font-display text-2xl">{t.today}</p>
+        <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+          {t.visits}
+        </span>
+      </div>
+      <ul className="space-y-1">
+        {t.shifts.map((s, i) => (
+          <li key={s.name}>
+            <button
+              type="button"
+              onClick={() => setSelected(i)}
+              aria-pressed={selected === i}
+              className={`flex w-full items-start gap-4 rounded-lg p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                selected === i ? "bg-secondary" : "hover:bg-muted"
+              }`}
             >
-              <span className="w-[4.5rem] shrink-0 pt-0.5 text-sm tabular-nums text-muted-foreground">
+              <span className="w-[4.5rem] shrink-0 pt-0.5 text-sm font-medium tabular-nums text-foreground/80">
                 {s.time}
               </span>
-              <div className="min-w-0">
-                <p className="truncate font-medium">{s.name}</p>
-                <p className="truncate text-xs text-muted-foreground">{s.detail}</p>
-                {i === 0 && (
-                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-gold-foreground">
-                    <MapPin className="h-3 w-3 text-gold" aria-hidden="true" />
-                    {t.verified}
-                  </span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-medium">{s.name}</span>
+                <span className="block truncate text-xs text-muted-foreground">{s.detail}</span>
+              </span>
+            </button>
+            {selected === i && badge !== "none" && (
+              <button
+                type="button"
+                onClick={cycleBadge}
+                className={`ml-[5.5rem] mb-2 inline-flex min-h-8 items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  badge === "verified"
+                    ? "bg-primary/15 text-primary hover:bg-primary/25"
+                    : "bg-attention-soft text-attention-foreground hover:opacity-80"
+                }`}
+              >
+                <MapPin className="h-3 w-3" aria-hidden="true" />
+                {badge === "verified" ? t.verified : t.pending}
+              </button>
+            )}
+            {selected === i && badge === "none" && (
+              <button
+                type="button"
+                onClick={cycleBadge}
+                className="ml-[5.5rem] mb-2 inline-flex min-h-8 items-center rounded-full border border-dashed border-border px-3 py-1 text-xs text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                + {t.verified}
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 border-t border-border/70 pt-4 text-xs text-muted-foreground">{t.demoHint}</p>
     </div>
   );
 }

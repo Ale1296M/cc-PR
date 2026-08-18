@@ -73,7 +73,8 @@
   --secondary: oklch(0.94 0.02 130);
   --secondary-foreground: oklch(0.3 0.05 155);
   --muted: oklch(0.95 0.014 100);
-  --muted-foreground: oklch(0.415 0.032 150);
+  /* Darkened for WCAG 2.1 AA (>= 4.5:1 on the cream canvas) */
+  --muted-foreground: oklch(0.365 0.032 150);
   --accent: oklch(0.82 0.12 88);
   --accent-foreground: oklch(0.28 0.05 155);
   --gold: oklch(0.78 0.14 85);
@@ -181,7 +182,7 @@
 @utility type-display {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 3rem;      /* text-5xl */
+  font-size: 2.25rem;      /* text-4xl on mobile */
   line-height: 1.02;
   letter-spacing: -0.02em;
   @media (width >= 48rem) {

@@ -11,11 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WellbeingRouteImport } from './routes/wellbeing'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as DashboardFamilyRouteImport } from './routes/dashboard/family'
+import { Route as DashboardCaregiverRouteImport } from './routes/dashboard/caregiver'
+import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
 import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
 import { Route as AppVisitRouteImport } from './routes/app/visit'
 import { Route as AppUsersRouteImport } from './routes/app/users'
@@ -43,9 +49,19 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -63,10 +79,30 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const DashboardFamilyRoute = DashboardFamilyRouteImport.update({
+  id: '/dashboard/family',
+  path: '/dashboard/family',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardCaregiverRoute = DashboardCaregiverRouteImport.update({
+  id: '/dashboard/caregiver',
+  path: '/dashboard/caregiver',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAdminRoute = DashboardAdminRouteImport.update({
+  id: '/dashboard/admin',
+  path: '/dashboard/admin',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppWellbeingRoute = AppWellbeingRouteImport.update({
   id: '/wellbeing',
@@ -156,7 +192,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -172,7 +210,11 @@ export interface FileRoutesByFullPath {
   '/app/users': typeof AppUsersRoute
   '/app/visit': typeof AppVisitRoute
   '/app/wellbeing': typeof AppWellbeingRoute
+  '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/caregiver': typeof DashboardCaregiverRoute
+  '/dashboard/family': typeof DashboardFamilyRoute
   '/app/': typeof AppIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -180,7 +222,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -196,7 +240,11 @@ export interface FileRoutesByTo {
   '/app/users': typeof AppUsersRoute
   '/app/visit': typeof AppVisitRoute
   '/app/wellbeing': typeof AppWellbeingRoute
+  '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/caregiver': typeof DashboardCaregiverRoute
+  '/dashboard/family': typeof DashboardFamilyRoute
   '/app': typeof AppIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -206,7 +254,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -222,7 +272,11 @@ export interface FileRoutesById {
   '/app/users': typeof AppUsersRoute
   '/app/visit': typeof AppVisitRoute
   '/app/wellbeing': typeof AppWellbeingRoute
+  '/dashboard/admin': typeof DashboardAdminRoute
+  '/dashboard/caregiver': typeof DashboardCaregiverRoute
+  '/dashboard/family': typeof DashboardFamilyRoute
   '/app/': typeof AppIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -233,7 +287,9 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/login'
     | '/mcp'
+    | '/signup'
     | '/sitemap.xml'
     | '/wellbeing'
     | '/.mcp/list-tools'
@@ -249,7 +305,11 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/app/visit'
     | '/app/wellbeing'
+    | '/dashboard/admin'
+    | '/dashboard/caregiver'
+    | '/dashboard/family'
     | '/app/'
+    | '/dashboard/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/app/clients/$clientId'
@@ -257,7 +317,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/login'
     | '/mcp'
+    | '/signup'
     | '/sitemap.xml'
     | '/wellbeing'
     | '/.mcp/list-tools'
@@ -273,7 +335,11 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/app/visit'
     | '/app/wellbeing'
+    | '/dashboard/admin'
+    | '/dashboard/caregiver'
+    | '/dashboard/family'
     | '/app'
+    | '/dashboard'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/app/clients/$clientId'
@@ -282,7 +348,9 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/login'
     | '/mcp'
+    | '/signup'
     | '/sitemap.xml'
     | '/wellbeing'
     | '/.mcp/list-tools'
@@ -298,7 +366,11 @@ export interface FileRouteTypes {
     | '/app/users'
     | '/app/visit'
     | '/app/wellbeing'
+    | '/dashboard/admin'
+    | '/dashboard/caregiver'
+    | '/dashboard/family'
     | '/app/'
+    | '/dashboard/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/app/clients/$clientId'
@@ -308,11 +380,17 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WellbeingRoute: typeof WellbeingRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DashboardAdminRoute: typeof DashboardAdminRoute
+  DashboardCaregiverRoute: typeof DashboardCaregiverRoute
+  DashboardFamilyRoute: typeof DashboardFamilyRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -333,11 +411,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -361,12 +453,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/': {
       id: '/app/'
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/dashboard/family': {
+      id: '/dashboard/family'
+      path: '/dashboard/family'
+      fullPath: '/dashboard/family'
+      preLoaderRoute: typeof DashboardFamilyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/caregiver': {
+      id: '/dashboard/caregiver'
+      path: '/dashboard/caregiver'
+      fullPath: '/dashboard/caregiver'
+      preLoaderRoute: typeof DashboardCaregiverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/admin': {
+      id: '/dashboard/admin'
+      path: '/dashboard/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof DashboardAdminRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/wellbeing': {
       id: '/app/wellbeing'
@@ -531,12 +651,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  LoginRoute: LoginRoute,
   McpRoute: McpRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WellbeingRoute: WellbeingRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DashboardAdminRoute: DashboardAdminRoute,
+  DashboardCaregiverRoute: DashboardCaregiverRoute,
+  DashboardFamilyRoute: DashboardFamilyRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
