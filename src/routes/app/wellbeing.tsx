@@ -144,38 +144,13 @@ function WellbeingTrends() {
   const uid = user?.id;
   const [recipientId, setRecipientId] = useState<string>("");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [rangeDays, setRangeDays] = useState<number>(7);
-  const showRibbon = rangeDays <= 31;
-  const days = useMemo(() => lastDays(rangeDays), [rangeDays]);
+  const days = useMemo(() => lastDays(DAYS), []);
   const since = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() - (rangeDays - 1));
+    d.setDate(d.getDate() - (DAYS - 1));
     return d.toISOString();
-  }, [rangeDays]);
-
-  const rangeToggle = (
-    <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Time range">
-      {RANGES.map((r) => (
-        <button
-          key={r.days}
-          type="button"
-          onClick={() => {
-            setRangeDays(r.days);
-            setSelectedDay(null);
-          }}
-          aria-pressed={rangeDays === r.days}
-          className={`min-h-9 rounded-full border px-4 text-sm transition ${
-            rangeDays === r.days
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-background hover:bg-secondary/50"
-          }`}
-        >
-          {r.label}
-        </button>
-      ))}
-    </div>
-  );
+  }, []);
 
   const {
     data: recipients,
