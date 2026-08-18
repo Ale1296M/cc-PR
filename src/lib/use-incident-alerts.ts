@@ -23,6 +23,7 @@ export function useUnreviewedIncidents(role: AppRole | null) {
       const { count, error } = await supabase
         .from("incident_reports")
         .select("*", { count: "exact", head: true })
+        .is("deleted_at", null)
         .in("status", ["open", "under_review"]);
       if (error) throw error;
       return count ?? 0;
@@ -100,6 +101,7 @@ export function useFamilyIncidentAlerts(role: AppRole | null, userId?: string) {
           "id, care_recipient_id, incident_type, severity, status, occurred_at, description, care_recipients:care_recipient_id(full_name)",
         )
         .in("severity", ["high", "critical"])
+        .is("deleted_at", null)
         .gte("occurred_at", since.toISOString())
         .order("occurred_at", { ascending: false })
         .limit(5);
