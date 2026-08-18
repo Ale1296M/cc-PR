@@ -1,17 +1,4 @@
 /** Comprehensive-enough IANA timezone list with live offset/time labels. */
-export const IANA_TIMEZONES: string[] = (() => {
-  const supported = (Intl as unknown as { supportedValuesOf?: (k: string) => string[] })
-    .supportedValuesOf;
-  if (typeof supported === "function") {
-    try {
-      return supported("timeZone");
-    } catch {
-      /* fall through */
-    }
-  }
-  return FALLBACK_TIMEZONES;
-})();
-
 export const FALLBACK_TIMEZONES = [
   "America/Puerto_Rico","America/New_York","America/Chicago","America/Denver","America/Phoenix",
   "America/Los_Angeles","America/Anchorage","Pacific/Honolulu","America/Toronto","America/Vancouver",
@@ -25,6 +12,19 @@ export const FALLBACK_TIMEZONES = [
   "Asia/Singapore","Asia/Manila","Asia/Seoul","Asia/Tokyo","Australia/Perth","Australia/Adelaide",
   "Australia/Brisbane","Australia/Sydney","Pacific/Auckland","UTC",
 ];
+
+export const IANA_TIMEZONES: string[] = (() => {
+  const supported = (Intl as unknown as { supportedValuesOf?: (k: string) => string[] })
+    .supportedValuesOf;
+  if (typeof supported === "function") {
+    try {
+      return supported("timeZone");
+    } catch {
+      /* fall through */
+    }
+  }
+  return FALLBACK_TIMEZONES;
+})();
 
 /** e.g. "America/Puerto_Rico (GMT-4, 3:42 PM)" */
 export function timezoneLabel(tz: string, now: Date = new Date()) {
