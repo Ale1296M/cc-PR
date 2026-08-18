@@ -35,7 +35,7 @@ type ShiftEvent = { id: string; title: string; start: Date; end: Date; resource:
 
 export default function AdminShiftCalendar({ adminId }: { adminId: string }) {
   const qc = useQueryClient();
-  const [view, setView] = useState<"week" | "month">("week");
+  const [view, setView] = useState<"week" | "month">("month");
   const [cursor, setCursor] = useState(() => new Date());
   const [editing, setEditing] = useState<ShiftRow | null>(null);
   const [creatingAt, setCreatingAt] = useState<{ start: Date; end: Date } | null>(null);

@@ -40,6 +40,33 @@ async function recipientName(id: string) {
   return data?.full_name ?? "a care recipient";
 }
 
+/** Admin sidebar badge: signed-up users who don't have a role assigned yet. */
+export function usePendingUsers(role: AppRole | null) {
+  return useQuery({
+    queryKey: ["users", "pending-count"],
+    enabled: role === "admin",
+    queryFn: async () => {
+      const [{ data: profiles, error: pErr }, { data: roles, error: rErr }] = await Promise.all([
+        supabase.from("profiles").select("id"),
+        supabase.from("user_roles").select("user_id"),
+      ]);
+      if (pErr) throw pErr;
+      if (rErr) throw rErr;
+      const assigned = new Set((roles ?? []).map((r) => r.user_id));
+      return (profiles ?? []).filter((p) => !assigned.has(p.id)).length;
+    },
+  });
+}
+
+async function unusedRecipientName(id: string) {
+  const { data } = await supabase
+    .from("care_recipients")
+    .select("full_name")
+    .eq("id", id)
+    .maybeSingle();
+  return data?.full_name ?? "a care recipient";
+}
+
 /**
  * Realtime in-app alerts for new incident reports.
  * Admins are alerted on every new incident; family members only on
