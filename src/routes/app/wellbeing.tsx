@@ -145,7 +145,6 @@ function WellbeingTrends() {
   const [recipientId, setRecipientId] = useState<string>("");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [rangeDays, setRangeDays] = useState<number>(7);
-  const rangeLabel = RANGES.find((r) => r.days === rangeDays)?.label ?? "Weekly";
   const showRibbon = rangeDays <= 31;
   const days = useMemo(() => lastDays(rangeDays), [rangeDays]);
   const since = useMemo(() => {
@@ -712,7 +711,7 @@ function DeltaBadge({ delta }: { delta: number | null }) {
       <Icon className="h-4 w-4" />
       {delta > 0 ? "+" : ""}
       {delta.toFixed(1)}{" "}
-      <span className="text-muted-foreground">compared to the week before</span>
+      <span className="text-muted-foreground">compared to the previous period</span>
     </span>
   );
 }
