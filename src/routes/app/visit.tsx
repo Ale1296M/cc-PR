@@ -166,6 +166,7 @@ function VisitFlow() {
         .eq("care_recipient_id", recipientId)
         .eq("caregiver_id", uid!)
         .is("clock_out", null)
+        .is("deleted_at", null)
         .order("clock_in", { ascending: false })
         .limit(1)
         .maybeSingle();
