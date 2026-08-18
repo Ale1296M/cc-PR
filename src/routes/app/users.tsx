@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/use-auth";
 import { listUsers, setUserRole, type AppRole } from "@/lib/users.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/app/users")({
   component: () => (
@@ -41,6 +42,8 @@ function UsersPage() {
   const { role } = useAuth();
   const qc = useQueryClient();
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("all");
+  const [linking, setLinking] = useState<{ userId: string; name: string } | null>(null);
+  const [picked, setPicked] = useState<string[]>([]);
 
   const fetchUsers = useServerFn(listUsers);
   const updateRole = useServerFn(setUserRole);
@@ -52,12 +55,29 @@ function UsersPage() {
   });
 
   const mutate = useMutation({
-    mutationFn: (vars: { userId: string; role: AppRole | null }) => updateRole({ data: vars }),
+    mutationFn: (vars: { userId: string; role: AppRole | null; careRecipientIds?: string[] }) =>
+      updateRole({ data: vars }),
     onSuccess: () => {
       toast.success("Role updated");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
+      setLinking(null);
+      setPicked([]);
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not update role"),
+  });
+
+  const { data: recipients } = useQuery({
+    queryKey: ["admin-care-recipients"],
+    enabled: role === "admin",
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("care_recipients")
+        .select("id, full_name")
+        .is("deleted_at", null)
+        .order("full_name");
+      if (error) throw error;
+      return data ?? [];
+    },
   });
 
   if (role && role !== "admin") {
@@ -135,9 +155,15 @@ function UsersPage() {
               <select
                 value={u.role ?? ""}
                 disabled={mutate.isPending}
-                onChange={(e) =>
-                  mutate.mutate({ userId: u.id, role: (e.target.value || null) as AppRole | null })
-                }
+                onChange={(e) => {
+                  const next = (e.target.value || null) as AppRole | null;
+                  if (next === "family_member") {
+                    setPicked([]);
+                    setLinking({ userId: u.id, name: u.full_name || u.email || "This person" });
+                    return;
+                  }
+                  mutate.mutate({ userId: u.id, role: next });
+                }}
                 className="rounded-lg border border-border bg-background px-4 py-1.5 text-sm capitalize"
               >
                 <option value="">Pending (no role)</option>
@@ -153,6 +179,62 @@ function UsersPage() {
       </div>
         )}
       </AsyncState>
+
+      {linking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg">
+            <h2 className="type-section">Link {linking.name} to care recipients</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Choose who this family member should see. You can also link them later.
+            </p>
+            <div className="mt-4 max-h-64 space-y-2 overflow-y-auto">
+              {(recipients ?? []).length === 0 && (
+                <p className="text-sm text-muted-foreground">No care recipients yet.</p>
+              )}
+              {(recipients ?? []).map((r) => (
+                <label key={r.id} className="flex items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={picked.includes(r.id)}
+                    onChange={(e) =>
+                      setPicked((prev) =>
+                        e.target.checked ? [...prev, r.id] : prev.filter((id) => id !== r.id),
+                      )
+                    }
+                  />
+                  <span>{r.full_name}</span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setLinking(null);
+                  setPicked([]);
+                }}
+                className="rounded-full border border-border px-4 py-2 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={mutate.isPending}
+                onClick={() =>
+                  mutate.mutate({
+                    userId: linking.userId,
+                    role: "family_member",
+                    careRecipientIds: picked,
+                  })
+                }
+                className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
