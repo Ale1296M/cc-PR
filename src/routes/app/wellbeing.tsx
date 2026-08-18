@@ -515,11 +515,10 @@ function WellbeingTrends() {
 
       <section className="card-soft p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="type-section">{showRibbon ? "Day by day" : "Week by week"}</h2>
+          <h2 className="type-section">Day by day</h2>
           <DeltaBadge delta={delta} />
         </div>
-        {showRibbon ? (
-        <div className="mt-4 grid grid-cols-7 gap-2 sm:[grid-template-columns:repeat(auto-fit,minmax(1.25rem,1fr))]">
+        <div className="mt-4 grid grid-cols-7 gap-2 sm:grid-cols-14">
           {ribbon.map((d) => {
             const date = new Date(`${d.key}T00:00:00`);
             const active = activeDay?.key === d.key;
@@ -540,20 +539,6 @@ function WellbeingTrends() {
             );
           })}
         </div>
-        ) : (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {weekly.map((w) => (
-              <span
-                key={w.key}
-                title={`Week of ${new Date(`${w.key}T00:00:00`).toLocaleDateString([], { month: "short", day: "numeric" })} · ${BAND_LABEL[w.band]}`}
-                className={`h-8 w-6 rounded-md ${BAND_CLASS[w.band]}`}
-              />
-            ))}
-            {weekly.length === 0 && (
-              <p className="text-sm text-muted-foreground">No check-ins recorded in this range.</p>
-            )}
-          </div>
-        )}
         <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
           {(["good", "usual", "attention", "none"] as const).map((b) => (
             <span key={b} className="flex items-center gap-2">
