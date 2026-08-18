@@ -64,13 +64,7 @@ type Visit = {
   wellbeing_entries: Entry | Entry[] | null;
 };
 
-const RANGES = [
-  { label: "Weekly", days: 7 },
-  { label: "Monthly", days: 30 },
-  { label: "3 Months", days: 90 },
-  { label: "6 Months", days: 180 },
-  { label: "Yearly", days: 365 },
-] as const;
+const DAYS = 14;
 
 function dayKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -90,13 +84,6 @@ function lastDays(n: number) {
   return out;
 }
 
-/** Monday-based week start key for a yyyy-mm-dd day key. */
-function weekKey(key: string) {
-  const d = new Date(`${key}T00:00:00`);
-  const dow = (d.getDay() + 6) % 7;
-  d.setDate(d.getDate() - dow);
-  return dayKey(d);
-}
 
 function firstEntry(v: Visit): Entry | null {
   const e = v.wellbeing_entries;
@@ -144,38 +131,13 @@ function WellbeingTrends() {
   const uid = user?.id;
   const [recipientId, setRecipientId] = useState<string>("");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [rangeDays, setRangeDays] = useState<number>(7);
-  const showRibbon = rangeDays <= 31;
-  const days = useMemo(() => lastDays(rangeDays), [rangeDays]);
+  const days = useMemo(() => lastDays(DAYS), []);
   const since = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() - (rangeDays - 1));
+    d.setDate(d.getDate() - (DAYS - 1));
     return d.toISOString();
-  }, [rangeDays]);
-
-  const rangeToggle = (
-    <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Time range">
-      {RANGES.map((r) => (
-        <button
-          key={r.days}
-          type="button"
-          onClick={() => {
-            setRangeDays(r.days);
-            setSelectedDay(null);
-          }}
-          aria-pressed={rangeDays === r.days}
-          className={`min-h-9 rounded-full border px-4 text-sm transition ${
-            rangeDays === r.days
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-background hover:bg-secondary/50"
-          }`}
-        >
-          {r.label}
-        </button>
-      ))}
-    </div>
-  );
+  }, []);
 
   const {
     data: recipients,
@@ -284,11 +246,10 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          Last {rangeDays} days
+          Last 14 days
         </p>
         <h1 className="type-display mt-1">Wellbeing trends</h1>
       </header>
-      {rangeToggle}
       {children}
     </div>
   );
@@ -365,49 +326,25 @@ function WellbeingTrends() {
 
   const scored = ribbon.filter((d) => d.score != null);
 
-  const weekly = (() => {
-    const groups = new Map<string, number[]>();
-    for (const d of scored) {
-      const k = weekKey(d.key);
-      const arr = groups.get(k) ?? [];
-      arr.push(d.score as number);
-      groups.set(k, arr);
-    }
-    return [...groups.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([k, scores]) => {
-        const value = Math.round((avg(scores) as number) * 10) / 10;
-        return { key: k, score: value, band: band(value) };
-      });
-  })();
+  const chartData = ribbon
+    .filter((d) => d.score != null)
+    .map((d) => ({
+      date: new Date(`${d.key}T00:00:00`).toLocaleDateString([], {
+        month: "short",
+        day: "numeric",
+      }),
+      score: d.score as number,
+      label: BAND_LABEL[d.band],
+    }));
 
-  const chartData = showRibbon
-    ? scored.map((d) => ({
-        date: new Date(`${d.key}T00:00:00`).toLocaleDateString([], {
-          month: "short",
-          day: "numeric",
-        }),
-        score: d.score as number,
-        label: BAND_LABEL[d.band],
-      }))
-    : weekly.map((w) => ({
-        date: `Wk of ${new Date(`${w.key}T00:00:00`).toLocaleDateString([], {
-          month: "short",
-          day: "numeric",
-        })}`,
-        score: w.score,
-        label: BAND_LABEL[w.band],
-      }));
-
-  const half = Math.max(1, Math.floor(ribbon.length / 2));
-  const recent = avg(
-    ribbon.slice(-half).map((d) => d.score).filter((s): s is number => s != null),
+  const thisWeek = avg(
+    ribbon.slice(7).map((d) => d.score).filter((s): s is number => s != null),
   );
-  const previous = avg(
-    ribbon.slice(0, ribbon.length - half).map((d) => d.score).filter((s): s is number => s != null),
+  const lastWeek = avg(
+    ribbon.slice(0, 7).map((d) => d.score).filter((s): s is number => s != null),
   );
   const delta =
-    recent != null && previous != null ? Math.round((recent - previous) * 10) / 10 : null;
+    thisWeek != null && lastWeek != null ? Math.round((thisWeek - lastWeek) * 10) / 10 : null;
 
   const activeDay =
     ribbon.find((d) => d.key === selectedDay) ??
@@ -461,7 +398,7 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          Last {rangeDays} days
+          Last 14 days
         </p>
         <h1 className="type-display mt-1">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -472,8 +409,6 @@ function WellbeingTrends() {
               : "A descriptive summary of what caregivers recorded during recent check-ins."}
         </p>
       </header>
-
-      {rangeToggle}
 
       {visitsPending && (
         <div className="mb-6">
@@ -515,11 +450,10 @@ function WellbeingTrends() {
 
       <section className="card-soft p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="type-section">{showRibbon ? "Day by day" : "Week by week"}</h2>
+          <h2 className="type-section">Day by day</h2>
           <DeltaBadge delta={delta} />
         </div>
-        {showRibbon ? (
-        <div className="mt-4 grid grid-cols-7 gap-2 sm:[grid-template-columns:repeat(auto-fit,minmax(1.25rem,1fr))]">
+        <div className="mt-4 grid grid-cols-7 gap-2 sm:grid-cols-14">
           {ribbon.map((d) => {
             const date = new Date(`${d.key}T00:00:00`);
             const active = activeDay?.key === d.key;
@@ -540,20 +474,6 @@ function WellbeingTrends() {
             );
           })}
         </div>
-        ) : (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {weekly.map((w) => (
-              <span
-                key={w.key}
-                title={`Week of ${new Date(`${w.key}T00:00:00`).toLocaleDateString([], { month: "short", day: "numeric" })} · ${BAND_LABEL[w.band]}`}
-                className={`h-8 w-6 rounded-md ${BAND_CLASS[w.band]}`}
-              />
-            ))}
-            {weekly.length === 0 && (
-              <p className="text-sm text-muted-foreground">No check-ins recorded in this range.</p>
-            )}
-          </div>
-        )}
         <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
           {(["good", "usual", "attention", "none"] as const).map((b) => (
             <span key={b} className="flex items-center gap-2">
@@ -567,7 +487,7 @@ function WellbeingTrends() {
         <h2 className="type-section">Overall recorded score</h2>
         {chartData.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            No wellbeing check-ins recorded in the last {rangeDays} days.
+            No wellbeing check-ins recorded in the last 14 days.
           </p>
         ) : (
           <div className="mt-4 h-64 w-full">
@@ -671,7 +591,7 @@ function WellbeingTrends() {
         <h2 className="type-section">Task completion by category</h2>
         {categories.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            No checklist items were recorded in the last {rangeDays} days.
+            No checklist items were recorded in the last 14 days.
           </p>
         ) : (
           <ul className="mt-4 space-y-4">
@@ -711,7 +631,7 @@ function DeltaBadge({ delta }: { delta: number | null }) {
       <Icon className="h-4 w-4" />
       {delta > 0 ? "+" : ""}
       {delta.toFixed(1)}{" "}
-      <span className="text-muted-foreground">compared to the previous period</span>
+      <span className="text-muted-foreground">compared to the week before</span>
     </span>
   );
 }
