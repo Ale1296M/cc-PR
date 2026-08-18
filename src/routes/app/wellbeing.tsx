@@ -711,7 +711,7 @@ function DeltaBadge({ delta }: { delta: number | null }) {
       <Icon className="h-4 w-4" />
       {delta > 0 ? "+" : ""}
       {delta.toFixed(1)}{" "}
-      <span className="text-muted-foreground">compared to the previous period</span>
+      <span className="text-muted-foreground">compared to the week before</span>
     </span>
   );
 }
