@@ -64,13 +64,7 @@ type Visit = {
   wellbeing_entries: Entry | Entry[] | null;
 };
 
-const RANGES = [
-  { label: "Weekly", days: 7 },
-  { label: "Monthly", days: 30 },
-  { label: "3 Months", days: 90 },
-  { label: "6 Months", days: 180 },
-  { label: "Yearly", days: 365 },
-] as const;
+const DAYS = 14;
 
 function dayKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
@@ -90,13 +84,6 @@ function lastDays(n: number) {
   return out;
 }
 
-/** Monday-based week start key for a yyyy-mm-dd day key. */
-function weekKey(key: string) {
-  const d = new Date(`${key}T00:00:00`);
-  const dow = (d.getDay() + 6) % 7;
-  d.setDate(d.getDate() - dow);
-  return dayKey(d);
-}
 
 function firstEntry(v: Visit): Entry | null {
   const e = v.wellbeing_entries;
