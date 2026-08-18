@@ -28,6 +28,13 @@ const FREQUENCIES = [
 
 const freqLabel = (f: string) => FREQUENCIES.find((x) => x.value === f)?.label ?? f;
 
+const CATEGORIES = [
+  "Activity",
+  "Medications Reminder",
+  "Meal Check",
+  "Housekeeping / General Care",
+] as const;
+
 function useRecipients() {
   return useQuery({
     queryKey: ["cp-recipients"],
@@ -202,12 +209,17 @@ function AdminCarePlan() {
                 className={`w-full bg-transparent text-sm font-medium outline-none ${item.active ? "" : "line-through opacity-60"}`}
               />
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <input
-                  defaultValue={item.category ?? ""}
-                  placeholder="Category"
-                  onBlur={(e) => update.mutate({ id: item.id, fields: { category: e.target.value || null } })}
-                  className="w-36 rounded-md border border-border bg-background px-2 py-1 text-xs"
-                />
+                <select
+                  aria-label="Category"
+                  value={item.category ?? ""}
+                  onChange={(e) => update.mutate({ id: item.id, fields: { category: e.target.value || null } })}
+                  className="rounded-md border border-border bg-background px-2 py-1 text-xs"
+                >
+                  <option value="">— Select category —</option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
                 <select
                   value={item.frequency}
                   onChange={(e) => update.mutate({ id: item.id, fields: { frequency: e.target.value } })}
@@ -249,13 +261,17 @@ function AdminCarePlan() {
           aria-label="Task description"
           className="min-h-10 min-w-[12rem] flex-1 rounded-md border border-border bg-background px-4 text-sm"
         />
-        <input
+        <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          placeholder="Category"
           aria-label="Category"
-          className="min-h-10 w-40 rounded-md border border-border bg-background px-4 text-sm"
-        />
+          className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
+        >
+          <option value="">— Select category —</option>
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
         <select
           value={frequency}
           onChange={(e) => setFrequency(e.target.value)}
