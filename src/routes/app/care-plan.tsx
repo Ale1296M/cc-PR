@@ -49,7 +49,8 @@ function useItems(recipientId: string, onlyActive: boolean) {
       let q = supabase
         .from("care_plan_items")
         .select("id, task_description, category, frequency, active, care_recipient_id")
-        .eq("care_recipient_id", recipientId);
+        .eq("care_recipient_id", recipientId)
+        .is("deleted_at", null);
       if (onlyActive) q = q.eq("active", true);
       const { data, error } = await q.order("created_at");
       if (error) throw error;
@@ -114,7 +115,10 @@ function AdminCarePlan() {
       id: string;
       fields: { task_description?: string; category?: string | null; frequency?: string; active?: boolean };
     }) => {
-      const { error } = await supabase.from("care_plan_items").update(p.fields).eq("id", p.id);
+      const { error } = await supabase
+        .from("care_plan_items")
+        .update(await withUpdatedBy(p.fields))
+        .eq("id", p.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -127,8 +131,7 @@ function AdminCarePlan() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("care_plan_items").delete().eq("id", id);
-      if (error) throw error;
+      await softDelete("care_plan_items", id);
     },
     onSuccess: () => {
       toast.success("Checklist item removed");
@@ -318,6 +321,7 @@ function CaregiverChecklist() {
         .eq("care_recipient_id", active)
         .eq("caregiver_id", user!.id)
         .is("clock_out", null)
+        .is("deleted_at", null)
         .order("clock_in", { ascending: false })
         .maybeSingle();
       return data;
