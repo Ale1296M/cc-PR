@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WellbeingRouteImport } from './routes/wellbeing'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -42,6 +43,11 @@ const WellbeingRoute = WellbeingRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -189,6 +196,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wellbeing': typeof WellbeingRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/login'
     | '/mcp'
+    | '/signup'
     | '/sitemap.xml'
     | '/wellbeing'
     | '/.mcp/list-tools'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/login'
     | '/mcp'
+    | '/signup'
     | '/sitemap.xml'
     | '/wellbeing'
     | '/.mcp/list-tools'
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/login'
     | '/mcp'
+    | '/signup'
     | '/sitemap.xml'
     | '/wellbeing'
     | '/.mcp/list-tools'
@@ -322,6 +334,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WellbeingRoute: typeof WellbeingRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -553,6 +573,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WellbeingRoute: WellbeingRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
