@@ -671,7 +671,7 @@ function WellbeingTrends() {
         <h2 className="type-section">Task completion by category</h2>
         {categories.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
-            No checklist items were recorded in the last {rangeDays} days.
+            No checklist items were recorded in the last 14 days.
           </p>
         ) : (
           <ul className="mt-4 space-y-4">
