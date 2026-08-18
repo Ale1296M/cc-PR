@@ -461,7 +461,7 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          Last {rangeDays} days
+          Last 14 days
         </p>
         <h1 className="type-display mt-1">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -472,8 +472,6 @@ function WellbeingTrends() {
               : "A descriptive summary of what caregivers recorded during recent check-ins."}
         </p>
       </header>
-
-      {rangeToggle}
 
       {visitsPending && (
         <div className="mb-6">
