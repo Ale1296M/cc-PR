@@ -36,7 +36,10 @@ function MessagesPage() {
   const qc = useQueryClient();
   const [thread, setThread] = useState<Thread | null>(null);
   const [body, setBody] = useState("");
+  const [search, setSearch] = useState("");
+  const [starting, setStarting] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLInputElement>(null);
 
   const isAdmin = role === "admin";
   const isCaregiver = role === "caregiver";
@@ -192,6 +195,17 @@ function MessagesPage() {
   });
 
   const listsPending = (canSeeFamilies && recipientsPending) || (isAdmin && caregiversPending);
+  const q = search.trim().toLowerCase();
+  const shownFamilies = q ? families.filter((f) => f.label.toLowerCase().includes(q)) : families;
+  const shownCaregivers = q
+    ? (caregiverList ?? []).filter((c) => c.label.toLowerCase().includes(q))
+    : (caregiverList ?? []);
+
+  function openThread(next: Thread) {
+    setThread(next);
+    requestAnimationFrame(() => composerRef.current?.focus());
+  }
+
   const listsError = (canSeeFamilies && recipientsError) || (isAdmin && caregiversError) || null;
   const showSidebar = isAdmin;
   const noThreads =
@@ -238,14 +252,54 @@ function MessagesPage() {
         >
           {showSidebar && (
             <aside className="border-b border-border md:border-b-0 md:border-r">
+              <div className="space-y-2 p-4 pb-0">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search conversations…"
+                  aria-label="Search conversations"
+                  className="min-h-11 w-full rounded-full border border-border bg-background px-4 text-sm"
+                />
+                <div className="flex gap-2">
+                  <select
+                    value={starting}
+                    onChange={(e) => setStarting(e.target.value)}
+                    aria-label="Choose someone to start a chat with"
+                    className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-3 text-sm"
+                  >
+                    <option value="">Choose a family or caregiver…</option>
+                    {families.map((f) => (
+                      <option key={`family:${f.id}`} value={`family:${f.id}`}>
+                        {f.label}
+                      </option>
+                    ))}
+                    {(caregiverList ?? []).map((c) => (
+                      <option key={`caregiver:${c.id}`} value={`caregiver:${c.id}`}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    disabled={!starting}
+                    onClick={() => {
+                      const [kind, id] = starting.split(":");
+                      openThread({ kind: kind as Thread["kind"], id });
+                    }}
+                    className="min-h-11 shrink-0 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
+                  >
+                    Start chat
+                  </button>
+                </div>
+              </div>
               <p className="px-4 pt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
                 Families
               </p>
               <ul>
-                {families.map((f) => (
+                {shownFamilies.map((f) => (
                   <li key={f.id}>
                     <button
-                      onClick={() => setThread({ kind: "family", id: f.id })}
+                      onClick={() => openThread({ kind: "family", id: f.id })}
                       className={`min-h-11 w-full px-4 py-4 text-left text-sm hover:bg-secondary ${
                         thread.kind === "family" && thread.id === f.id ? "bg-secondary font-medium" : ""
                       }`}
@@ -254,18 +308,20 @@ function MessagesPage() {
                     </button>
                   </li>
                 ))}
-                {families.length === 0 && (
-                  <li className="px-4 py-4 text-sm text-muted-foreground">No families yet</li>
+                {shownFamilies.length === 0 && (
+                  <li className="px-4 py-4 text-sm text-muted-foreground">
+                    {q ? "No matching families" : "No families yet"}
+                  </li>
                 )}
               </ul>
               <p className="border-t border-border px-4 pt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
                 Caregivers
               </p>
               <ul>
-                {(caregiverList ?? []).map((c) => (
+                {shownCaregivers.map((c) => (
                   <li key={c.id}>
                     <button
-                      onClick={() => setThread({ kind: "caregiver", id: c.id })}
+                      onClick={() => openThread({ kind: "caregiver", id: c.id })}
                       className={`min-h-11 w-full px-4 py-4 text-left text-sm hover:bg-secondary ${
                         thread.kind === "caregiver" && thread.id === c.id ? "bg-secondary font-medium" : ""
                       }`}
@@ -274,8 +330,10 @@ function MessagesPage() {
                     </button>
                   </li>
                 ))}
-                {(caregiverList ?? []).length === 0 && (
-                  <li className="px-4 py-4 text-sm text-muted-foreground">No caregivers yet</li>
+                {shownCaregivers.length === 0 && (
+                  <li className="px-4 py-4 text-sm text-muted-foreground">
+                    {q ? "No matching caregivers" : "No caregivers yet"}
+                  </li>
                 )}
               </ul>
             </aside>
@@ -330,6 +388,7 @@ function MessagesPage() {
               className="flex gap-2 border-t border-border p-4"
             >
               <input
+                ref={composerRef}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Type a message…"

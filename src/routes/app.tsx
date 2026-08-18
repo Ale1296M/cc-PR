@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Activity, AlertTriangle, CalendarDays, ClipboardList, History, Home, LogOut, MapPinOff, MessageCircle, NotebookPen, ShieldCheck, Trash2, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/use-auth";
-import { useIncidentAlerts, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
+import { useIncidentAlerts, usePendingUsers, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -53,8 +53,12 @@ function AppLayout() {
   const visibleNav = role ? NAV_BY_ROLE[role] : [{ to: "/app", label: "Home", icon: Home }];
   useIncidentAlerts(role, user?.id);
   const { data: unreviewed } = useUnreviewedIncidents(role);
-  const badgeFor = (to: string) =>
-    to === "/app/incidents" && (unreviewed ?? 0) > 0 ? unreviewed : null;
+  const { data: pendingUsers } = usePendingUsers(role);
+  const badgeFor = (to: string) => {
+    if (to === "/app/incidents") return (unreviewed ?? 0) > 0 ? unreviewed : null;
+    if (to === "/app/users") return (pendingUsers ?? 0) > 0 ? pendingUsers : null;
+    return null;
+  };
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { next: path } });
