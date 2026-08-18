@@ -36,7 +36,10 @@ function MessagesPage() {
   const qc = useQueryClient();
   const [thread, setThread] = useState<Thread | null>(null);
   const [body, setBody] = useState("");
+  const [search, setSearch] = useState("");
+  const [starting, setStarting] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLInputElement>(null);
 
   const isAdmin = role === "admin";
   const isCaregiver = role === "caregiver";
@@ -192,6 +195,17 @@ function MessagesPage() {
   });
 
   const listsPending = (canSeeFamilies && recipientsPending) || (isAdmin && caregiversPending);
+  const q = search.trim().toLowerCase();
+  const shownFamilies = q ? families.filter((f) => f.label.toLowerCase().includes(q)) : families;
+  const shownCaregivers = q
+    ? (caregiverList ?? []).filter((c) => c.label.toLowerCase().includes(q))
+    : (caregiverList ?? []);
+
+  function openThread(next: Thread) {
+    setThread(next);
+    requestAnimationFrame(() => composerRef.current?.focus());
+  }
+
   const listsError = (canSeeFamilies && recipientsError) || (isAdmin && caregiversError) || null;
   const showSidebar = isAdmin;
   const noThreads =
