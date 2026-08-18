@@ -131,6 +131,7 @@ function Dashboard() {
         .from("visit_logs")
         .select("clock_in, wellbeing_entries(mood_scale)")
         .eq("care_recipient_id", person.id)
+        .is("deleted_at", null)
         .gte("clock_in", since.toISOString())
         .order("clock_in");
       const moods = (visits ?? [])
@@ -154,6 +155,7 @@ function Dashboard() {
       const { count } = await supabase
         .from("incident_reports")
         .select("*", { count: "exact", head: true })
+        .is("deleted_at", null)
         .eq("status", "open");
       return count ?? 0;
     },

@@ -17,6 +17,7 @@ export default defineTool({
       .from("care_plan_items")
       .select("id, care_recipient_id, task_description, category, frequency, active")
       .eq("care_recipient_id", care_recipient_id)
+      .is("deleted_at", null)
       .order("created_at");
     return error ? toolError(error.message) : toolJson(data ?? []);
   },

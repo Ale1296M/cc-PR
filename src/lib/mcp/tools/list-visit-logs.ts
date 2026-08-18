@@ -18,6 +18,7 @@ export default defineTool({
     let query = supabase
       .from("visit_logs")
       .select("id, care_recipient_id, caregiver_id, clock_in, clock_out, mood, notes")
+      .is("deleted_at", null)
       .order("clock_in", { ascending: false })
       .limit(Math.min(Math.max(limit ?? 50, 1), 200));
     if (care_recipient_id) query = query.eq("care_recipient_id", care_recipient_id);

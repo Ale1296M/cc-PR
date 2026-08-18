@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { capturePosition } from "@/lib/geo";
+import { withUpdatedBy } from "@/lib/soft-delete";
 
 export type Geofence = {
   homeLat: number | null;
@@ -68,7 +69,7 @@ export async function clockOutVisit(opts: {
   }
   const { error } = await supabase
     .from("visit_logs")
-    .update(update as never)
+    .update((await withUpdatedBy(update)) as never)
     .eq("id", opts.visitLogId);
   if (error) throw error;
   return clockOut;

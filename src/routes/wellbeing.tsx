@@ -157,6 +157,7 @@ function LogVisit() {
         .select("id")
         .eq("caregiver_id", uid)
         .eq("care_recipient_id", recipientId)
+        .is("deleted_at", null)
         .gte("clock_in", startOfDay.toISOString())
         .order("clock_in", { ascending: false })
         .limit(1)

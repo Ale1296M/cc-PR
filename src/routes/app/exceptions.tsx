@@ -53,6 +53,7 @@ function VisitExceptions() {
           "id, clock_in, clock_out, evv_exception, clock_in_method, clock_out_method, clock_in_accuracy_m, care_recipient_id, caregiver_id, care_recipients(full_name), profiles:caregiver_id(full_name)",
         )
         .not("evv_exception", "is", null)
+        .is("deleted_at", null)
         .order("clock_in", { ascending: false })
         .limit(100);
       if (filter !== "all") q = q.eq("evv_exception", filter);
