@@ -17,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as DashboardFamilyRouteImport } from './routes/dashboard/family'
 import { Route as DashboardCaregiverRouteImport } from './routes/dashboard/caregiver'
@@ -76,6 +77,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/caregiver': typeof DashboardCaregiverRoute
   '/dashboard/family': typeof DashboardFamilyRoute
   '/app/': typeof AppIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/dashboard/caregiver': typeof DashboardCaregiverRoute
   '/dashboard/family': typeof DashboardFamilyRoute
   '/app': typeof AppIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   '/dashboard/caregiver': typeof DashboardCaregiverRoute
   '/dashboard/family': typeof DashboardFamilyRoute
   '/app/': typeof AppIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
@@ -300,6 +309,7 @@ export interface FileRouteTypes {
     | '/dashboard/caregiver'
     | '/dashboard/family'
     | '/app/'
+    | '/dashboard/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/app/clients/$clientId'
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/dashboard/caregiver'
     | '/dashboard/family'
     | '/app'
+    | '/dashboard'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/app/clients/$clientId'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/dashboard/caregiver'
     | '/dashboard/family'
     | '/app/'
+    | '/dashboard/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/app/clients/$clientId'
@@ -378,6 +390,7 @@ export interface RootRouteChildren {
   DashboardAdminRoute: typeof DashboardAdminRoute
   DashboardCaregiverRoute: typeof DashboardCaregiverRoute
   DashboardFamilyRoute: typeof DashboardFamilyRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -438,6 +451,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -642,6 +662,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardAdminRoute: DashboardAdminRoute,
   DashboardCaregiverRoute: DashboardCaregiverRoute,
   DashboardFamilyRoute: DashboardFamilyRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
