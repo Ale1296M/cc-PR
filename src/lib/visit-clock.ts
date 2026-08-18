@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { capturePosition } from "@/lib/geo";
+import { withUpdatedBy } from "@/lib/soft-delete";
 
 export type Geofence = {
   homeLat: number | null;
