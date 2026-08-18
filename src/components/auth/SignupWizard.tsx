@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Check, Eye, EyeOff, HeartHandshake, Loader2, ShieldCheck, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { sortedTimezones, timezoneLabel } from "@/lib/timezones";
 
 export type WizardRole = "caregiver" | "admin" | "family_member";
 
@@ -10,14 +11,6 @@ const ROLES: { value: WizardRole; title: string; body: string; icon: typeof User
   { value: "caregiver", title: "Caregiver", body: "Log visits, follow care plans, message families.", icon: HeartHandshake },
   { value: "admin", title: "Administrator", body: "Schedule shifts, manage the roster, review incidents.", icon: ShieldCheck },
   { value: "family_member", title: "Family member", body: "Follow your loved one's day and message the team.", icon: Users },
-];
-
-const TIMEZONES = [
-  "America/Puerto_Rico",
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
 ];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -59,7 +52,19 @@ export function SignupWizard({ startStep = 1 }: { startStep?: 1 | 2 | 3 }) {
 
   // Step 3
   const [workspace, setWorkspace] = useState("");
-  const [timezone, setTimezone] = useState(TIMEZONES[0]!);
+  const [timezone, setTimezone] = useState(() => {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Puerto_Rico";
+    } catch {
+      return "America/Puerto_Rico";
+    }
+  });
+  // Timezone is stored in the Supabase auth user metadata (data.timezone) on sign-up.
+  // TODO: profiles has no `timezone` column yet — a migration is needed to persist it there.
+  const timezoneOptions = useMemo(() => {
+    const now = new Date();
+    return sortedTimezones(now).map((tz) => ({ tz, label: timezoneLabel(tz, now) }));
+  }, []);
   const [invites, setInvites] = useState("");
   const [mfa, setMfa] = useState(false);
 
@@ -283,8 +288,11 @@ export function SignupWizard({ startStep = 1 }: { startStep?: 1 | 2 | 3 }) {
               onChange={(e) => setTimezone(e.target.value)}
               className={inputClass}
             >
-              {TIMEZONES.map((tz) => (
-                <option key={tz} value={tz}>{tz.replace("_", " ")}</option>
+              {!timezoneOptions.some((o) => o.tz === timezone) && (
+                <option value={timezone}>{timezoneLabel(timezone)}</option>
+              )}
+              {timezoneOptions.map((o) => (
+                <option key={o.tz} value={o.tz}>{o.label}</option>
               ))}
             </select>
           </Field>
