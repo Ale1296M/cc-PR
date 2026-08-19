@@ -67,7 +67,10 @@ export const setUserRole = createServerFn({ method: "POST" })
       .object({
         userId: z.string().uuid(),
         role: z.enum(["admin", "caregiver", "family_member"]).nullable(),
-        careRecipientIds: z.array(z.string().uuid()).optional(),
+        /** Existing family this member joins. */
+        familyId: z.string().uuid().optional(),
+        /** Name for a brand-new family to create and join. */
+        newFamilyName: z.string().trim().min(1).max(120).optional(),
       })
       .parse(data),
   )
@@ -83,34 +86,39 @@ export const setUserRole = createServerFn({ method: "POST" })
       if (error) throw error;
     }
 
+    // Family membership lives in public.family_members. Never write it for other roles,
+    // and never auto-create a family — the admin picks or explicitly names one.
     if (data.role === "family_member") {
-      const { data: existingFamily, error: familyCheckErr } = await supabaseAdmin
-        .from("families")
-        .select("id")
-        .eq("profile_id", data.userId)
-        .maybeSingle();
-      if (familyCheckErr) throw familyCheckErr;
+      let familyId = data.familyId ?? null;
 
-      if (!existingFamily) {
-        const { error: familyInsertErr } = await supabaseAdmin.from("families").insert({ profile_id: data.userId });
-        if (familyInsertErr) throw familyInsertErr;
+      if (!familyId && data.newFamilyName) {
+        const { data: created, error: createErr } = await supabaseAdmin
+          .from("families")
+          .insert({ name: data.newFamilyName, start_date: new Date().toISOString().slice(0, 10) })
+          .select("id")
+          .single();
+        if (createErr) throw createErr;
+        familyId = created.id;
       }
 
-      if (data.careRecipientIds?.length) {
-        const { data: existing, error: exErr } = await supabaseAdmin
-          .from("client_family_members")
-          .select("care_recipient_id")
-          .eq("user_id", data.userId);
-        if (exErr) throw exErr;
-        const have = new Set((existing ?? []).map((r: any) => r.care_recipient_id));
-        const rows = data.careRecipientIds
-          .filter((id) => !have.has(id))
-          .map((id) => ({ user_id: data.userId, care_recipient_id: id }));
-        if (rows.length > 0) {
-          const { error } = await supabaseAdmin.from("client_family_members").insert(rows);
-          if (error) throw error;
-        }
+      if (familyId) {
+        const { error: linkErr } = await supabaseAdmin
+          .from("family_members")
+          .upsert({ family_id: familyId, user_id: data.userId }, { onConflict: "family_id,user_id", ignoreDuplicates: true });
+        if (linkErr) throw linkErr;
       }
     }
     return { ok: true };
+  });
+
+export type FamilyOption = { id: string; name: string | null };
+
+export const listFamilies = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<FamilyOption[]> => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.from("families").select("id, name").order("name");
+    if (error) throw error;
+    return (data ?? []) as FamilyOption[];
   });
