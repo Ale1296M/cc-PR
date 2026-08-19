@@ -101,7 +101,7 @@ const COPY = {
 
 type Copy = (typeof COPY)["en"] | (typeof COPY)["es"];
 
-const FEATURE_ICONS = [CalendarHeart, ClipboardList, MessagesSquare, ShieldCheck];
+const FEATURE_ICONS = [CalendarHeart, ClipboardList, MessagesSquare, ShieldCheck, HeartPulse];
 
 function Landing() {
   const [lang, setLang] = useState<Lang>("en");
@@ -120,7 +120,7 @@ function Landing() {
 
   return (
     <div className="min-h-dvh" lang={lang}>
-      <header className="border-b border-border/70">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5 md:px-8">
           <Link to="/" className="flex items-center gap-2.5">
             <Logo />
@@ -182,15 +182,7 @@ function Landing() {
               {t.lede}
             </p>
             <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
-              <Button asChild className="min-h-12 w-full rounded-full px-8 text-base sm:w-auto">
-                <Link to="/signup">{t.ctaPrimary}</Link>
-              </Button>
-              <Link
-                to="/login"
-                className="min-h-11 py-2 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {t.ctaSecondary}
-              </Link>
+              {/* Hero CTAs intentionally removed — sign up / log in now live only in the top nav. */}
             </div>
           </div>
 
