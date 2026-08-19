@@ -52,8 +52,8 @@ function CareRecipientsPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("families")
-        .select("id, status, profiles:profile_id(full_name)")
-        .order("created_at");
+        .select("id, name")
+        .order("name");
       return data ?? [];
     },
   });
@@ -138,9 +138,7 @@ function CareRecipientsPage() {
         <NewCareRecipient
           families={(families ?? []).map((f) => ({
             id: f.id,
-            label:
-              (f.profiles as unknown as { full_name: string | null } | null)?.full_name ??
-              `Family ${f.id.slice(0, 8)}`,
+            label: f.name ?? `Family ${f.id.slice(0, 8)}`,
           }))}
           onCreate={(f) => create.mutate(f)}
           onClose={() => setShowNew(false)}

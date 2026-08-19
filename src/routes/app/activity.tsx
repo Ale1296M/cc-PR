@@ -37,7 +37,7 @@ const TABLES = [
   { key: "wellbeing_entries", label: "Wellbeing" },
   { key: "emergency_contacts", label: "Emergency contacts" },
   { key: "care_shifts", label: "Shifts" },
-  { key: "client_family_members", label: "Family links" },
+  { key: "family_members", label: "Family links" },
 ] as const;
 
 const TABLE_LABEL: Record<string, string> = Object.fromEntries(
