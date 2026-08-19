@@ -258,10 +258,10 @@ function SchedulePreview({ t }: { t: Copy }) {
     setBadge((b) => BADGE_CYCLE[(BADGE_CYCLE.indexOf(b) + 1) % BADGE_CYCLE.length]!);
 
   return (
-    <div className="rounded-xl border bg-card p-6 shadow-sm">
+    <div className="w-full overflow-hidden rounded-2xl border border-border/60 bg-card p-5 shadow-sm md:p-6">
       <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="font-display text-2xl">{t.today}</p>
-        <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+        <p className="truncate font-display text-xl sm:text-2xl">{t.today}</p>
+        <span className="shrink-0 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
           {t.visits}
         </span>
       </div>
@@ -272,7 +272,7 @@ function SchedulePreview({ t }: { t: Copy }) {
               type="button"
               onClick={() => setSelected(i)}
               aria-pressed={selected === i}
-              className={`flex w-full items-start gap-4 rounded-lg p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`flex min-h-11 w-full items-start gap-4 rounded-xl p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 selected === i ? "bg-secondary" : "hover:bg-muted"
               }`}
             >
@@ -288,7 +288,7 @@ function SchedulePreview({ t }: { t: Copy }) {
               <button
                 type="button"
                 onClick={cycleBadge}
-                className={`ml-[5.5rem] mb-2 inline-flex min-h-8 items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`mb-2 ml-3 inline-flex min-h-11 items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:ml-[5.5rem] ${
                   badge === "verified"
                     ? "bg-primary/15 text-primary hover:bg-primary/25"
                     : "bg-attention-soft text-attention-foreground hover:opacity-80"
@@ -302,7 +302,7 @@ function SchedulePreview({ t }: { t: Copy }) {
               <button
                 type="button"
                 onClick={cycleBadge}
-                className="ml-[5.5rem] mb-2 inline-flex min-h-8 items-center rounded-full border border-dashed border-border px-3 py-1 text-xs text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="mb-2 ml-3 inline-flex min-h-11 items-center rounded-full border border-dashed border-border px-3 py-1 text-xs text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:ml-[5.5rem]"
               >
                 + {t.verified}
               </button>
@@ -317,48 +317,69 @@ function SchedulePreview({ t }: { t: Copy }) {
 
 function WellbeingTrackerPreview({ lang }: { lang: Lang }) {
   const days = lang === "es" ? ["L", "M", "X", "J", "V", "S", "D"] : ["M", "T", "W", "T", "F", "S", "S"];
-  const moods = ["😊", "🙂", "😐", "🤕", "😴", "🙂", "😊"];
-  const levels = [80, 65, 50, 35, 45, 70, 85];
+  const states = ["good", "good", "usual", "good", "attention", "none", "none"] as const;
   const [hovered, setHovered] = useState<number | null>(null);
 
+  const labels: Record<(typeof states)[number], string> =
+    lang === "es"
+      ? { good: "Bien", usual: "Como siempre", attention: "Requiere atención", none: "Sin registro" }
+      : { good: "Good", usual: "Usual", attention: "Needs attention", none: "No check-in" };
+
+  const swatch: Record<(typeof states)[number], string> = {
+    good: "bg-wb-good",
+    usual: "bg-wb-usual",
+    attention: "bg-wb-attention",
+    none: "bg-wb-none",
+  };
+
   return (
-    <div className="mt-5 flex-1">
-      <div className="rounded-lg border border-border/60 bg-secondary/40 p-3">
-        <div className="flex items-end justify-between gap-1.5">
-          {days.map((day, i) => (
-            <button
-              key={day + i}
-              type="button"
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-              onFocus={() => setHovered(i)}
-              onBlur={() => setHovered(null)}
-              className="group flex flex-col items-center gap-1.5 rounded-md p-1 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label={lang === "es" ? `Bienestar ${day}: ${moods[i]}` : `Wellbeing ${day}: ${moods[i]}`}
-            >
-              <span className="text-sm" aria-hidden="true">
-                {moods[i]}
-              </span>
-              <div className="relative h-12 w-3 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                <div
-                  className="absolute bottom-0 w-full rounded-full bg-primary transition-all duration-300"
-                  style={{ height: `${levels[i]}%` }}
+    <div className="mt-5 w-full min-w-0 overflow-hidden">
+      <div className="rounded-xl border border-border/60 bg-secondary/40 p-3">
+        <div className="flex items-center justify-between gap-1">
+          {days.map((day, i) => {
+            const state = states[i]!;
+            return (
+              <button
+                key={day + i}
+                type="button"
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                onFocus={() => setHovered(i)}
+                onBlur={() => setHovered(null)}
+                className="flex min-w-0 flex-col items-center gap-1 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`${day}: ${labels[state]}`}
+              >
+                <span
+                  className={`h-7 w-7 rounded-lg transition-transform hover:scale-105 ${swatch[state]} ${
+                    state === "none" ? "border border-border/70" : ""
+                  }`}
+                  aria-hidden="true"
                 />
-              </div>
-              <span className="text-[10px] font-medium text-muted-foreground">{day}</span>
-            </button>
-          ))}
+                <span className="text-[10px] font-medium text-muted-foreground">{day}</span>
+              </button>
+            );
+          })}
         </div>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          {hovered !== null
-            ? lang === "es"
-              ? `${days[hovered]}: nivel de bienestar ${levels[hovered]}%`
-              : `${days[hovered]}: wellness level ${levels[hovered]}%`
-            : lang === "es"
-              ? "Pasa el cursor para ver el resumen diario"
-              : "Hover a day for its quick summary"}
-        </p>
+
+        <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1 border-t border-border/60 pt-3">
+          {(["good", "usual", "attention", "none"] as const).map((s) => (
+            <li key={s} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <span
+                className={`h-2 w-2 rounded-full ${swatch[s]} ${s === "none" ? "border border-border/70" : ""}`}
+                aria-hidden="true"
+              />
+              {labels[s]}
+            </li>
+          ))}
+        </ul>
       </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        {hovered !== null
+          ? `${days[hovered]} — ${labels[states[hovered]!]}`
+          : lang === "es"
+            ? "Pasa el cursor por un día para ver su resumen"
+            : "Hover a day for its quick summary"}
+      </p>
     </div>
   );
 }
