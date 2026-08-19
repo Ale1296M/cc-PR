@@ -179,35 +179,51 @@ function UsersPage() {
       {linking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
           <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg">
-            <h2 className="type-section">Link {linking.name} to care recipients</h2>
+            <h2 className="type-section">Add {linking.name} to a family</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Choose who this family member should see. You can also link them later.
+              They&apos;ll see every care recipient belonging to the family you choose.
             </p>
-            <div className="mt-4 max-h-64 space-y-2 overflow-y-auto">
-              {(recipients ?? []).length === 0 && (
-                <p className="text-sm text-muted-foreground">No care recipients yet.</p>
-              )}
-              {(recipients ?? []).map((r) => (
-                <label key={r.id} className="flex items-center gap-3 text-sm">
+            <div className="mt-4 space-y-4">
+              <label className="block">
+                <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Family</span>
+                <select
+                  value={pickedFamily}
+                  onChange={(e) => {
+                    setPickedFamily(e.target.value);
+                    if (e.target.value !== "__new__") setNewFamilyName("");
+                  }}
+                  className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
+                >
+                  <option value="">Select a family…</option>
+                  {(families ?? []).map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name ?? `Family ${f.id.slice(0, 8)}`}
+                    </option>
+                  ))}
+                  <option value="__new__">Create new family…</option>
+                </select>
+              </label>
+              {pickedFamily === "__new__" && (
+                <label className="block">
+                  <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">
+                    New family name
+                  </span>
                   <input
-                    type="checkbox"
-                    checked={picked.includes(r.id)}
-                    onChange={(e) =>
-                      setPicked((prev) =>
-                        e.target.checked ? [...prev, r.id] : prev.filter((id) => id !== r.id),
-                      )
-                    }
+                    value={newFamilyName}
+                    onChange={(e) => setNewFamilyName(e.target.value)}
+                    placeholder="Familia González"
+                    className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
                   />
-                  <span>{r.full_name}</span>
                 </label>
-              ))}
+              )}
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setLinking(null);
-                  setPicked([]);
+                  setPickedFamily("");
+                  setNewFamilyName("");
                 }}
                 className="rounded-full border border-border px-4 py-2 text-sm"
               >
@@ -215,15 +231,21 @@ function UsersPage() {
               </button>
               <button
                 type="button"
-                disabled={mutate.isPending}
+                disabled={
+                  mutate.isPending ||
+                  !pickedFamily ||
+                  (pickedFamily === "__new__" && !newFamilyName.trim())
+                }
                 onClick={() =>
                   mutate.mutate({
                     userId: linking.userId,
                     role: "family_member",
-                    careRecipientIds: picked,
+                    ...(pickedFamily === "__new__"
+                      ? { newFamilyName: newFamilyName.trim() }
+                      : { familyId: pickedFamily }),
                   })
                 }
-                className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+                className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
               >
                 Confirm
               </button>
