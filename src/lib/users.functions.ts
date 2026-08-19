@@ -94,7 +94,8 @@ export const setUserRole = createServerFn({ method: "POST" })
       if (!familyId && data.newFamilyName) {
         const { data: created, error: createErr } = await supabaseAdmin
           .from("families")
-          .insert({ name: data.newFamilyName, start_date: new Date().toISOString().slice(0, 10) })
+          // profile_id is NOT NULL; the person being approved becomes the account holder.
+          .insert({ name: data.newFamilyName, profile_id: data.userId })
           .select("id")
           .single();
         if (createErr) throw createErr;
