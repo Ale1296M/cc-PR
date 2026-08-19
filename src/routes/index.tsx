@@ -46,8 +46,6 @@ const COPY = {
     headlineAccent: "connected",
     lede:
       "Con Cariño PR gives home care teams and the families they serve one warm place to plan visits, share updates, and remember every small thing that matters.",
-    ctaPrimary: "Create your workspace",
-    ctaSecondary: "I already have an account",
     today: "Today · Tuesday",
     visits: "3 visits",
     verified: "Location verified",
