@@ -52,8 +52,8 @@ function CareRecipientsPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("families")
-        .select("id, status, profiles:profile_id(full_name)")
-        .order("created_at");
+        .select("id, name")
+        .order("name");
       return data ?? [];
     },
   });
@@ -138,9 +138,7 @@ function CareRecipientsPage() {
         <NewCareRecipient
           families={(families ?? []).map((f) => ({
             id: f.id,
-            label:
-              (f.profiles as unknown as { full_name: string | null } | null)?.full_name ??
-              `Family ${f.id.slice(0, 8)}`,
+            label: f.name ?? `Family ${f.id.slice(0, 8)}`,
           }))}
           onCreate={(f) => create.mutate(f)}
           onClose={() => setShowNew(false)}
@@ -182,6 +180,9 @@ function NewCareRecipient({
                 <option key={f.id} value={f.id}>{f.label}</option>
               ))}
             </select>
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Everyone who belongs to this family will be able to see this care recipient.
+            </span>
           </label>
           <F label="Address" value={address_line} onChange={setAddress} />
           <F label="Emergency contact" value={emergency_contact_name} onChange={setContact} />

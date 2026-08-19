@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { fetchMyFamilyRecipients } from "@/lib/family-access";
 import { toast } from "sonner";
 import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 
@@ -56,6 +57,10 @@ function MessagesPage() {
     queryKey: ["chat-recipients", uid],
     enabled: !!uid && canSeeFamilies,
     queryFn: async () => {
+      if (isFamily) {
+        // Family members: threads come from their family_members memberships.
+        return await fetchMyFamilyRecipients(uid!);
+      }
       const { data, error } = await supabase
         .from("care_recipients")
         .select("id, full_name, family_id")

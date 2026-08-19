@@ -6,8 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/use-auth";
-import { listUsers, setUserRole, type AppRole } from "@/lib/users.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { listFamilies, listUsers, setUserRole, type AppRole } from "@/lib/users.functions";
 
 export const Route = createFileRoute("/app/users")({
   component: () => (
@@ -43,10 +42,12 @@ function UsersPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("all");
   const [linking, setLinking] = useState<{ userId: string; name: string } | null>(null);
-  const [picked, setPicked] = useState<string[]>([]);
+  const [pickedFamily, setPickedFamily] = useState<string>("");
+  const [newFamilyName, setNewFamilyName] = useState("");
 
   const fetchUsers = useServerFn(listUsers);
   const updateRole = useServerFn(setUserRole);
+  const fetchFamilies = useServerFn(listFamilies);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["admin-users"],
@@ -55,29 +56,23 @@ function UsersPage() {
   });
 
   const mutate = useMutation({
-    mutationFn: (vars: { userId: string; role: AppRole | null; careRecipientIds?: string[] }) =>
+    mutationFn: (vars: { userId: string; role: AppRole | null; familyId?: string; newFamilyName?: string }) =>
       updateRole({ data: vars }),
     onSuccess: () => {
       toast.success("Role updated");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-families"] });
       setLinking(null);
-      setPicked([]);
+      setPickedFamily("");
+      setNewFamilyName("");
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not update role"),
   });
 
-  const { data: recipients } = useQuery({
-    queryKey: ["admin-care-recipients"],
+  const { data: families } = useQuery({
+    queryKey: ["admin-families"],
     enabled: role === "admin",
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("care_recipients")
-        .select("id, full_name")
-        .is("deleted_at", null)
-        .order("full_name");
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: () => fetchFamilies(),
   });
 
   if (role && role !== "admin") {
@@ -158,7 +153,8 @@ function UsersPage() {
                 onChange={(e) => {
                   const next = (e.target.value || null) as AppRole | null;
                   if (next === "family_member") {
-                    setPicked([]);
+                    setPickedFamily("");
+                    setNewFamilyName("");
                     setLinking({ userId: u.id, name: u.full_name || u.email || "This person" });
                     return;
                   }
@@ -183,35 +179,51 @@ function UsersPage() {
       {linking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4">
           <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg">
-            <h2 className="type-section">Link {linking.name} to care recipients</h2>
+            <h2 className="type-section">Add {linking.name} to a family</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Choose who this family member should see. You can also link them later.
+              They&apos;ll see every care recipient belonging to the family you choose.
             </p>
-            <div className="mt-4 max-h-64 space-y-2 overflow-y-auto">
-              {(recipients ?? []).length === 0 && (
-                <p className="text-sm text-muted-foreground">No care recipients yet.</p>
-              )}
-              {(recipients ?? []).map((r) => (
-                <label key={r.id} className="flex items-center gap-3 text-sm">
+            <div className="mt-4 space-y-4">
+              <label className="block">
+                <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Family</span>
+                <select
+                  value={pickedFamily}
+                  onChange={(e) => {
+                    setPickedFamily(e.target.value);
+                    if (e.target.value !== "__new__") setNewFamilyName("");
+                  }}
+                  className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
+                >
+                  <option value="">Select a family…</option>
+                  {(families ?? []).map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name ?? `Family ${f.id.slice(0, 8)}`}
+                    </option>
+                  ))}
+                  <option value="__new__">Create new family…</option>
+                </select>
+              </label>
+              {pickedFamily === "__new__" && (
+                <label className="block">
+                  <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">
+                    New family name
+                  </span>
                   <input
-                    type="checkbox"
-                    checked={picked.includes(r.id)}
-                    onChange={(e) =>
-                      setPicked((prev) =>
-                        e.target.checked ? [...prev, r.id] : prev.filter((id) => id !== r.id),
-                      )
-                    }
+                    value={newFamilyName}
+                    onChange={(e) => setNewFamilyName(e.target.value)}
+                    placeholder="Familia González"
+                    className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
                   />
-                  <span>{r.full_name}</span>
                 </label>
-              ))}
+              )}
             </div>
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setLinking(null);
-                  setPicked([]);
+                  setPickedFamily("");
+                  setNewFamilyName("");
                 }}
                 className="rounded-full border border-border px-4 py-2 text-sm"
               >
@@ -219,15 +231,21 @@ function UsersPage() {
               </button>
               <button
                 type="button"
-                disabled={mutate.isPending}
+                disabled={
+                  mutate.isPending ||
+                  !pickedFamily ||
+                  (pickedFamily === "__new__" && !newFamilyName.trim())
+                }
                 onClick={() =>
                   mutate.mutate({
                     userId: linking.userId,
                     role: "family_member",
-                    careRecipientIds: picked,
+                    ...(pickedFamily === "__new__"
+                      ? { newFamilyName: newFamilyName.trim() }
+                      : { familyId: pickedFamily }),
                   })
                 }
-                className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+                className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
               >
                 Confirm
               </button>

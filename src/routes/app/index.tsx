@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { fetchMyFamilyRecipients } from "@/lib/family-access";
 import { AsyncState, AsyncSkeleton, AsyncError } from "@/components/ui/async-state";
 import { useFamilyIncidentAlerts, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
 import { severityLabel, typeLabel, formatStamp } from "@/components/incidents/incident-meta";
@@ -115,14 +116,7 @@ function Dashboard() {
     queryKey: ["dash-loved", uid],
     enabled: !!uid && isFamily,
     queryFn: async () => {
-      const { data: fam, error } = await supabase
-        .from("families")
-        .select("care_recipients(id, full_name)")
-        .eq("profile_id", uid!);
-      if (error) throw error;
-      const recipients = (fam ?? []).flatMap(
-        (f) => (f.care_recipients ?? []) as unknown as { id: string; full_name: string }[],
-      );
+      const recipients = await fetchMyFamilyRecipients(uid!);
       const person = recipients[0] ?? null;
       if (!person) return null;
       const since = new Date();
