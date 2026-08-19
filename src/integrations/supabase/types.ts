@@ -379,38 +379,6 @@ export type Database = {
           },
         ]
       }
-      client_family_members: {
-        Row: {
-          care_recipient_id: string | null
-          created_at: string
-          id: string
-          relationship: string | null
-          user_id: string
-        }
-        Insert: {
-          care_recipient_id?: string | null
-          created_at?: string
-          id?: string
-          relationship?: string | null
-          user_id: string
-        }
-        Update: {
-          care_recipient_id?: string | null
-          created_at?: string
-          id?: string
-          relationship?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "client_family_members_care_recipient_id_fkey"
-            columns: ["care_recipient_id"]
-            isOneToOne: false
-            referencedRelation: "care_recipients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       emergency_contacts: {
         Row: {
           care_recipient_id: string
@@ -487,7 +455,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          name: string | null
+          name: string
           profile_id: string
           start_date: string
           status: string
@@ -497,7 +465,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          name?: string | null
+          name: string
           profile_id: string
           start_date?: string
           status?: string
@@ -507,7 +475,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          name?: string | null
+          name?: string
           profile_id?: string
           start_date?: string
           status?: string
