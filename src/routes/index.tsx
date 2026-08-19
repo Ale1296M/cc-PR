@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   CalendarHeart,
   ClipboardList,
+  HeartPulse,
   MapPin,
   Menu,
   MessagesSquare,
@@ -45,8 +46,6 @@ const COPY = {
     headlineAccent: "connected",
     lede:
       "Con Cariño PR gives home care teams and the families they serve one warm place to plan visits, share updates, and remember every small thing that matters.",
-    ctaPrimary: "Create your workspace",
-    ctaSecondary: "I already have an account",
     today: "Today · Tuesday",
     visits: "3 visits",
     verified: "Location verified",
@@ -62,6 +61,7 @@ const COPY = {
       { title: "Care plans", body: "Living checklists for meds, meals, mobility, and moments." },
       { title: "Family updates", body: "Warm messages between caregivers and loved ones." },
       { title: "Visit logs", body: "Clock in, note what happened, and keep a gentle history." },
+      { title: "Wellbeing tracker", body: "A quick look at mood, comfort, and daily wellness patterns." },
     ],
     footer: "Made with care.",
   },
@@ -74,8 +74,6 @@ const COPY = {
     headlineAccent: "conectado",
     lede:
       "Con Cariño PR ofrece a los equipos de cuidado en el hogar y a las familias un espacio cálido para planificar visitas, compartir novedades y recordar cada pequeño detalle que importa.",
-    ctaPrimary: "Crea tu espacio",
-    ctaSecondary: "Ya tengo una cuenta",
     today: "Hoy · martes",
     visits: "3 visitas",
     verified: "Ubicación verificada",
@@ -91,6 +89,7 @@ const COPY = {
       { title: "Planes de cuidado", body: "Listas vivas para medicinas, comidas, movilidad y momentos." },
       { title: "Novedades para la familia", body: "Mensajes cálidos entre cuidadores y seres queridos." },
       { title: "Registro de visitas", body: "Marca tu llegada, anota lo sucedido y guarda un historial cuidadoso." },
+      { title: "Seguimiento de bienestar", body: "Un vistazo rápido al estado de ánimo, la comodidad y los patrones diarios de bienestar." },
     ],
     footer: "Hecho con cariño.",
   },
@@ -98,7 +97,7 @@ const COPY = {
 
 type Copy = (typeof COPY)["en"] | (typeof COPY)["es"];
 
-const FEATURE_ICONS = [CalendarHeart, ClipboardList, MessagesSquare, ShieldCheck];
+const FEATURE_ICONS = [CalendarHeart, ClipboardList, MessagesSquare, ShieldCheck, HeartPulse];
 
 function Landing() {
   const [lang, setLang] = useState<Lang>("en");
@@ -117,7 +116,7 @@ function Landing() {
 
   return (
     <div className="min-h-dvh" lang={lang}>
-      <header className="border-b border-border/70">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5 md:px-8">
           <Link to="/" className="flex items-center gap-2.5">
             <Logo />
@@ -178,31 +177,22 @@ function Landing() {
             <p className="mt-8 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
               {t.lede}
             </p>
-            <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
-              <Button asChild className="min-h-12 w-full rounded-full px-8 text-base sm:w-auto">
-                <Link to="/signup">{t.ctaPrimary}</Link>
-              </Button>
-              <Link
-                to="/login"
-                className="min-h-11 py-2 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {t.ctaSecondary}
-              </Link>
-            </div>
           </div>
 
           <SchedulePreview t={t} />
         </section>
 
         <section className="mt-20 md:mt-28">
-          <div className="grid gap-4 sm:grid-cols-2 md:gap-6">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {t.features.map((f, i) => {
               const Icon = FEATURE_ICONS[i]!;
+              const isWellbeing = f.title === "Wellbeing tracker" || f.title === "Seguimiento de bienestar";
               return (
-                <div key={f.title} className="rounded-xl border bg-card p-6 shadow-sm">
+                <div key={f.title} className="flex flex-col rounded-xl border bg-card p-6 shadow-sm">
                   <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
                   <h2 className="mt-4 type-subhead">{f.title}</h2>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
+                  {isWellbeing && <WellbeingTrackerPreview lang={lang} />}
                 </div>
               );
             })}
@@ -312,6 +302,54 @@ function SchedulePreview({ t }: { t: Copy }) {
         ))}
       </ul>
       <p className="mt-4 border-t border-border/70 pt-4 text-xs text-muted-foreground">{t.demoHint}</p>
+    </div>
+  );
+}
+
+function WellbeingTrackerPreview({ lang }: { lang: Lang }) {
+  const days = lang === "es" ? ["L", "M", "X", "J", "V", "S", "D"] : ["M", "T", "W", "T", "F", "S", "S"];
+  const moods = ["😊", "🙂", "😐", "🤕", "😴", "🙂", "😊"];
+  const levels = [80, 65, 50, 35, 45, 70, 85];
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  return (
+    <div className="mt-5 flex-1">
+      <div className="rounded-lg border border-border/60 bg-secondary/40 p-3">
+        <div className="flex items-end justify-between gap-1.5">
+          {days.map((day, i) => (
+            <button
+              key={day + i}
+              type="button"
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(i)}
+              onBlur={() => setHovered(null)}
+              className="group flex flex-col items-center gap-1.5 rounded-md p-1 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={lang === "es" ? `Bienestar ${day}: ${moods[i]}` : `Wellbeing ${day}: ${moods[i]}`}
+            >
+              <span className="text-sm" aria-hidden="true">
+                {moods[i]}
+              </span>
+              <div className="relative h-12 w-3 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                <div
+                  className="absolute bottom-0 w-full rounded-full bg-primary transition-all duration-300"
+                  style={{ height: `${levels[i]}%` }}
+                />
+              </div>
+              <span className="text-[10px] font-medium text-muted-foreground">{day}</span>
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          {hovered !== null
+            ? lang === "es"
+              ? `${days[hovered]}: nivel de bienestar ${levels[hovered]}%`
+              : `${days[hovered]}: wellness level ${levels[hovered]}%`
+            : lang === "es"
+              ? "Pasa el cursor para ver el resumen diario"
+              : "Hover a day for its quick summary"}
+        </p>
+      </div>
     </div>
   );
 }
