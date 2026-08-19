@@ -190,14 +190,16 @@ function Landing() {
         </section>
 
         <section className="mt-20 md:mt-28">
-          <div className="grid gap-4 sm:grid-cols-2 md:gap-6">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {t.features.map((f, i) => {
               const Icon = FEATURE_ICONS[i]!;
+              const isWellbeing = f.title === "Wellbeing tracker" || f.title === "Seguimiento de bienestar";
               return (
-                <div key={f.title} className="rounded-xl border bg-card p-6 shadow-sm">
+                <div key={f.title} className="flex flex-col rounded-xl border bg-card p-6 shadow-sm">
                   <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
                   <h2 className="mt-4 type-subhead">{f.title}</h2>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
+                  {isWellbeing && <WellbeingTrackerPreview lang={lang} />}
                 </div>
               );
             })}
