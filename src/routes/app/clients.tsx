@@ -180,6 +180,9 @@ function NewCareRecipient({
                 <option key={f.id} value={f.id}>{f.label}</option>
               ))}
             </select>
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Everyone who belongs to this family will be able to see this care recipient.
+            </span>
           </label>
           <F label="Address" value={address_line} onChange={setAddress} />
           <F label="Emergency contact" value={emergency_contact_name} onChange={setContact} />
