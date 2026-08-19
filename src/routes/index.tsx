@@ -313,6 +313,54 @@ function SchedulePreview({ t }: { t: Copy }) {
   );
 }
 
+function WellbeingTrackerPreview({ lang }: { lang: Lang }) {
+  const days = lang === "es" ? ["L", "M", "X", "J", "V", "S", "D"] : ["M", "T", "W", "T", "F", "S", "S"];
+  const moods = ["😊", "🙂", "😐", "🤕", "😴", "🙂", "😊"];
+  const levels = [80, 65, 50, 35, 45, 70, 85];
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  return (
+    <div className="mt-5 flex-1">
+      <div className="rounded-lg border border-border/60 bg-secondary/40 p-3">
+        <div className="flex items-end justify-between gap-1.5">
+          {days.map((day, i) => (
+            <button
+              key={day + i}
+              type="button"
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(i)}
+              onBlur={() => setHovered(null)}
+              className="group flex flex-col items-center gap-1.5 rounded-md p-1 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={lang === "es" ? `Bienestar ${day}: ${moods[i]}` : `Wellbeing ${day}: ${moods[i]}`}
+            >
+              <span className="text-sm" aria-hidden="true">
+                {moods[i]}
+              </span>
+              <div className="relative h-12 w-3 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                <div
+                  className="absolute bottom-0 w-full rounded-full bg-primary transition-all duration-300"
+                  style={{ height: `${levels[i]}%` }}
+                />
+              </div>
+              <span className="text-[10px] font-medium text-muted-foreground">{day}</span>
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          {hovered !== null
+            ? lang === "es"
+              ? `${days[hovered]}: nivel de bienestar ${levels[hovered]}%`
+              : `${days[hovered]}: wellness level ${levels[hovered]}%`
+            : lang === "es"
+              ? "Pasa el cursor para ver el resumen diario"
+              : "Hover a day for its quick summary"}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function Logo() {
   return (
     <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
