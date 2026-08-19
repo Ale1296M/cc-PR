@@ -6,8 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/use-auth";
-import { listUsers, setUserRole, type AppRole } from "@/lib/users.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { listFamilies, listUsers, setUserRole, type AppRole } from "@/lib/users.functions";
 
 export const Route = createFileRoute("/app/users")({
   component: () => (
@@ -43,10 +42,12 @@ function UsersPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("all");
   const [linking, setLinking] = useState<{ userId: string; name: string } | null>(null);
-  const [picked, setPicked] = useState<string[]>([]);
+  const [pickedFamily, setPickedFamily] = useState<string>("");
+  const [newFamilyName, setNewFamilyName] = useState("");
 
   const fetchUsers = useServerFn(listUsers);
   const updateRole = useServerFn(setUserRole);
+  const fetchFamilies = useServerFn(listFamilies);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["admin-users"],
@@ -55,29 +56,23 @@ function UsersPage() {
   });
 
   const mutate = useMutation({
-    mutationFn: (vars: { userId: string; role: AppRole | null; careRecipientIds?: string[] }) =>
+    mutationFn: (vars: { userId: string; role: AppRole | null; familyId?: string; newFamilyName?: string }) =>
       updateRole({ data: vars }),
     onSuccess: () => {
       toast.success("Role updated");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-families"] });
       setLinking(null);
-      setPicked([]);
+      setPickedFamily("");
+      setNewFamilyName("");
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not update role"),
   });
 
-  const { data: recipients } = useQuery({
-    queryKey: ["admin-care-recipients"],
+  const { data: families } = useQuery({
+    queryKey: ["admin-families"],
     enabled: role === "admin",
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("care_recipients")
-        .select("id, full_name")
-        .is("deleted_at", null)
-        .order("full_name");
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: () => fetchFamilies(),
   });
 
   if (role && role !== "admin") {
@@ -158,7 +153,8 @@ function UsersPage() {
                 onChange={(e) => {
                   const next = (e.target.value || null) as AppRole | null;
                   if (next === "family_member") {
-                    setPicked([]);
+                    setPickedFamily("");
+                    setNewFamilyName("");
                     setLinking({ userId: u.id, name: u.full_name || u.email || "This person" });
                     return;
                   }
