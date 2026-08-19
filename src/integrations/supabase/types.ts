@@ -487,6 +487,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          name: string | null
           profile_id: string
           start_date: string
           status: string
@@ -496,6 +497,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          name?: string | null
           profile_id: string
           start_date?: string
           status?: string
@@ -505,6 +507,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          name?: string | null
           profile_id?: string
           start_date?: string
           status?: string
@@ -524,6 +527,38 @@ export type Database = {
             columns: ["subscription_tier_id"]
             isOneToOne: false
             referencedRelation: "subscription_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          relationship: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          relationship?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          relationship?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
             referencedColumns: ["id"]
           },
         ]
@@ -1030,6 +1065,14 @@ export type Database = {
         Returns: boolean
       }
       user_can_view_recipient: {
+        Args: { _recipient_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_in_family: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
+      user_in_family_of_recipient: {
         Args: { _recipient_id: string; _user_id: string }
         Returns: boolean
       }
