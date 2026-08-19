@@ -74,8 +74,6 @@ const COPY = {
     headlineAccent: "conectado",
     lede:
       "Con Cariño PR ofrece a los equipos de cuidado en el hogar y a las familias un espacio cálido para planificar visitas, compartir novedades y recordar cada pequeño detalle que importa.",
-    ctaPrimary: "Crea tu espacio",
-    ctaSecondary: "Ya tengo una cuenta",
     today: "Hoy · martes",
     visits: "3 visitas",
     verified: "Ubicación verificada",
