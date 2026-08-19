@@ -177,9 +177,6 @@ function Landing() {
             <p className="mt-8 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
               {t.lede}
             </p>
-            <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
-              {/* Hero CTAs intentionally removed — sign up / log in now live only in the top nav. */}
-            </div>
           </div>
 
           <SchedulePreview t={t} />
