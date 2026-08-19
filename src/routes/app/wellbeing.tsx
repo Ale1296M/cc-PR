@@ -14,6 +14,7 @@ import {
 import { AlertTriangle, ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { fetchMyFamilyRecipients } from "@/lib/family-access";
 import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { formatDuration } from "@/lib/geo";
