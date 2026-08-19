@@ -171,30 +171,9 @@ function WellbeingTrends() {
         if (error) throw error;
         for (const row of data ?? []) add(row.care_recipients as unknown as Recipient | null);
       } else {
-        // family_member: their own families' recipients …
-        const { data: fam } = await supabase
-          .from("families")
-          .select("care_recipients(id, full_name)")
-          .eq("profile_id", uid!);
-        for (const f of fam ?? []) {
-          const rs = (f.care_recipients ?? []) as unknown as Recipient[];
-          rs.forEach(add);
-        }
-        // … plus any recipients reached through client_family_members → clients
-        const { data: links } = await supabase
-          .from("client_family_members")
-          .select("clients(full_name)")
-          .eq("user_id", uid!);
-        const names = (links ?? [])
-          .map((l) => (l.clients as unknown as { full_name: string } | null)?.full_name)
-          .filter((n): n is string => !!n);
-        if (names.length > 0) {
-          const { data: byName } = await supabase
-            .from("care_recipients")
-            .select("id, full_name")
-            .in("full_name", names);
-          (byName ?? []).forEach(add);
-        }
+        // family_member: every recipient of every family they belong to
+        const mine = await fetchMyFamilyRecipients(uid!);
+        mine.forEach(add);
       }
       return [...map.values()].sort((a, b) => a.full_name.localeCompare(b.full_name));
     },

@@ -5,6 +5,7 @@ import { lazy, Suspense } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import { useMyFamilyRecipients } from "@/lib/family-access";
 import { SHIFT_STATUSES, formatDay, formatTime, statusLabel } from "@/components/shifts/shift-utils";
 import { AsyncSkeleton, AsyncState } from "@/components/ui/async-state";
 import { toast } from "sonner";
@@ -47,27 +48,8 @@ function SchedulePage() {
 
 /** Read-only upcoming schedule for family members, scoped to their linked recipients. */
 function FamilySchedule({ uid }: { uid?: string }) {
-  const { data: recipientIds } = useQuery({
-    queryKey: ["family-recipient-ids", uid],
-    enabled: !!uid,
-    queryFn: async () => {
-      const ids = new Set<string>();
-      const { data: fam } = await supabase
-        .from("families")
-        .select("care_recipients(id)")
-        .eq("profile_id", uid!);
-      for (const f of fam ?? []) {
-        const rs = (f.care_recipients ?? []) as unknown as { id: string }[];
-        rs.forEach((r) => r?.id && ids.add(r.id));
-      }
-      const { data: links } = await supabase
-        .from("client_family_members")
-        .select("care_recipient_id")
-        .eq("user_id", uid!);
-      (links ?? []).forEach((l) => l.care_recipient_id && ids.add(l.care_recipient_id));
-      return [...ids];
-    },
-  });
+  const { data: myRecipients } = useMyFamilyRecipients();
+  const recipientIds = myRecipients?.map((r) => r.id);
 
   const {
     data: shifts,
