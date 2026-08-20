@@ -1,9 +1,27 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Activity, AlertTriangle, CalendarDays, ClipboardList, History, Home, LogOut, MapPinOff, MessageCircle, NotebookPen, ShieldCheck, Trash2, Users } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  Bell,
+  CalendarDays,
+  ClipboardList,
+  Heart,
+  HelpCircle,
+  History,
+  Home,
+  LogOut,
+  MapPinOff,
+  MessageCircle,
+  NotebookPen,
+  ShieldCheck,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/use-auth";
 import { useIncidentAlerts, usePendingUsers, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -46,6 +64,18 @@ const NAV_BY_ROLE: Record<AppRole, NavItem[]> = {
   ],
 };
 
+const ROLE_BADGES: Record<AppRole, string> = {
+  admin: "ADMIN CONSOLE",
+  caregiver: "CAREGIVER",
+  family_member: "FAMILY",
+};
+
+const ROLE_TITLES: Record<AppRole, string> = {
+  admin: "Super Admin",
+  caregiver: "Caregiver",
+  family_member: "Family Member",
+};
+
 function AppLayout() {
   const { user, loading, role } = useAuth();
   const navigate = useNavigate();
@@ -72,27 +102,48 @@ function AppLayout() {
     );
   }
 
+  const today = new Date();
+  const dateEyebrow = today
+    .toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })
+    .toUpperCase();
+
+  const displayName =
+    ((user.user_metadata?.full_name as string | undefined) || user.email?.split("@")[0] || "User");
+  const initials = displayName.charAt(0).toUpperCase();
+  const roleBadge = role ? ROLE_BADGES[role] : "AWAITING ROLE";
+  const roleTitle = role ? ROLE_TITLES[role] : "Awaiting role";
+
   return (
     <div className="min-h-screen md:flex">
       <aside className="hidden md:flex md:w-64 md:flex-col bg-sidebar text-sidebar-foreground">
         <div className="p-6">
-          <Link to="/" className="font-display text-2xl text-sidebar-primary">Con Cariño</Link>
-          <p className="mt-1 text-xs uppercase tracking-widest text-sidebar-foreground/60">
-            {role ? role.replace("_", " ") : "awaiting role"}
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <Heart className="h-4 w-4 fill-current" />
+            </div>
+            <div>
+              <Link to="/" className="font-display text-2xl text-sidebar-foreground">
+                Con Cariño
+              </Link>
+              <span className="mt-1 block w-fit rounded-md bg-sidebar-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-sidebar-accent-foreground">
+                {roleBadge}
+              </span>
+            </div>
+          </div>
         </div>
+
         <nav className="flex-1 space-y-1 px-4">
-        {visibleNav.map(({ to, label, icon: Icon }) => {
+          {visibleNav.map(({ to, label, icon: Icon }) => {
             const active = to === "/app" ? path === to : path.startsWith(to);
             const badge = badgeFor(to);
             return (
               <Link
                 key={to}
                 to={to as "/app"}
-                className={`flex items-center gap-4 rounded-lg px-4 py-2 text-sm transition ${
+                className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition ${
                   active
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "hover:bg-sidebar-accent"
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -106,22 +157,51 @@ function AppLayout() {
             );
           })}
         </nav>
+
         <div className="border-t border-sidebar-border p-4">
-          <p className="truncate text-sm">{user.email}</p>
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              navigate({ to: "/" });
-            }}
-            className="mt-2 flex w-full items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground"
-          >
-            <LogOut className="h-4 w-4" /> Sign out
-          </button>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-accent text-sm font-semibold text-sidebar-accent-foreground">
+                {initials}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-sidebar-foreground">{displayName}</p>
+                <p className="text-xs text-sidebar-foreground/50">{roleTitle}</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate({ to: "/" });
+              }}
+              aria-label="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </aside>
 
-      <main className="flex-1 pb-24 md:pb-0">
-        <div className="mx-auto max-w-5xl px-6 py-8 md:px-12">
+      <main className="flex-1 bg-background pb-24 md:pb-0">
+        <header className="mx-auto flex max-w-5xl items-center justify-between px-6 pt-6 md:px-12">
+          <span className="text-xs uppercase tracking-widest text-muted-foreground">
+            {dateEyebrow}
+          </span>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Notifications">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2 text-muted-foreground">
+              <HelpCircle className="h-4 w-4" />
+              Help Center
+            </Button>
+          </div>
+        </header>
+
+        <div className="mx-auto max-w-5xl px-6 py-6 md:px-12 md:py-8">
           {role === null ? <AwaitingRole email={user.email ?? ""} /> : <Outlet />}
         </div>
       </main>
