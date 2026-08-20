@@ -38,7 +38,6 @@ function Dashboard() {
   const { user, role } = useAuth();
   const uid = user?.id;
   const isFamily = role === "family_member";
-  const today = new Date();
 
   const { data: caregiverId } = useQuery({
     queryKey: ["dash-caregiver-id", uid],
@@ -169,11 +168,6 @@ function Dashboard() {
 
   return (
     <div>
-      <header className="mb-8">
-        <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          {today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
-        </p>
-      </header>
 
       {role === "caregiver" && (
         <CaregiverHero
@@ -217,7 +211,7 @@ function Dashboard() {
       {role === "admin" && (
         <>
           <div className="mb-8">
-            <h1 className="type-display">Agency overview</h1>
+            <h1 className="type-section">Agency overview</h1>
             <p className="mt-1 text-sm text-muted-foreground md:text-base">
               {plural(openIncidents ?? 0, "open incident", "open incidents")} ·{" "}
               {plural(unreviewed ?? 0, "unreviewed incident", "unreviewed incidents")} ·{" "}

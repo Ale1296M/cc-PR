@@ -94,7 +94,7 @@ function CareRecipientDetail() {
 
       <header className="card-soft mb-8 p-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipient</p>
-        <h1 className="type-display mt-1">{recipient.full_name}</h1>
+        <h1 className="type-section mt-1">{recipient.full_name}</h1>
         <div className="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
           {address && <p>📍 {address}</p>}
           {recipient.date_of_birth && <p>🎂 {new Date(recipient.date_of_birth).toLocaleDateString()}</p>}

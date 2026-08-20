@@ -274,7 +274,7 @@ function VisitFlow() {
             day: "numeric",
           })}
         </p>
-        <h1 className="type-display mt-1">Log a visit</h1>
+        <h1 className="type-section mt-1">Log a visit</h1>
       </header>
 
       <section>

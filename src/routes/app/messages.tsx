@@ -227,7 +227,7 @@ function MessagesPage() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Messages</p>
-        <h1 className="type-display mt-1">{heading}</h1>
+        <h1 className="type-section mt-1">{heading}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{subheading}</p>
       </header>
 
