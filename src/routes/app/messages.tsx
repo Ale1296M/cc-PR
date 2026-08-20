@@ -383,12 +383,8 @@ function MessagesPage() {
                   </div>
                 );
               })}
-              {!messagesPending && !messagesError && (messages ?? []).length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No messages yet — send the first one to start the conversation.
-                </p>
-              )}
               <div ref={bottomRef} />
+
             </div>
 
             <form
