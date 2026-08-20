@@ -214,10 +214,8 @@ function AdminCarePlan() {
               </p>
             </div>
           ) : (
-
-
-        {(list) => (
       <div className="mb-6 divide-y divide-border border-t border-border">
+
         {list.map((item) => (
           <div key={item.id} className="flex flex-wrap items-center gap-4 p-4">
             <div className="min-w-0 flex-1">
