@@ -463,7 +463,7 @@ function CaregiverView({ t }: { t: typeof T.en }) {
               ) : checkedIn === i ? (
                 <button
                   onClick={() => setCheckedIn(null)}
-                  className="px-2.5 py-1 bg-wb-attention text-white rounded-full text-xs font-medium shrink-0"
+                  className="px-2.5 py-1 bg-attention text-white rounded-full text-xs font-medium shrink-0"
                 >
                   {t.checkout}
                 </button>
