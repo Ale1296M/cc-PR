@@ -502,16 +502,23 @@ function WellbeingTrends() {
         </p>
       </section>
 
-      <section className="mt-8 border-t border-border pt-8">
-        <h2 className="type-section">
-          {activeDay
-            ? new Date(`${activeDay.key}T00:00:00`).toLocaleDateString(undefined, {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })
-            : "Day detail"}
-        </h2>
+      <section className="card-soft mt-6 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="type-section">
+            {activeDay
+              ? `${new Date(`${activeDay.key}T00:00:00`).toLocaleDateString(undefined, {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })} detail`
+              : "Day detail"}
+          </h2>
+          {activeDay?.band === "attention" && (
+            <span className="rounded-full bg-destructive/10 px-3 py-1 text-xs text-destructive">
+              Alert
+            </span>
+          )}
+        </div>
         {!activeDay?.entry ? (
           <p className="mt-4 text-sm text-muted-foreground">
             No check-in was recorded on this day. Select another day in the ribbon above.
@@ -524,17 +531,17 @@ function WellbeingTrends() {
               return (
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                   <span>
-                    Arrived{" "}
+                    Arrival{" "}
                     {new Date(v.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
                     {v.clock_out
-                      ? ` · left ${new Date(v.clock_out).toLocaleTimeString([], { timeStyle: "short" })} · ${formatDuration(v.clock_in, v.clock_out)}`
+                      ? ` · Departure ${new Date(v.clock_out).toLocaleTimeString([], { timeStyle: "short" })} · ${formatDuration(v.clock_in, v.clock_out)}`
                       : " · visit in progress"}
                   </span>
                   <VerifiedBadge verified={v.location_verified} />
                 </div>
               );
             })()}
-            <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <dl className="mt-4 divide-y divide-border border-t border-border">
               <Detail label="Mood" value={moodLabel(activeDay.entry.mood_scale)} />
               <Detail label="Appetite" value={capitalise(activeDay.entry.food_appetite)} />
               <Detail label="Medicine" value={medicineLabel(activeDay.entry.medicine_taken)} />
@@ -550,6 +557,7 @@ function WellbeingTrends() {
               />
               <Detail label="Hygiene" value={hygieneLabel(activeDay.entry)} />
             </dl>
+
             {(activeDay.entry.mood_notes || activeDay.entry.movement_notes) && (
               <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-4">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground">
