@@ -94,9 +94,9 @@ function IncidentsAdmin() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Safety</p>
         <h1 className="type-display mt-1">Incidents</h1>
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
-          Every report filed by a caregiver or family member, with a full record of who reported it
-          and who closed it out.
+          Review and resolve safety and medical event logs submitted by caregivers
         </p>
+
       </header>
 
       <div className="mb-6 flex flex-wrap gap-4">
@@ -202,26 +202,29 @@ function IncidentCard({ row }: { row: Row }) {
 
   return (
     <article className="card-soft p-6">
-      <div className="flex flex-wrap items-center gap-2">
-        <p className="font-display text-xl">{typeLabel(row.incident_type)}</p>
-        <span className={`rounded-full px-2 py-0.5 text-xs ${severityClass[row.severity] ?? ""}`}>
-          {severityLabel(row.severity)}
-        </span>
-        <span className={`rounded-full px-2 py-0.5 text-xs ${statusClass[row.status] ?? ""}`}>
-          {statusLabel(row.status)}
-        </span>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-display text-xl">{typeLabel(row.incident_type)}</p>
+          <span className={`rounded-full px-3 py-1 text-xs ${severityClass[row.severity] ?? ""}`}>
+            {severityLabel(row.severity)} severity
+          </span>
+          <span className={`rounded-full px-3 py-1 text-xs ${statusClass[row.status] ?? ""}`}>
+            {statusLabel(row.status)}
+          </span>
+        </div>
+        <p className="text-right text-sm text-muted-foreground">
+          <Link
+            to="/app/clients/$clientId"
+            params={{ clientId: row.care_recipient_id }}
+            className="text-primary underline"
+          >
+            {row.recipient?.full_name ?? "Care recipient"}
+          </Link>
+          <br />
+          <span className="text-xs">occurred {formatStamp(row.occurred_at)}</span>
+        </p>
       </div>
 
-      <p className="mt-1 text-sm text-muted-foreground">
-        <Link
-          to="/app/clients/$clientId"
-          params={{ clientId: row.care_recipient_id }}
-          className="text-primary underline"
-        >
-          {row.recipient?.full_name ?? "Care recipient"}
-        </Link>{" "}
-        · occurred {formatStamp(row.occurred_at)}
-      </p>
 
       <p className="mt-4 text-sm">{row.description}</p>
       {row.action_taken && (
@@ -265,17 +268,7 @@ function IncidentCard({ row }: { row: Row }) {
         />
       </label>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {row.status !== "under_review" && (
-          <button
-            type="button"
-            onClick={() => update.mutate("under_review")}
-            disabled={update.isPending}
-            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
-          >
-            Mark under review
-          </button>
-        )}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         {row.status !== "resolved" && (
           <ConfirmAction
             title="Resolve this incident?"
@@ -293,6 +286,16 @@ function IncidentCard({ row }: { row: Row }) {
             </button>
           </ConfirmAction>
         )}
+        {row.status !== "under_review" && (
+          <button
+            type="button"
+            onClick={() => update.mutate("under_review")}
+            disabled={update.isPending}
+            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
+          >
+            Mark under review
+          </button>
+        )}
         {row.status !== "open" && (
           <button
             type="button"
@@ -303,23 +306,26 @@ function IncidentCard({ row }: { row: Row }) {
             Reopen
           </button>
         )}
-        <ConfirmAction
-          title="Remove this incident report?"
-          description="It moves to Recently deleted, where an admin can restore it. Nothing is erased."
-          confirmLabel="Remove report"
-          destructive
-          disabled={remove.isPending}
-          onConfirm={() => remove.mutate()}
-        >
-          <button
-            type="button"
+        <div className="ml-auto">
+          <ConfirmAction
+            title="Remove this incident report?"
+            description="It moves to Recently deleted, where an admin can restore it. Nothing is erased."
+            confirmLabel="Remove report"
+            destructive
             disabled={remove.isPending}
-            className="min-h-10 rounded-full border border-border px-6 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+            onConfirm={() => remove.mutate()}
           >
-            Remove
-          </button>
-        </ConfirmAction>
+            <button
+              type="button"
+              disabled={remove.isPending}
+              className="min-h-10 rounded-full border border-border px-6 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+            >
+              Remove
+            </button>
+          </ConfirmAction>
+        </div>
       </div>
+
     </article>
   );
 }

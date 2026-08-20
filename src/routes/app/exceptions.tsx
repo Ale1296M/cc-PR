@@ -69,8 +69,7 @@ function VisitExceptions() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
         <h1 className="type-display mt-1">Visit exceptions</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Visits that couldn&apos;t be location-verified. Review them with the caregiver — a flag on
-          its own doesn&apos;t mean anything went wrong.
+          Monitor shifts flagged due to check-in location disparities or missing coordinates
         </p>
       </header>
 
@@ -80,15 +79,16 @@ function VisitExceptions() {
             key={f.key}
             type="button"
             onClick={() => setFilter(f.key)}
-            className={`min-h-10 rounded-full border px-4 text-sm transition ${
+            className={`min-h-10 rounded-full px-4 text-sm transition ${
               filter === f.key
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border hover:bg-secondary/50"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:opacity-90"
             }`}
           >
             {f.label}
           </button>
         ))}
+
       </div>
 
       <AsyncState
@@ -104,40 +104,68 @@ function VisitExceptions() {
         }}
       >
         {(rows) => (
-      <div className="divide-y divide-border border-t border-border">
-        {rows.map((v) => {
-          const recipient = (v.care_recipients as unknown as { full_name: string } | null)?.full_name;
-          const caregiver = (v.profiles as unknown as { full_name: string } | null)?.full_name;
-          return (
-            <div key={v.id} className="p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-medium">
-                  {recipient ?? "Care recipient"}
-                  <span className="text-muted-foreground"> · {caregiver ?? "Caregiver"}</span>
-                </p>
-                <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
-                  {LABEL[v.evv_exception ?? ""] ?? v.evv_exception}
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {new Date(v.clock_in).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
-                {v.clock_out ? ` · ${formatDuration(v.clock_in, v.clock_out)}` : " · in progress"}
-                {v.clock_in_accuracy_m != null ? ` · ±${Math.round(v.clock_in_accuracy_m)}m` : ""}
-                {v.clock_in_method ? ` · clock-in ${v.clock_in_method}` : ""}
-              </p>
-              {v.care_recipient_id && (
-                <Link
-                  to="/app/clients/$clientId"
-                  params={{ clientId: v.care_recipient_id }}
-                  className="mt-2 inline-block text-sm text-primary underline"
-                >
-                  Open care recipient
-                </Link>
-              )}
-            </div>
-          );
-        })}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[46rem] border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-[10px] uppercase tracking-widest text-muted-foreground">
+              <th className="py-2 pr-4 font-medium">Care recipient</th>
+              <th className="py-2 pr-4 font-medium">Caregiver</th>
+              <th className="py-2 pr-4 font-medium">Shift time</th>
+              <th className="py-2 pr-4 font-medium">Status</th>
+              <th className="py-2 pr-4 font-medium">Dispatch type</th>
+              <th className="py-2 pr-4 font-medium">Flag details</th>
+              <th className="py-2 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {rows.map((v) => {
+              const recipient = (v.care_recipients as unknown as { full_name: string } | null)?.full_name;
+              const caregiver = (v.profiles as unknown as { full_name: string } | null)?.full_name;
+              const missing = v.evv_exception === "missing_gps";
+              return (
+                <tr key={v.id} className="align-top">
+                  <td className="py-3 pr-4 font-medium">{recipient ?? "Care recipient"}</td>
+                  <td className="py-3 pr-4 text-muted-foreground">{caregiver ?? "Caregiver"}</td>
+                  <td className="py-3 pr-4 text-muted-foreground">
+                    {new Date(v.clock_in).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
+                    {v.clock_out ? ` · ${formatDuration(v.clock_in, v.clock_out)}` : ""}
+                  </td>
+                  <td className="py-3 pr-4 text-muted-foreground">
+                    {v.clock_out ? "Completed" : "In progress"}
+                  </td>
+                  <td className="py-3 pr-4 text-muted-foreground">
+                    {v.clock_in_method ?? "—"}
+                    {v.clock_in_accuracy_m != null ? ` · ±${Math.round(v.clock_in_accuracy_m)}m` : ""}
+                  </td>
+                  <td className="py-3 pr-4">
+                    <span
+                      className={`inline-block rounded-full px-3 py-1 text-xs ${
+                        missing
+                          ? "bg-attention/20 text-attention-foreground"
+                          : "bg-destructive/10 text-destructive"
+                      }`}
+                    >
+                      {LABEL[v.evv_exception ?? ""] ?? v.evv_exception}
+                    </span>
+                  </td>
+                  <td className="py-3">
+                    {v.care_recipient_id && (
+                      <Link
+                        to="/app/clients/$clientId"
+                        params={{ clientId: v.care_recipient_id }}
+                        className="text-sm text-primary underline"
+                      >
+                        Open care recipient
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
+
         )}
       </AsyncState>
     </div>

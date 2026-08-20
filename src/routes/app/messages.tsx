@@ -221,7 +221,7 @@ function MessagesPage() {
     ? "A private thread between you and the Con Cariño PR care team."
     : isFamily
       ? "A private thread between your family and the Con Cariño PR care team."
-      : "Private threads with families and with caregivers.";
+      : "Private secure thread console with families and caregiver workforce";
 
   return (
     <div>
@@ -269,10 +269,11 @@ function MessagesPage() {
                   <select
                     value={starting}
                     onChange={(e) => setStarting(e.target.value)}
-                    aria-label="Choose someone to start a chat with"
+                    aria-label="Select contact"
                     className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-3 text-sm"
                   >
-                    <option value="">Choose a family or caregiver…</option>
+                    <option value="">Select contact…</option>
+
                     {families.map((f) => (
                       <option key={`family:${f.id}`} value={`family:${f.id}`}>
                         {f.label}
@@ -300,13 +301,15 @@ function MessagesPage() {
               <p className="px-4 pt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
                 Families
               </p>
-              <ul>
+              <ul className="space-y-1 p-2">
                 {shownFamilies.map((f) => (
                   <li key={f.id}>
                     <button
                       onClick={() => openThread({ kind: "family", id: f.id })}
-                      className={`min-h-11 w-full px-4 py-4 text-left text-sm hover:bg-secondary ${
-                        thread.kind === "family" && thread.id === f.id ? "bg-secondary font-medium" : ""
+                      className={`min-h-11 w-full rounded-lg px-3 py-3 text-left text-sm transition hover:bg-secondary ${
+                        thread.kind === "family" && thread.id === f.id
+                          ? "border border-border bg-secondary font-medium"
+                          : "border border-transparent"
                       }`}
                     >
                       {f.label}
@@ -314,7 +317,7 @@ function MessagesPage() {
                   </li>
                 ))}
                 {shownFamilies.length === 0 && (
-                  <li className="px-4 py-4 text-sm text-muted-foreground">
+                  <li className="px-3 py-3 text-sm text-muted-foreground">
                     {q ? "No matching families" : "No families yet"}
                   </li>
                 )}
@@ -322,13 +325,15 @@ function MessagesPage() {
               <p className="border-t border-border px-4 pt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
                 Caregivers
               </p>
-              <ul>
+              <ul className="space-y-1 p-2">
                 {shownCaregivers.map((c) => (
                   <li key={c.id}>
                     <button
                       onClick={() => openThread({ kind: "caregiver", id: c.id })}
-                      className={`min-h-11 w-full px-4 py-4 text-left text-sm hover:bg-secondary ${
-                        thread.kind === "caregiver" && thread.id === c.id ? "bg-secondary font-medium" : ""
+                      className={`min-h-11 w-full rounded-lg px-3 py-3 text-left text-sm transition hover:bg-secondary ${
+                        thread.kind === "caregiver" && thread.id === c.id
+                          ? "border border-border bg-secondary font-medium"
+                          : "border border-transparent"
                       }`}
                     >
                       {c.label}
@@ -336,11 +341,12 @@ function MessagesPage() {
                   </li>
                 ))}
                 {shownCaregivers.length === 0 && (
-                  <li className="px-4 py-4 text-sm text-muted-foreground">
+                  <li className="px-3 py-3 text-sm text-muted-foreground">
                     {q ? "No matching caregivers" : "No caregivers yet"}
                   </li>
                 )}
               </ul>
+
             </aside>
           )}
 
@@ -377,12 +383,8 @@ function MessagesPage() {
                   </div>
                 );
               })}
-              {!messagesPending && !messagesError && (messages ?? []).length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No messages yet — send the first one to start the conversation.
-                </p>
-              )}
               <div ref={bottomRef} />
+
             </div>
 
             <form

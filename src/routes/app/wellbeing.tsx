@@ -378,15 +378,13 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          Last 14 days
+          {new Date()
+            .toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })
+            .toUpperCase()}
         </p>
         <h1 className="type-display mt-1">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {activeName
-            ? `A descriptive summary of what caregivers recorded for ${activeName}.`
-            : isFamily
-              ? "A descriptive summary of what caregivers recorded for your loved one."
-              : "A descriptive summary of what caregivers recorded during recent check-ins."}
+          Real-time daily wellness monitoring history
         </p>
       </header>
 
@@ -397,22 +395,28 @@ function WellbeingTrends() {
       )}
 
       {list.length > 1 && (
-        <select
-          aria-label="Choose a person"
-          value={activeId}
-          onChange={(e) => {
-            setRecipientId(e.target.value);
-            setSelectedDay(null);
-          }}
-          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
-        >
-          {list.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.full_name}
-            </option>
-          ))}
-        </select>
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <label htmlFor="wb-recipient" className="text-sm text-muted-foreground">
+            Care recipient profile:
+          </label>
+          <select
+            id="wb-recipient"
+            value={activeId}
+            onChange={(e) => {
+              setRecipientId(e.target.value);
+              setSelectedDay(null);
+            }}
+            className="min-h-10 w-full max-w-sm rounded-md border border-border bg-secondary/40 px-4 text-sm"
+          >
+            {list.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.full_name}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
+
 
       {flags.length > 0 && (
         <div className="mb-6 flex gap-4 rounded-lg border-l-2 border-attention bg-attention-soft/60 p-4">
@@ -430,30 +434,37 @@ function WellbeingTrends() {
 
       <section className="card-soft p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="type-section">Day by day</h2>
+          <h2 className="type-section">Daily wellness records map</h2>
+          <span className="text-xs text-muted-foreground">Last 14 days summary history</span>
+        </div>
+        <div className="mt-1">
           <DeltaBadge delta={delta} />
         </div>
         <div className="mt-4 grid grid-cols-7 gap-2 sm:grid-cols-14">
           {ribbon.map((d) => {
             const date = new Date(`${d.key}T00:00:00`);
+            const short = date.toLocaleDateString([], { month: "short", day: "numeric" });
             const active = activeDay?.key === d.key;
             return (
               <button
                 key={d.key}
                 type="button"
                 onClick={() => setSelectedDay(d.key)}
-                title={`${date.toLocaleDateString([], { month: "short", day: "numeric" })} · ${BAND_LABEL[d.band]}`}
-                aria-label={`${date.toLocaleDateString([], { month: "short", day: "numeric" })}: ${BAND_LABEL[d.band]}`}
+                title={`${short} · ${BAND_LABEL[d.band]}`}
+                aria-label={`${short}: ${BAND_LABEL[d.band]}`}
                 className={`flex min-h-[3.25rem] min-w-0 flex-col items-center gap-1 rounded-lg p-1 transition ${
                   active ? "ring-2 ring-primary" : "hover:opacity-80"
                 }`}
               >
                 <span className={`h-10 w-full rounded-md ${BAND_CLASS[d.band]}`} />
-                <span className="text-[10px] text-muted-foreground">{date.getDate()}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {date.getDate()} {date.toLocaleDateString([], { month: "short" })}
+                </span>
               </button>
             );
           })}
         </div>
+
         <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
           {(["good", "usual", "attention", "none"] as const).map((b) => (
             <span key={b} className="flex items-center gap-2">
@@ -464,7 +475,8 @@ function WellbeingTrends() {
       </section>
 
       <section className="card-soft mt-6 p-6">
-        <h2 className="type-section">Overall recorded score</h2>
+        <h2 className="type-section">Overall recorded score trend</h2>
+
         {chartData.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
             No wellbeing check-ins recorded in the last 14 days.
@@ -494,24 +506,36 @@ function WellbeingTrends() {
             </ResponsiveContainer>
           </div>
         )}
+        <p className="mt-3 text-xs italic text-muted-foreground">
+          Disclaimer: Scoring index evaluates cognitive wellness, physical activity levels, and
+          daily nutrition charts.
+        </p>
         <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
           This screen shows trends and patterns from caregiver-recorded check-ins only. It is not a
           medical assessment and should not be used to make health decisions. If you have questions
           about your family member&apos;s wellbeing, please speak with their care team or a
           qualified healthcare professional.
         </p>
+
       </section>
 
-      <section className="mt-8 border-t border-border pt-8">
-        <h2 className="type-section">
-          {activeDay
-            ? new Date(`${activeDay.key}T00:00:00`).toLocaleDateString(undefined, {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })
-            : "Day detail"}
-        </h2>
+      <section className="card-soft mt-6 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="type-section">
+            {activeDay
+              ? `${new Date(`${activeDay.key}T00:00:00`).toLocaleDateString(undefined, {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })} detail`
+              : "Day detail"}
+          </h2>
+          {activeDay?.band === "attention" && (
+            <span className="rounded-full bg-destructive/10 px-3 py-1 text-xs text-destructive">
+              Alert
+            </span>
+          )}
+        </div>
         {!activeDay?.entry ? (
           <p className="mt-4 text-sm text-muted-foreground">
             No check-in was recorded on this day. Select another day in the ribbon above.
@@ -524,17 +548,17 @@ function WellbeingTrends() {
               return (
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                   <span>
-                    Arrived{" "}
+                    Arrival{" "}
                     {new Date(v.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
                     {v.clock_out
-                      ? ` · left ${new Date(v.clock_out).toLocaleTimeString([], { timeStyle: "short" })} · ${formatDuration(v.clock_in, v.clock_out)}`
+                      ? ` · Departure ${new Date(v.clock_out).toLocaleTimeString([], { timeStyle: "short" })} · ${formatDuration(v.clock_in, v.clock_out)}`
                       : " · visit in progress"}
                   </span>
                   <VerifiedBadge verified={v.location_verified} />
                 </div>
               );
             })()}
-            <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <dl className="mt-4 divide-y divide-border border-t border-border">
               <Detail label="Mood" value={moodLabel(activeDay.entry.mood_scale)} />
               <Detail label="Appetite" value={capitalise(activeDay.entry.food_appetite)} />
               <Detail label="Medicine" value={medicineLabel(activeDay.entry.medicine_taken)} />
@@ -550,6 +574,7 @@ function WellbeingTrends() {
               />
               <Detail label="Hygiene" value={hygieneLabel(activeDay.entry)} />
             </dl>
+
             {(activeDay.entry.mood_notes || activeDay.entry.movement_notes) && (
               <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-4">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground">
@@ -616,14 +641,31 @@ function DeltaBadge({ delta }: { delta: number | null }) {
   );
 }
 
+function valueTone(value: string | null) {
+  if (!value) return "bg-secondary text-secondary-foreground";
+  const v = value.toLowerCase();
+  if (["good", "taken", "independent", "complete", "completed"].some((k) => v.includes(k)))
+    return "bg-primary/15 text-primary";
+  if (["poor", "not taken", "not completed", "needs attention"].some((k) => v.includes(k)))
+    return "bg-destructive/10 text-destructive";
+  if (["partial", "with help", "fair", "usual"].some((k) => v.includes(k)))
+    return "bg-attention/20 text-attention-foreground";
+  return "bg-secondary text-secondary-foreground";
+}
+
 function Detail({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="rounded-xl border border-border p-4">
-      <dt className="text-xs uppercase tracking-widest text-muted-foreground">{label}</dt>
-      <dd className="mt-1 font-display text-xl">{value ?? "Not recorded"}</dd>
+    <div className="flex items-center justify-between gap-4 py-3">
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd>
+        <span className={`rounded-full px-3 py-1 text-xs ${valueTone(value)}`}>
+          {value ?? "Not recorded"}
+        </span>
+      </dd>
     </div>
   );
 }
+
 
 function capitalise(v: string | null) {
   return v ? v.charAt(0).toUpperCase() + v.slice(1) : null;
