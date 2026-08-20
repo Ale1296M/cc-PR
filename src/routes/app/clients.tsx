@@ -94,7 +94,7 @@ function CareRecipientsPage() {
       <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
           <p className="text-sm uppercase tracking-widest text-muted-foreground">Database</p>
-          <h1 className="type-display mt-1">Who we care for</h1>
+          <h1 className="type-section mt-1">Who we care for</h1>
         </div>
         {role === "admin" && (
           <button

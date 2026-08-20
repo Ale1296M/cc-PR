@@ -153,7 +153,7 @@ function AdminCarePlan() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="type-display mt-1">Checklist builder</h1>
+        <h1 className="type-section mt-1">Checklist builder</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Build and manage custom checklists for caregiver visits
         </p>
@@ -446,7 +446,7 @@ function CaregiverChecklist() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Today’s visit</p>
-        <h1 className="type-display mt-1">Care checklist</h1>
+        <h1 className="type-section mt-1">Care checklist</h1>
       </header>
 
       {shiftsPending && <AsyncSkeleton shape="rows" count={4} />}
@@ -574,7 +574,7 @@ function FamilyCarePlan() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
-        <h1 className="type-display mt-1">
+        <h1 className="type-section mt-1">
           {activeName ? `${activeName}'s care plan` : "Your loved one's care plan"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">

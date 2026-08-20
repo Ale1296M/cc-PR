@@ -137,7 +137,7 @@ function ActivityLog() {
     <div>
       <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
-        <h1 className="type-display mt-1">Activity log</h1>
+        <h1 className="type-section mt-1">Activity log</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Read-only diagnostic audit log tracking updates across clinical care, visits, and user rosters
         </p>

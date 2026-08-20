@@ -92,7 +92,7 @@ function IncidentsAdmin() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Safety</p>
-        <h1 className="type-display mt-1">Incidents</h1>
+        <h1 className="type-section mt-1">Incidents</h1>
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
           Review and resolve safety and medical event logs submitted by caregivers
         </p>
