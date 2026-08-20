@@ -464,7 +464,8 @@ function WellbeingTrends() {
       </section>
 
       <section className="card-soft mt-6 p-6">
-        <h2 className="type-section">Overall recorded score</h2>
+        <h2 className="type-section">Overall recorded score trend</h2>
+
         {chartData.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">
             No wellbeing check-ins recorded in the last 14 days.
