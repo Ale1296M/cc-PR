@@ -273,41 +273,48 @@ function AdminCarePlan() {
 
       <form
         onSubmit={(e) => { e.preventDefault(); if (task && active) add.mutate(); }}
-        className="card-soft flex flex-wrap items-center gap-2 p-4"
+        className="card-soft flex flex-wrap items-end gap-3 p-4"
       >
-        <input
-          value={task}
-          onChange={(e) => setTask(e.target.value)}
-          placeholder="Task description…"
-          aria-label="Task description"
-          className="min-h-10 min-w-[12rem] flex-1 rounded-md border border-border bg-background px-4 text-sm"
-        />
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          aria-label="Category"
-          className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
-        >
-          <option value="">— Select category —</option>
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-        <select
-          value={frequency}
-          onChange={(e) => setFrequency(e.target.value)}
-          aria-label="Frequency"
-          className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
-        >
-          {FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
-        </select>
+        <label className="min-w-[12rem] flex-1">
+          <span className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Task</span>
+          <input
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            placeholder="Task description..."
+            className="min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+          />
+        </label>
+        <label>
+          <span className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Category</span>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
+          >
+            <option value="">Select category</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">Frequency</span>
+          <select
+            value={frequency}
+            onChange={(e) => setFrequency(e.target.value)}
+            className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
+          >
+            {FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+          </select>
+        </label>
         <button
           disabled={!task || !active || add.isPending}
           className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
         >
-          <Plus className="h-4 w-4" /> {add.isPending ? "Adding…" : "Add item"}
+          <Plus className="h-4 w-4" /> {add.isPending ? "Adding…" : "Add Item"}
         </button>
       </form>
+
       </>
       )}
     </div>
