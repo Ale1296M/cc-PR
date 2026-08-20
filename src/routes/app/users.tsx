@@ -86,13 +86,21 @@ function UsersPage() {
 
   return (
     <div>
-      <header className="mb-8">
+      <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
         <h1 className="type-display mt-1">Users &amp; roles</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Everyone with an account. New signups stay pending until you assign a role.
+          Manage permissions &amp; roles for caregivers and family members
         </p>
       </header>
+
+      <div className="mb-6 rounded-xl border border-border bg-card p-4">
+        <p className="text-sm font-semibold">Security Announcement</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Everyone with an account has specified boundaries. New signups stay pending until you assign a
+          validated role.
+        </p>
+      </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
         {TABS.map((t) => {
@@ -107,7 +115,7 @@ function UsersPage() {
               className={`rounded-full px-4 py-1.5 text-sm transition ${
                 tab === t.key
                   ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
+                  : "bg-secondary text-secondary-foreground hover:opacity-90"
               }`}
             >
               {t.label} <span className="opacity-70">({count})</span>
@@ -115,6 +123,7 @@ function UsersPage() {
           );
         })}
       </div>
+
 
       <AsyncState
         isPending={isLoading}
