@@ -378,15 +378,13 @@ function WellbeingTrends() {
     <div>
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          Last 14 days
+          {new Date()
+            .toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })
+            .toUpperCase()}
         </p>
         <h1 className="type-display mt-1">Wellbeing trends</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {activeName
-            ? `A descriptive summary of what caregivers recorded for ${activeName}.`
-            : isFamily
-              ? "A descriptive summary of what caregivers recorded for your loved one."
-              : "A descriptive summary of what caregivers recorded during recent check-ins."}
+          Real-time daily wellness monitoring history
         </p>
       </header>
 
@@ -397,22 +395,28 @@ function WellbeingTrends() {
       )}
 
       {list.length > 1 && (
-        <select
-          aria-label="Choose a person"
-          value={activeId}
-          onChange={(e) => {
-            setRecipientId(e.target.value);
-            setSelectedDay(null);
-          }}
-          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
-        >
-          {list.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.full_name}
-            </option>
-          ))}
-        </select>
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <label htmlFor="wb-recipient" className="text-sm text-muted-foreground">
+            Care recipient profile:
+          </label>
+          <select
+            id="wb-recipient"
+            value={activeId}
+            onChange={(e) => {
+              setRecipientId(e.target.value);
+              setSelectedDay(null);
+            }}
+            className="min-h-10 w-full max-w-sm rounded-md border border-border bg-secondary/40 px-4 text-sm"
+          >
+            {list.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.full_name}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
+
 
       {flags.length > 0 && (
         <div className="mb-6 flex gap-4 rounded-lg border-l-2 border-attention bg-attention-soft/60 p-4">
