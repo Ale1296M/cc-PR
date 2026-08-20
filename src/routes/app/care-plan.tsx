@@ -197,21 +197,24 @@ function AdminCarePlan() {
         what="the checklist"
         onRetry={() => refetchItems()}
         skeleton="rows"
-        emptyRender={
-          <div className="flex flex-col items-center gap-2 border-t border-border py-12 text-center">
-            <ClipboardCheck className="h-12 w-12 text-muted-foreground" />
-            <p className="font-semibold">No checklist items yet</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              Add the first task below — for example “Morning medication” — and it will appear on the
-              caregiver&apos;s visit checklist.
-            </p>
-          </div>
-        }
+        isEmpty={() => false}
         empty={{
           title: "No checklist items yet",
           hint: "Add the first task below — for example “Morning medication” — and it will appear on the caregiver's visit checklist.",
         }}
       >
+        {(list) =>
+          list.length === 0 ? (
+            <div className="mb-6 flex flex-col items-center gap-2 border-t border-border py-12 text-center">
+              <ClipboardCheck className="h-12 w-12 text-muted-foreground" aria-hidden />
+              <p className="font-semibold">No checklist items yet</p>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                Add the first task below — for example “Morning medication” — and it will appear on the
+                caregiver&apos;s visit checklist.
+              </p>
+            </div>
+          ) : (
+
 
         {(list) => (
       <div className="mb-6 divide-y divide-border border-t border-border">
