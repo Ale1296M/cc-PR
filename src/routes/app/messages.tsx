@@ -269,10 +269,11 @@ function MessagesPage() {
                   <select
                     value={starting}
                     onChange={(e) => setStarting(e.target.value)}
-                    aria-label="Choose someone to start a chat with"
+                    aria-label="Select contact"
                     className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-3 text-sm"
                   >
-                    <option value="">Choose a family or caregiver…</option>
+                    <option value="">Select contact…</option>
+
                     {families.map((f) => (
                       <option key={`family:${f.id}`} value={`family:${f.id}`}>
                         {f.label}
