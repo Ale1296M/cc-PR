@@ -6,6 +6,7 @@ import { fetchMyFamilyRecipients } from "@/lib/family-access";
 import { AsyncState, AsyncSkeleton, AsyncError } from "@/components/ui/async-state";
 import { useFamilyIncidentAlerts, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
 import { severityLabel, typeLabel, formatStamp } from "@/components/incidents/incident-meta";
+import { AgencyOverview } from "@/components/dashboard/AgencyOverview";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -214,15 +215,18 @@ function Dashboard() {
       )}
 
       {role === "admin" && (
-        <AdminHero
-          isPending={shiftsPending}
-          error={shiftsError}
-          onRetry={() => refetchShifts()}
-          openIncidents={openIncidents ?? 0}
-          unreviewed={unreviewed ?? 0}
-          todayCount={todayShifts.length}
-          unread={unread ?? 0}
-        />
+        <>
+          <div className="mb-8">
+            <h1 className="type-display">Agency overview</h1>
+            <p className="mt-1 text-sm text-muted-foreground md:text-base">
+              {plural(openIncidents ?? 0, "open incident", "open incidents")} ·{" "}
+              {plural(unreviewed ?? 0, "unreviewed incident", "unreviewed incidents")} ·{" "}
+              {plural(todayShifts.length, "visit", "visits")} today ·{" "}
+              {plural(unread ?? 0, "unread message", "unread messages")}
+            </p>
+          </div>
+          <AgencyOverview />
+        </>
       )}
 
       <section className="mt-12">

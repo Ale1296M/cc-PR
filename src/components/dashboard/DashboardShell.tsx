@@ -20,9 +20,6 @@ export function DashboardShell({
 
   const links = (
     <>
-      <Link to="/app" className="min-h-11 rounded-md px-3 py-2 text-sm font-medium hover:text-primary">
-        Full workspace
-      </Link>
       <Button variant="outline" className="min-h-11 w-full sm:w-auto" onClick={signOut}>
         <LogOut /> Sign out
       </Button>
