@@ -16,7 +16,18 @@ export const Route = createFileRoute("/app/clients")({
   ),
 });
 
+type Tag = { label: string; risk?: boolean };
+
+/** Illustrative care-plan tags until per-recipient tags are stored. */
+const EXAMPLE_TAGS: Tag[][] = [
+  [{ label: "Fall risk", risk: true }, { label: "Medication" }],
+  [{ label: "Mobility support" }, { label: "Meal prep" }],
+  [{ label: "Diabetes", risk: true }, { label: "Companionship" }],
+  [{ label: "Housekeeping" }],
+];
+
 type NewRecipient = {
+
   full_name: string;
   family_id: string;
   address_line: string;
