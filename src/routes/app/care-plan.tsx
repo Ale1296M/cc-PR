@@ -154,6 +154,9 @@ function AdminCarePlan() {
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Care plan</p>
         <h1 className="type-display mt-1">Checklist builder</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Build and manage custom checklists for caregiver visits
+        </p>
       </header>
 
       {recipientsPending && <AsyncSkeleton shape="rows" count={3} />}
@@ -172,16 +175,20 @@ function AdminCarePlan() {
       )}
       {(recipients ?? []).length > 0 && (
       <>
-      <select
-        aria-label="Care recipient"
-        value={active}
-        onChange={(e) => setRecipientId(e.target.value)}
-        className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
-      >
-        {(recipients ?? []).map((r) => (
-          <option key={r.id} value={r.id}>{r.full_name}{r.city ? ` · ${r.city}` : ""}</option>
-        ))}
-      </select>
+      <label className="mb-6 block max-w-sm">
+        <span className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground">
+          Care recipient profile
+        </span>
+        <select
+          value={active}
+          onChange={(e) => setRecipientId(e.target.value)}
+          className="min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+        >
+          {(recipients ?? []).map((r) => (
+            <option key={r.id} value={r.id}>{r.full_name}{r.city ? ` · ${r.city}` : ""}</option>
+          ))}
+        </select>
+      </label>
 
       <AsyncState
         isPending={itemsPending}
@@ -190,11 +197,22 @@ function AdminCarePlan() {
         what="the checklist"
         onRetry={() => refetchItems()}
         skeleton="rows"
+        emptyRender={
+          <div className="flex flex-col items-center gap-2 border-t border-border py-12 text-center">
+            <ClipboardCheck className="h-12 w-12 text-muted-foreground" />
+            <p className="font-semibold">No checklist items yet</p>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Add the first task below — for example “Morning medication” — and it will appear on the
+              caregiver&apos;s visit checklist.
+            </p>
+          </div>
+        }
         empty={{
           title: "No checklist items yet",
           hint: "Add the first task below — for example “Morning medication” — and it will appear on the caregiver's visit checklist.",
         }}
       >
+
         {(list) => (
       <div className="mb-6 divide-y divide-border border-t border-border">
         {list.map((item) => (
