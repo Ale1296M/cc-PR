@@ -69,8 +69,7 @@ function VisitExceptions() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
         <h1 className="type-display mt-1">Visit exceptions</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Visits that couldn&apos;t be location-verified. Review them with the caregiver — a flag on
-          its own doesn&apos;t mean anything went wrong.
+          Monitor shifts flagged due to check-in location disparities or missing coordinates
         </p>
       </header>
 
@@ -80,15 +79,16 @@ function VisitExceptions() {
             key={f.key}
             type="button"
             onClick={() => setFilter(f.key)}
-            className={`min-h-10 rounded-full border px-4 text-sm transition ${
+            className={`min-h-10 rounded-full px-4 text-sm transition ${
               filter === f.key
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border hover:bg-secondary/50"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:opacity-90"
             }`}
           >
             {f.label}
           </button>
         ))}
+
       </div>
 
       <AsyncState

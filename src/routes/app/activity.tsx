@@ -139,7 +139,7 @@ function ActivityLog() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
         <h1 className="type-display mt-1">Activity log</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          A read-only record of who changed what, and when. Nothing here can be edited or deleted.
+          Read-only diagnostic audit log tracking updates across clinical care, visits, and user rosters
         </p>
       </header>
 
@@ -149,15 +149,16 @@ function ActivityLog() {
             key={t.key}
             type="button"
             onClick={() => setTable(t.key)}
-            className={`min-h-10 rounded-full border px-4 text-sm transition ${
+            className={`min-h-10 rounded-full px-4 text-sm transition ${
               table === t.key
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border hover:bg-secondary/50"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:opacity-90"
             }`}
           >
             {t.label}
           </button>
         ))}
+
       </div>
 
       <div className="mb-6 flex flex-wrap items-end gap-4">
