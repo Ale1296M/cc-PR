@@ -94,9 +94,9 @@ function IncidentsAdmin() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Safety</p>
         <h1 className="type-display mt-1">Incidents</h1>
         <p className="mt-2 max-w-prose text-sm text-muted-foreground">
-          Every report filed by a caregiver or family member, with a full record of who reported it
-          and who closed it out.
+          Review and resolve safety and medical event logs submitted by caregivers
         </p>
+
       </header>
 
       <div className="mb-6 flex flex-wrap gap-4">
