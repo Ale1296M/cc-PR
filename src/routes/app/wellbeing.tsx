@@ -430,30 +430,37 @@ function WellbeingTrends() {
 
       <section className="card-soft p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="type-section">Day by day</h2>
+          <h2 className="type-section">Daily wellness records map</h2>
+          <span className="text-xs text-muted-foreground">Last 14 days summary history</span>
+        </div>
+        <div className="mt-1">
           <DeltaBadge delta={delta} />
         </div>
         <div className="mt-4 grid grid-cols-7 gap-2 sm:grid-cols-14">
           {ribbon.map((d) => {
             const date = new Date(`${d.key}T00:00:00`);
+            const short = date.toLocaleDateString([], { month: "short", day: "numeric" });
             const active = activeDay?.key === d.key;
             return (
               <button
                 key={d.key}
                 type="button"
                 onClick={() => setSelectedDay(d.key)}
-                title={`${date.toLocaleDateString([], { month: "short", day: "numeric" })} · ${BAND_LABEL[d.band]}`}
-                aria-label={`${date.toLocaleDateString([], { month: "short", day: "numeric" })}: ${BAND_LABEL[d.band]}`}
+                title={`${short} · ${BAND_LABEL[d.band]}`}
+                aria-label={`${short}: ${BAND_LABEL[d.band]}`}
                 className={`flex min-h-[3.25rem] min-w-0 flex-col items-center gap-1 rounded-lg p-1 transition ${
                   active ? "ring-2 ring-primary" : "hover:opacity-80"
                 }`}
               >
                 <span className={`h-10 w-full rounded-md ${BAND_CLASS[d.band]}`} />
-                <span className="text-[10px] text-muted-foreground">{date.getDate()}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {date.getDate()} {date.toLocaleDateString([], { month: "short" })}
+                </span>
               </button>
             );
           })}
         </div>
+
         <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
           {(["good", "usual", "attention", "none"] as const).map((b) => (
             <span key={b} className="flex items-center gap-2">
