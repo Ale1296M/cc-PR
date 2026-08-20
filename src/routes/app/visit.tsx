@@ -267,13 +267,7 @@ function VisitFlow() {
   return (
     <div>
       <header className="mb-8">
-        <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          {new Date().toLocaleDateString(undefined, {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
+        <p className="text-sm uppercase tracking-widest text-muted-foreground">Caregiver</p>
         <h1 className="type-section mt-1">Log a visit</h1>
       </header>
 
