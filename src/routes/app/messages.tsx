@@ -221,7 +221,7 @@ function MessagesPage() {
     ? "A private thread between you and the Con Cariño PR care team."
     : isFamily
       ? "A private thread between your family and the Con Cariño PR care team."
-      : "Private threads with families and with caregivers.";
+      : "Private secure thread console with families and caregiver workforce";
 
   return (
     <div>
