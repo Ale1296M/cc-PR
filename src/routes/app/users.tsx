@@ -191,7 +191,7 @@ function UsersPage() {
                     }
                     mutate.mutate({ userId: u.id, role: next });
                   }}
-                  className="min-h-10 rounded-lg border border-border bg-background px-4 text-sm capitalize"
+                  className="min-h-11 rounded-lg border border-border bg-background px-4 text-sm capitalize"
                 >
                   <option value="">Pending (no role)</option>
                   {ROLES.map((r) => (

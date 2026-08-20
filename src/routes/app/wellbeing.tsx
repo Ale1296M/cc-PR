@@ -269,7 +269,7 @@ function WellbeingTrends() {
               setRecipientId(e.target.value);
               setSelectedDay(null);
             }}
-            className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
+            className="mb-6 min-h-11 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
           >
             {list.map((r) => (
               <option key={r.id} value={r.id}>
@@ -406,7 +406,7 @@ function WellbeingTrends() {
               setRecipientId(e.target.value);
               setSelectedDay(null);
             }}
-            className="min-h-10 w-full max-w-sm rounded-md border border-border bg-secondary/40 px-4 text-sm"
+            className="min-h-11 w-full max-w-sm rounded-md border border-border bg-secondary/40 px-4 text-sm"
           >
             {list.map((r) => (
               <option key={r.id} value={r.id}>

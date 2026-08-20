@@ -105,7 +105,7 @@ function IncidentsAdmin() {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as Status | "all")}
-            className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
+            className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
           >
             <option value="all">All statuses</option>
             {STATUSES.map((s) => (
@@ -118,7 +118,7 @@ function IncidentsAdmin() {
           <select
             value={severity}
             onChange={(e) => setSeverity(e.target.value)}
-            className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
+            className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
           >
             <option value="all">All severities</option>
             {SEVERITIES.map((s) => (
