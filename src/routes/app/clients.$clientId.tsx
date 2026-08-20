@@ -243,7 +243,7 @@ function HomeLocationCard({
               onChange={(e) => setLat(e.target.value)}
               inputMode="decimal"
               placeholder="18.4655"
-              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+              className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
           <label className="text-sm">
@@ -253,7 +253,7 @@ function HomeLocationCard({
               onChange={(e) => setLng(e.target.value)}
               inputMode="decimal"
               placeholder="-66.1057"
-              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+              className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
           <label className="text-sm">
@@ -262,7 +262,7 @@ function HomeLocationCard({
               value={radius}
               onChange={(e) => setRadius(e.target.value)}
               inputMode="numeric"
-              className="mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+              className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
         </div>
@@ -395,7 +395,7 @@ function ClockInBar({
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             aria-label="Mood"
-            className="min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+            className="min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
           >
             <option value="">Mood…</option>
             {["Great", "Okay", "Tired", "Unwell", "Concern", "Cheerful"].map((m) => <option key={m}>{m}</option>)}

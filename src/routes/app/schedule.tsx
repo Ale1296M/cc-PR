@@ -247,7 +247,7 @@ function CaregiverSchedule({ uid }: { uid?: string }) {
                     value={s.status}
                     onChange={(ev) => updateStatus.mutate({ id: s.id, status: ev.target.value })}
                     disabled={s.caregiver_id !== caregiverId}
-                    className="order-2 min-h-10 shrink-0 rounded-md border border-border bg-background px-2 text-xs sm:order-3"
+                    className="order-2 min-h-11 shrink-0 rounded-md border border-border bg-background px-2 text-xs sm:order-3"
                   >
                     {SHIFT_STATUSES.map((o) => (
                       <option key={o} value={o}>

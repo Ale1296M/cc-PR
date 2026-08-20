@@ -182,7 +182,7 @@ function AdminCarePlan() {
         <select
           value={active}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+          className="min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
         >
           {(recipients ?? []).map((r) => (
             <option key={r.id} value={r.id}>{r.full_name}{r.city ? ` · ${r.city}` : ""}</option>
@@ -281,7 +281,7 @@ function AdminCarePlan() {
             value={task}
             onChange={(e) => setTask(e.target.value)}
             placeholder="Task description..."
-            className="min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm"
+            className="min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
           />
         </label>
         <label>
@@ -289,7 +289,7 @@ function AdminCarePlan() {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
+            className="min-h-11 rounded-md border border-border bg-background px-4 text-sm"
           >
             <option value="">Select category</option>
             {CATEGORIES.map((c) => (
@@ -302,7 +302,7 @@ function AdminCarePlan() {
           <select
             value={frequency}
             onChange={(e) => setFrequency(e.target.value)}
-            className="min-h-10 rounded-md border border-border bg-background px-4 text-sm"
+            className="min-h-11 rounded-md border border-border bg-background px-4 text-sm"
           >
             {FREQUENCIES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
           </select>
@@ -463,7 +463,7 @@ function CaregiverChecklist() {
           aria-label="Today's visit"
           value={active}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
+          className="mb-6 min-h-11 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
         >
           {(shifts ?? []).map((s) => (
             <option key={s.id} value={s.care_recipient_id}>
@@ -535,7 +535,7 @@ function CaregiverChecklist() {
                     onBlur={(e) =>
                       toggle.mutate({ itemId: item.id, completed: checked, notes: e.target.value || null })
                     }
-                    className="mt-4 min-h-10 w-full rounded-md border border-border bg-background px-4 text-xs"
+                    className="mt-4 min-h-11 w-full rounded-md border border-border bg-background px-4 text-xs"
                   />
                 </div>
               );
@@ -600,7 +600,7 @@ function FamilyCarePlan() {
           aria-label="Choose a person"
           value={active}
           onChange={(e) => setRecipientId(e.target.value)}
-          className="mb-6 min-h-10 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
+          className="mb-6 min-h-11 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
         >
           {(recipients ?? []).map((r) => <option key={r.id} value={r.id}>{r.full_name}</option>)}
         </select>

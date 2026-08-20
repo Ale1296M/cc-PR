@@ -333,10 +333,10 @@ const scoreData = [
 const stateOrder: VisitState[] = ["scheduled", "verified", "now", "done"];
 
 const dotBg: Record<WellStatus, string> = {
-  good: "bg-[#1F5235]",
-  usual: "bg-[#DDA735]",
-  attention: "bg-[#B86F54]",
-  none: "bg-[#D5CFC5]",
+  good: "bg-wb-good",
+  usual: "bg-wb-usual",
+  attention: "bg-wb-attention",
+  none: "bg-wb-none",
 };
 
 const LORA = "'Lora', Georgia, serif";
@@ -378,7 +378,7 @@ function AdminView({ t }: { t: typeof T.en }) {
                   {c.clients > 0 ? t.adminClients(c.clients) : t.adminAvailable}
                 </p>
               </div>
-              <div className={clsx("w-2 h-2 rounded-full", c.active ? "bg-[#1F5235]" : "bg-[#D5CFC5]")} />
+              <div className={clsx("w-2 h-2 rounded-full", c.active ? "bg-wb-good" : "bg-wb-none")} />
             </div>
           ))}
         </div>
@@ -386,10 +386,10 @@ function AdminView({ t }: { t: typeof T.en }) {
 
       <div className="space-y-4">
         <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.adminFlagged}</p>
-        <div className="p-4 rounded-xl border border-[#B86F54]/25 bg-[#B86F54]/5">
+        <div className="p-4 rounded-xl border border-attention/25 bg-attention/5">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#B86F54]/15 flex items-center justify-center shrink-0 mt-0.5">
-              <AlertTriangle className="w-4 h-4 text-[#B86F54]" />
+            <div className="w-8 h-8 rounded-full bg-attention/15 flex items-center justify-center shrink-0 mt-0.5">
+              <AlertTriangle className="w-4 h-4 text-attention" />
             </div>
             <div>
               <p className="text-sm font-medium text-foreground">Rosa Quiñones</p>
@@ -446,7 +446,7 @@ function CaregiverView({ t }: { t: typeof T.en }) {
             className={clsx(
               "p-4 rounded-xl border transition-all",
               v.done
-                ? "border-[#1F5235]/20 bg-[#1F5235]/5"
+                ? "border-primary/20 bg-primary/5"
                 : "border-border bg-white"
             )}
           >
@@ -463,7 +463,7 @@ function CaregiverView({ t }: { t: typeof T.en }) {
               ) : checkedIn === i ? (
                 <button
                   onClick={() => setCheckedIn(null)}
-                  className="px-2.5 py-1 bg-[#B86F54] text-white rounded-full text-xs font-medium shrink-0"
+                  className="px-2.5 py-1 bg-attention text-white rounded-full text-xs font-medium shrink-0"
                 >
                   {t.checkout}
                 </button>
@@ -487,7 +487,7 @@ function FamilyView({ t }: { t: typeof T.en }) {
   const hours = [
     { label: t.hoursAllotted, value: 80, max: 80, bar: "bg-secondary border border-border" },
     { label: t.hoursUsed, value: 62, max: 80, bar: "bg-primary" },
-    { label: t.hoursRemaining, value: 18, max: 80, bar: "bg-[#DDA735]" },
+    { label: t.hoursRemaining, value: 18, max: 80, bar: "bg-wb-usual" },
   ];
 
   const upcoming = [
@@ -572,8 +572,8 @@ function Landing() {
   const stateBadge: Record<VisitState, string> = {
     scheduled: "bg-secondary text-secondary-foreground",
     verified: "bg-primary text-primary-foreground",
-    now: "bg-[#B86F54] text-white",
-    done: "bg-[#DDA735] text-[#1C2318]",
+    now: "bg-wb-attention text-white",
+    done: "bg-wb-usual text-foreground",
   };
 
   const featureIcons = [Calendar, ClipboardList, MessageSquare, Shield, Activity];
@@ -814,7 +814,7 @@ function Landing() {
 
       {/* ── Role Views ── */}
 
-      <section className="bg-[#EAE5DC] border-y border-border py-20">
+      <section className="bg-secondary border-y border-border py-20">
         <div className="max-w-6xl mx-auto px-6">
           <h2
             className="text-[1.875rem] font-semibold text-foreground text-center mb-10"
@@ -942,10 +942,10 @@ function Landing() {
               <div className="flex flex-wrap gap-x-5 gap-y-2 mb-8">
                 {t.legend.map((label, i) => {
                   const colors = [
-                    "bg-[#1F5235] ring-1 ring-white/25",
-                    "bg-[#DDA735]",
-                    "bg-[#B86F54]",
-                    "bg-[#D5CFC5]",
+                    "bg-wb-good ring-1 ring-white/25",
+                    "bg-wb-usual",
+                    "bg-wb-attention",
+                    "bg-wb-none",
                   ];
                   return (
                     <div key={label} className="flex items-center gap-1.5">
@@ -987,9 +987,9 @@ function Landing() {
                       const statusMap: WellStatus[] = ["good", "usual", "attention"];
                       const isSelected = selectedDayData.status === statusMap[i];
                       const selectedStyles = [
-                        "bg-[#1F5235] border-[#2a6b44] text-white",
-                        "bg-[#DDA735] border-[#c99430] text-[#1C2318]",
-                        "bg-[#B86F54] border-[#9d5e45] text-white",
+                        "bg-primary border-primary text-primary-foreground",
+                        "bg-gold border-gold text-gold-foreground",
+                        "bg-attention border-attention text-primary-foreground",
                       ];
                       return (
                         <button

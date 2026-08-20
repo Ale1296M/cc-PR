@@ -18,6 +18,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/use-auth";
 import { useIncidentAlerts, usePendingUsers, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
@@ -104,7 +105,7 @@ function AppLayout() {
 
   const today = new Date();
   const dateEyebrow = today
-    .toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })
+    .toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })
     .toUpperCase();
 
   const displayName =
@@ -140,7 +141,7 @@ function AppLayout() {
               <Link
                 key={to}
                 to={to as "/app"}
-                className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition ${
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition ${
                   active
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -149,7 +150,7 @@ function AppLayout() {
                 <Icon className="h-4 w-4" />
                 <span className="flex-1">{label}</span>
                 {badge != null && (
-                  <span className="rounded-full bg-attention px-2 py-0.5 text-[11px] font-medium text-attention-foreground">
+                  <span className="rounded-full bg-attention-soft px-2 py-0.5 text-[11px] font-medium text-attention-foreground">
                     {badge}
                   </span>
                 )}
@@ -166,13 +167,13 @@ function AppLayout() {
               </div>
               <div>
                 <p className="text-sm font-medium text-sidebar-foreground">{displayName}</p>
-                <p className="text-xs text-sidebar-foreground/50">{roleTitle}</p>
+                <p className="text-xs text-sidebar-foreground/60">{roleTitle}</p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              className="h-11 w-11 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               onClick={async () => {
                 await supabase.auth.signOut();
                 navigate({ to: "/" });
@@ -191,10 +192,19 @@ function AppLayout() {
             {dateEyebrow}
           </span>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Notifications">
+            <Link
+              to="/app/incidents"
+              className="relative inline-flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition hover:bg-secondary"
+              aria-label="Notifications"
+            >
               <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="sm" className="gap-2 text-muted-foreground">
+              {(unreviewed ?? 0) > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-attention-soft text-[10px] font-medium text-attention-foreground">
+                  {unreviewed}
+                </span>
+              )}
+            </Link>
+            <Button variant="outline" size="sm" className="gap-2 text-muted-foreground" onClick={() => toast.info("Help Center coming soon")}>
               <HelpCircle className="h-4 w-4" />
               Help Center
             </Button>
@@ -215,13 +225,13 @@ function AppLayout() {
             <Link
               key={to}
               to={to as "/app"}
-              className={`relative flex flex-col items-center gap-1 px-4 py-1 text-[11px] ${
+              className={`relative flex flex-col items-center gap-1 px-4 py-1 text-xs ${
                 active ? "text-primary" : "text-muted-foreground"
               }`}
             >
               <Icon className="h-5 w-5" />
               {badge != null && (
-                <span className="absolute right-2 top-0 rounded-full bg-attention px-1.5 text-[10px] font-medium text-attention-foreground">
+                <span className="absolute right-2 top-0 rounded-full bg-attention-soft px-1.5 text-[10px] font-medium text-attention-foreground">
                   {badge}
                 </span>
               )}

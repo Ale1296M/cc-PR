@@ -168,7 +168,7 @@ function ActivityLog() {
             type="date"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
-            className="min-h-10 rounded-md border border-border bg-background px-3 text-sm"
+            className="min-h-11 rounded-md border border-border bg-background px-3 text-sm"
           />
         </label>
         <label className="text-sm">
@@ -177,7 +177,7 @@ function ActivityLog() {
             type="date"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            className="min-h-10 rounded-md border border-border bg-background px-3 text-sm"
+            className="min-h-11 rounded-md border border-border bg-background px-3 text-sm"
           />
         </label>
         {hasFilters && (
