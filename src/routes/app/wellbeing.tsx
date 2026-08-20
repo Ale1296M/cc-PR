@@ -495,12 +495,17 @@ function WellbeingTrends() {
             </ResponsiveContainer>
           </div>
         )}
+        <p className="mt-3 text-xs italic text-muted-foreground">
+          Disclaimer: Scoring index evaluates cognitive wellness, physical activity levels, and
+          daily nutrition charts.
+        </p>
         <p className="mt-4 border-t border-border pt-4 text-xs text-muted-foreground">
           This screen shows trends and patterns from caregiver-recorded check-ins only. It is not a
           medical assessment and should not be used to make health decisions. If you have questions
           about your family member&apos;s wellbeing, please speak with their care team or a
           qualified healthcare professional.
         </p>
+
       </section>
 
       <section className="card-soft mt-6 p-6">
