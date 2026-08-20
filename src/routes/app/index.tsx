@@ -6,6 +6,7 @@ import { fetchMyFamilyRecipients } from "@/lib/family-access";
 import { AsyncState, AsyncSkeleton, AsyncError } from "@/components/ui/async-state";
 import { useFamilyIncidentAlerts, useUnreviewedIncidents } from "@/lib/use-incident-alerts";
 import { severityLabel, typeLabel, formatStamp } from "@/components/incidents/incident-meta";
+import { AgencyOverview } from "@/components/dashboard/AgencyOverview";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -214,15 +215,18 @@ function Dashboard() {
       )}
 
       {role === "admin" && (
-        <AdminHero
-          isPending={shiftsPending}
-          error={shiftsError}
-          onRetry={() => refetchShifts()}
-          openIncidents={openIncidents ?? 0}
-          unreviewed={unreviewed ?? 0}
-          todayCount={todayShifts.length}
-          unread={unread ?? 0}
-        />
+        <>
+          <div className="mb-8">
+            <h1 className="type-display">Agency overview</h1>
+            <p className="mt-1 text-sm text-muted-foreground md:text-base">
+              {plural(openIncidents ?? 0, "open incident", "open incidents")} ·{" "}
+              {plural(unreviewed ?? 0, "unreviewed incident", "unreviewed incidents")} ·{" "}
+              {plural(todayShifts.length, "visit", "visits")} today ·{" "}
+              {plural(unread ?? 0, "unread message", "unread messages")}
+            </p>
+          </div>
+          <AgencyOverview />
+        </>
       )}
 
       <section className="mt-12">
@@ -438,52 +442,6 @@ function FamilyHero({
           </p>
         </>
       )}
-    </HeroShell>
-  );
-}
-
-function AdminHero({
-  isPending,
-  error,
-  onRetry,
-  openIncidents,
-  unreviewed,
-  todayCount,
-  unread,
-}: {
-  isPending: boolean;
-  error: unknown;
-  onRetry: () => void;
-  openIncidents: number;
-  unreviewed: number;
-  todayCount: number;
-  unread: number;
-}) {
-  const calm = openIncidents === 0;
-  const secondary = `${plural(unreviewed, "unreviewed incident", "unreviewed incidents")} · ${plural(todayCount, "visit", "visits")} today · ${plural(unread, "unread message", "unread messages")}`;
-  return (
-    <HeroShell
-      isPending={isPending}
-      error={error}
-      onRetry={onRetry}
-      what="what needs attention"
-      secondary={secondary}
-    >
-      <p className="text-sm uppercase tracking-widest text-muted-foreground">Needs attention</p>
-      <h1 className="type-display mt-2">
-        {calm ? "All clear today" : `${plural(openIncidents, "open incident", "open incidents")}`}
-      </h1>
-      <p className="mt-2 text-lg text-muted-foreground">
-        {calm
-          ? `No open incidents · ${plural(todayCount, "visit", "visits")} scheduled today.`
-          : `Plus ${plural(todayCount, "visit", "visits")} scheduled today.`}
-      </p>
-      <Link
-        to={calm ? "/app/schedule" : "/app/incidents"}
-        className="mt-6 inline-flex min-h-11 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
-      >
-        {calm ? "Review today's schedule" : "Review incidents"}
-      </Link>
     </HeroShell>
   );
 }

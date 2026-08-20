@@ -26,7 +26,7 @@ function DashboardIndex() {
       navigate({ to: "/login", replace: true });
       return;
     }
-    if (role === "admin") navigate({ to: "/dashboard/admin", replace: true });
+    if (role === "admin") navigate({ to: "/app", replace: true });
     else if (role === "caregiver") navigate({ to: "/dashboard/caregiver", replace: true });
     else if (role === "family_member") navigate({ to: "/dashboard/family", replace: true });
   }, [loading, user, role, navigate]);
