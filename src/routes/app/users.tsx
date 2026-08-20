@@ -37,6 +37,19 @@ const ROLES: AppRole[] = ["admin", "caregiver", "family_member"];
 
 const roleLabel = (r: AppRole | null) => (r ? r.replace("_", " ") : "Pending");
 
+const roleBadge = (r: AppRole | null) => {
+  switch (r) {
+    case "admin":
+    case "caregiver":
+      return "bg-primary/10 text-primary";
+    case "family_member":
+      return "bg-secondary text-secondary-foreground";
+    default:
+      return "bg-attention text-attention-foreground";
+  }
+};
+
+
 function UsersPage() {
   const { role } = useAuth();
   const qc = useQueryClient();
@@ -86,13 +99,21 @@ function UsersPage() {
 
   return (
     <div>
-      <header className="mb-8">
+      <header className="mb-6">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Admin</p>
         <h1 className="type-display mt-1">Users &amp; roles</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Everyone with an account. New signups stay pending until you assign a role.
+          Manage permissions &amp; roles for caregivers and family members
         </p>
       </header>
+
+      <div className="mb-6 rounded-xl border border-border bg-card p-4">
+        <p className="text-sm font-semibold">Security Announcement</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Everyone with an account has specified boundaries. New signups stay pending until you assign a
+          validated role.
+        </p>
+      </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
         {TABS.map((t) => {
@@ -107,7 +128,7 @@ function UsersPage() {
               className={`rounded-full px-4 py-1.5 text-sm transition ${
                 tab === t.key
                   ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
+                  : "bg-secondary text-secondary-foreground hover:opacity-90"
               }`}
             >
               {t.label} <span className="opacity-70">({count})</span>
@@ -115,6 +136,7 @@ function UsersPage() {
           );
         })}
       </div>
+
 
       <AsyncState
         isPending={isLoading}
@@ -139,37 +161,48 @@ function UsersPage() {
               <p className="truncate font-medium">{u.full_name || "Unnamed"}</p>
               <p className="truncate text-sm text-muted-foreground">{u.email ?? "No email on file"}</p>
             </div>
-            <div className="flex items-center gap-4">
-              <span
-                className={`rounded-full px-4 py-1 text-xs capitalize ${
-                  u.role ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {roleLabel(u.role)}
-              </span>
-              <select
-                value={u.role ?? ""}
-                disabled={mutate.isPending}
-                onChange={(e) => {
-                  const next = (e.target.value || null) as AppRole | null;
-                  if (next === "family_member") {
-                    setPickedFamily("");
-                    setNewFamilyName("");
-                    setLinking({ userId: u.id, name: u.full_name || u.email || "This person" });
-                    return;
-                  }
-                  mutate.mutate({ userId: u.id, role: next });
-                }}
-                className="rounded-lg border border-border bg-background px-4 py-1.5 text-sm capitalize"
-              >
-                <option value="">Pending (no role)</option>
-                {ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {r.replace("_", " ")}
-                  </option>
-                ))}
-              </select>
+            <div className="flex flex-wrap items-end gap-6">
+              <div>
+                <p className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Assigned role
+                </p>
+                <span className={`inline-block rounded-full px-4 py-1 text-xs capitalize ${roleBadge(u.role)}`}>
+                  {roleLabel(u.role)}
+                </span>
+              </div>
+              <div>
+                <label
+                  htmlFor={`role-${u.id}`}
+                  className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground"
+                >
+                  Change role
+                </label>
+                <select
+                  id={`role-${u.id}`}
+                  value={u.role ?? ""}
+                  disabled={mutate.isPending}
+                  onChange={(e) => {
+                    const next = (e.target.value || null) as AppRole | null;
+                    if (next === "family_member") {
+                      setPickedFamily("");
+                      setNewFamilyName("");
+                      setLinking({ userId: u.id, name: u.full_name || u.email || "This person" });
+                      return;
+                    }
+                    mutate.mutate({ userId: u.id, role: next });
+                  }}
+                  className="min-h-10 rounded-lg border border-border bg-background px-4 text-sm capitalize"
+                >
+                  <option value="">Pending (no role)</option>
+                  {ROLES.map((r) => (
+                    <option key={r} value={r}>
+                      {r.replace("_", " ")}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+
           </div>
         ))}
       </div>

@@ -16,7 +16,18 @@ export const Route = createFileRoute("/app/clients")({
   ),
 });
 
+type Tag = { label: string; risk?: boolean };
+
+/** Illustrative care-plan tags until per-recipient tags are stored. */
+const EXAMPLE_TAGS: Tag[][] = [
+  [{ label: "Fall risk", risk: true }, { label: "Medication" }],
+  [{ label: "Mobility support" }, { label: "Meal prep" }],
+  [{ label: "Diabetes", risk: true }, { label: "Companionship" }],
+  [{ label: "Housekeeping" }],
+];
+
 type NewRecipient = {
+
   full_name: string;
   family_id: string;
   address_line: string;
@@ -82,7 +93,7 @@ function CareRecipientsPage() {
     <div>
       <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
         <div className="min-w-0">
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">Care recipients</p>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">Database</p>
           <h1 className="type-display mt-1">Who we care for</h1>
         </div>
         {role === "admin" && (
@@ -109,29 +120,69 @@ function CareRecipientsPage() {
       >
         {(rows) => (
       <div className="grid gap-4 sm:grid-cols-2">
-        {rows.map((c) => (
-          <Link
-            key={c.id}
-            to="/app/clients/$clientId"
-            params={{ clientId: c.id }}
-            className="card-soft group p-6 transition hover:border-primary"
-          >
-            <p className="font-display text-2xl group-hover:text-primary">{c.full_name}</p>
+        {rows.map((c, i) => {
+          const tags = EXAMPLE_TAGS[i % EXAMPLE_TAGS.length];
+          return (
+          <article key={c.id} className="card-soft flex flex-col gap-4 p-6 text-center">
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary font-medium">
+              {c.full_name?.trim().charAt(0).toUpperCase() || "?"}
+            </div>
+
+            <div>
+              <h2 className="font-display text-xl font-semibold">{c.full_name}</h2>
+              {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+                  {tags.map((t) => (
+                    <span
+                      key={t.label}
+                      className={`rounded-full px-2.5 py-0.5 text-[11px] ${
+                        t.risk ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
+                      }`}
+                    >
+                      {t.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {(c.address_line || c.municipality || c.city) && (
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {[c.address_line, c.municipality ?? c.city].filter(Boolean).join(", ")}
               </p>
             )}
+
             {c.emergency_contact_name && (
-              <p className="mt-4 text-xs text-muted-foreground">
-                Emergency contact: {c.emergency_contact_name}
-                {c.emergency_contact_phone ? ` · ${c.emergency_contact_phone}` : ""}
-              </p>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Emergency contact</p>
+                <p className="mt-1 text-sm">{c.emergency_contact_name}</p>
+                {c.emergency_contact_phone && (
+                  <p className="text-sm text-muted-foreground">{c.emergency_contact_phone}</p>
+                )}
+              </div>
             )}
-          </Link>
-        ))}
+
+            <div className="mt-auto grid grid-cols-2 gap-2 pt-2">
+              <Link
+                to="/app/clients/$clientId"
+                params={{ clientId: c.id }}
+                className="inline-flex min-h-10 items-center justify-center rounded-full border border-border px-3 text-sm hover:bg-muted"
+              >
+                View Profile
+              </Link>
+              <Link
+                to="/app/care-plan"
+                className="inline-flex min-h-10 items-center justify-center rounded-full bg-primary px-3 text-sm text-primary-foreground hover:opacity-90"
+              >
+                Care Plan
+              </Link>
+            </div>
+          </article>
+          );
+        })}
       </div>
         )}
+
       </AsyncState>
 
       {showNew && (

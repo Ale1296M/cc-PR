@@ -29,14 +29,26 @@ function SchedulePage() {
       <header className="mb-8">
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Schedule</p>
         <h1 className="type-display mt-1">Shifts &amp; visits</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Interactive dispatch monthly dashboard</p>
       </header>
 
       {role === "admin" ? (
-        <ClientOnly fallback={<AsyncSkeleton shape="rows" count={6} />}>
-          <Suspense fallback={<AsyncSkeleton shape="rows" count={6} />}>
-            <AdminShiftCalendar adminId={uid!} />
-          </Suspense>
-        </ClientOnly>
+        <>
+          <ClientOnly fallback={<AsyncSkeleton shape="rows" count={6} />}>
+            <Suspense fallback={<AsyncSkeleton shape="rows" count={6} />}>
+              <AdminShiftCalendar adminId={uid!} />
+            </Suspense>
+          </ClientOnly>
+          <div className="mt-6 flex flex-wrap items-center gap-6">
+            <LegendDot className="bg-primary" label="Scheduled" />
+            <LegendDot className="bg-primary/40" label="Completed" />
+            <LegendDot className="bg-destructive" label="Cancelled" />
+            <LegendDot className="bg-foreground" label="No Show" />
+          </div>
+          <p className="mt-3 text-xs italic text-muted-foreground">
+            Drag a shift to reschedule. Click an empty slot to add one.
+          </p>
+        </>
       ) : role === "family_member" ? (
         <FamilySchedule uid={uid} />
       ) : (
@@ -45,6 +57,16 @@ function SchedulePage() {
     </div>
   );
 }
+
+function LegendDot({ className, label }: { className: string; label: string }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className={`h-2.5 w-2.5 rounded-full ${className}`} aria-hidden />
+      <span className="text-xs text-muted-foreground">{label}</span>
+    </span>
+  );
+}
+
 
 /** Read-only upcoming schedule for family members, scoped to their linked recipients. */
 function FamilySchedule({ uid }: { uid?: string }) {
