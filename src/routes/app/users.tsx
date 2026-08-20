@@ -37,6 +37,19 @@ const ROLES: AppRole[] = ["admin", "caregiver", "family_member"];
 
 const roleLabel = (r: AppRole | null) => (r ? r.replace("_", " ") : "Pending");
 
+const roleBadge = (r: AppRole | null) => {
+  switch (r) {
+    case "admin":
+    case "caregiver":
+      return "bg-primary/10 text-primary";
+    case "family_member":
+      return "bg-secondary text-secondary-foreground";
+    default:
+      return "bg-attention text-attention-foreground";
+  }
+};
+
+
 function UsersPage() {
   const { role } = useAuth();
   const qc = useQueryClient();
