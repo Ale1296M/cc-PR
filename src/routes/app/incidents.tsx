@@ -268,17 +268,7 @@ function IncidentCard({ row }: { row: Row }) {
         />
       </label>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {row.status !== "under_review" && (
-          <button
-            type="button"
-            onClick={() => update.mutate("under_review")}
-            disabled={update.isPending}
-            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
-          >
-            Mark under review
-          </button>
-        )}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         {row.status !== "resolved" && (
           <ConfirmAction
             title="Resolve this incident?"
@@ -296,6 +286,16 @@ function IncidentCard({ row }: { row: Row }) {
             </button>
           </ConfirmAction>
         )}
+        {row.status !== "under_review" && (
+          <button
+            type="button"
+            onClick={() => update.mutate("under_review")}
+            disabled={update.isPending}
+            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
+          >
+            Mark under review
+          </button>
+        )}
         {row.status !== "open" && (
           <button
             type="button"
@@ -306,23 +306,26 @@ function IncidentCard({ row }: { row: Row }) {
             Reopen
           </button>
         )}
-        <ConfirmAction
-          title="Remove this incident report?"
-          description="It moves to Recently deleted, where an admin can restore it. Nothing is erased."
-          confirmLabel="Remove report"
-          destructive
-          disabled={remove.isPending}
-          onConfirm={() => remove.mutate()}
-        >
-          <button
-            type="button"
+        <div className="ml-auto">
+          <ConfirmAction
+            title="Remove this incident report?"
+            description="It moves to Recently deleted, where an admin can restore it. Nothing is erased."
+            confirmLabel="Remove report"
+            destructive
             disabled={remove.isPending}
-            className="min-h-10 rounded-full border border-border px-6 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+            onConfirm={() => remove.mutate()}
           >
-            Remove
-          </button>
-        </ConfirmAction>
+            <button
+              type="button"
+              disabled={remove.isPending}
+              className="min-h-10 rounded-full border border-border px-6 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+            >
+              Remove
+            </button>
+          </ConfirmAction>
+        </div>
       </div>
+
     </article>
   );
 }
