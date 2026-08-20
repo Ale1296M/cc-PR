@@ -624,14 +624,31 @@ function DeltaBadge({ delta }: { delta: number | null }) {
   );
 }
 
+function valueTone(value: string | null) {
+  if (!value) return "bg-secondary text-secondary-foreground";
+  const v = value.toLowerCase();
+  if (["good", "taken", "independent", "complete", "completed"].some((k) => v.includes(k)))
+    return "bg-primary/15 text-primary";
+  if (["poor", "not taken", "not completed", "needs attention"].some((k) => v.includes(k)))
+    return "bg-destructive/10 text-destructive";
+  if (["partial", "with help", "fair", "usual"].some((k) => v.includes(k)))
+    return "bg-attention/20 text-attention-foreground";
+  return "bg-secondary text-secondary-foreground";
+}
+
 function Detail({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="rounded-xl border border-border p-4">
-      <dt className="text-xs uppercase tracking-widest text-muted-foreground">{label}</dt>
-      <dd className="mt-1 font-display text-xl">{value ?? "Not recorded"}</dd>
+    <div className="flex items-center justify-between gap-4 py-3">
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd>
+        <span className={`rounded-full px-3 py-1 text-xs ${valueTone(value)}`}>
+          {value ?? "Not recorded"}
+        </span>
+      </dd>
     </div>
   );
 }
+
 
 function capitalise(v: string | null) {
   return v ? v.charAt(0).toUpperCase() + v.slice(1) : null;
