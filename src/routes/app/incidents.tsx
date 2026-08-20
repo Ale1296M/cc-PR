@@ -202,26 +202,29 @@ function IncidentCard({ row }: { row: Row }) {
 
   return (
     <article className="card-soft p-6">
-      <div className="flex flex-wrap items-center gap-2">
-        <p className="font-display text-xl">{typeLabel(row.incident_type)}</p>
-        <span className={`rounded-full px-2 py-0.5 text-xs ${severityClass[row.severity] ?? ""}`}>
-          {severityLabel(row.severity)}
-        </span>
-        <span className={`rounded-full px-2 py-0.5 text-xs ${statusClass[row.status] ?? ""}`}>
-          {statusLabel(row.status)}
-        </span>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-display text-xl">{typeLabel(row.incident_type)}</p>
+          <span className={`rounded-full px-3 py-1 text-xs ${severityClass[row.severity] ?? ""}`}>
+            {severityLabel(row.severity)} severity
+          </span>
+          <span className={`rounded-full px-3 py-1 text-xs ${statusClass[row.status] ?? ""}`}>
+            {statusLabel(row.status)}
+          </span>
+        </div>
+        <p className="text-right text-sm text-muted-foreground">
+          <Link
+            to="/app/clients/$clientId"
+            params={{ clientId: row.care_recipient_id }}
+            className="text-primary underline"
+          >
+            {row.recipient?.full_name ?? "Care recipient"}
+          </Link>
+          <br />
+          <span className="text-xs">occurred {formatStamp(row.occurred_at)}</span>
+        </p>
       </div>
 
-      <p className="mt-1 text-sm text-muted-foreground">
-        <Link
-          to="/app/clients/$clientId"
-          params={{ clientId: row.care_recipient_id }}
-          className="text-primary underline"
-        >
-          {row.recipient?.full_name ?? "Care recipient"}
-        </Link>{" "}
-        · occurred {formatStamp(row.occurred_at)}
-      </p>
 
       <p className="mt-4 text-sm">{row.description}</p>
       {row.action_taken && (
