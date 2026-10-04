@@ -15,3 +15,5 @@
 - Shift times are stored as Puerto Rico wall-clock (UTC-4, no DST); convert for viewers via src/lib/pr-time.ts.
 - Accessibility baseline (focus rings, 48px minimum targets, base text size) lives in the global CSS layer in src/styles.css — why: one place guarantees WCAG 2.1 AA across every page; dense grids opt out via role="grid" or data-compact.
 - Wide data tables render as cards below md and as tables at md+ — why: caregivers read them on phones mid-visit.
+- Server functions touching a care recipient call assertRecipientAccess / assertAdmin from src/lib/security/access.ts — why: denials return 403 and are logged to security_events, with RLS as the second layer.
+- Recipient PII leaves the server through maskRecipient (src/lib/security/pii.ts); inputs go through src/lib/security/validation.ts schemas — why: one place for masking and sanitization rules.
