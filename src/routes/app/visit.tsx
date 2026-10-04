@@ -12,6 +12,7 @@ import { formatDuration } from "@/lib/geo";
 import { clockInVisit, finishVisit, flushOfflineQueue } from "@/lib/visit-clock";
 import { useOnline, useQueuedJobs } from "@/lib/offline-queue";
 import { ReportIncidentDialog } from "@/components/incidents/ReportIncidentDialog";
+import { SosButton } from "@/components/incidents/SosButton";
 
 export const Route = createFileRoute("/app/visit")({
   component: () => (
@@ -315,6 +316,8 @@ function VisitFlow() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Caregiver</p>
         <h1 className="type-section mt-1">Log a visit</h1>
       </header>
+
+      {recipientId && <SosButton careRecipientId={recipientId} recipientName={list.find((r) => r.id === recipientId)?.full_name} />}
 
       {(!online || queued.length > 0) && (
         <div role="status" className="mb-6 flex items-start gap-3 rounded-lg border border-attention/40 bg-attention/10 p-4 text-sm">

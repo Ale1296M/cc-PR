@@ -42,3 +42,14 @@ export const medicalIdSchema = z
 
 export const limitSchema = (max = 200, dflt = 50) =>
   z.number().int().min(1).max(max).default(dflt);
+
+// Date of birth: valid ISO date, not in the future, not older than 130 years.
+export const birthdateSchema = isoDateSchema
+  .refine((v) => new Date(`${v}T00:00:00Z`).getTime() <= Date.now(), "Date of birth can't be in the future")
+  .refine((v) => new Date(`${v}T00:00:00Z`).getUTCFullYear() >= new Date().getUTCFullYear() - 130, "Please check the year");
+
+// Upload guard for document pickers.
+export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+export function checkUploadSize(file: { size: number }, max = MAX_UPLOAD_BYTES): string | null {
+  return file.size > max ? `That file is ${(file.size / 1048576).toFixed(0)} MB — the limit is ${Math.round(max / 1048576)} MB.` : null;
+}
