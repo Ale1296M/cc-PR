@@ -289,6 +289,36 @@ function HomeLocationCard({
             </a>
           )}
         </div>
+        {(() => {
+          const pLat = Number(lat);
+          const pLng = Number(lng);
+          const pRad = Number(radius) || 150;
+          if (!lat || !lng || !Number.isFinite(pLat) || !Number.isFinite(pLng)) return null;
+          const dLat = (pRad * 2.2) / 111320;
+          const dLng = dLat / Math.max(Math.cos((pLat * Math.PI) / 180), 0.01);
+          const bbox = [pLng - dLng, pLat - dLat, pLng + dLng, pLat + dLat].join(",");
+          return (
+            <figure className="overflow-hidden rounded-lg border border-border">
+              <div className="relative aspect-[16/9] w-full bg-secondary">
+                <iframe
+                  title="Home location preview"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${pLat},${pLng}`}
+                  className="absolute inset-0 h-full w-full"
+                  loading="lazy"
+                />
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-primary/10"
+                  style={{ height: `${(1 / 2.2) * 100}%` }}
+                />
+              </div>
+              <figcaption className="px-4 py-2 text-xs text-muted-foreground">
+                Circle shows the {Math.round(pRad)} m verification area. Check the pin sits on the
+                house, not the street. {lat !== (recipient.home_lat?.toString() ?? "") || lng !== (recipient.home_lng?.toString() ?? "") ? "Unsaved changes." : ""}
+              </figcaption>
+            </figure>
+          );
+        })()}
         {recipient.home_lat == null && (
           <p className="text-xs text-muted-foreground">
             No home location set yet — visits for this person can&apos;t be location-verified.

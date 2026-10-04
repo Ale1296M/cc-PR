@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
 import { useMyFamilyRecipients } from "@/lib/family-access";
 import { SHIFT_STATUSES, formatDay, formatTime, statusLabel } from "@/components/shifts/shift-utils";
+import { viewerLocalLabel } from "@/lib/pr-time";
 import { AsyncSkeleton, AsyncState } from "@/components/ui/async-state";
 import { toast } from "sonner";
 
@@ -126,8 +127,16 @@ function FamilySchedule({ uid }: { uid?: string }) {
               <div className="divide-y divide-border border-t border-border">
                 {list.map((s) => (
                   <div key={s.id} className="flex flex-col gap-1 p-4 sm:flex-row sm:items-center sm:gap-4">
-                    <div className="text-sm sm:w-32 sm:shrink-0">
+                    <div className="text-sm sm:w-40 sm:shrink-0">
                       {formatTime(s.scheduled_start_time)} – {formatTime(s.scheduled_end_time)}
+                      {(() => {
+                        const local = viewerLocalLabel(s.scheduled_date, s.scheduled_start_time);
+                        return local ? (
+                          <p className="text-xs text-muted-foreground">
+                            Puerto Rico time · {local} for you
+                          </p>
+                        ) : null;
+                      })()}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">

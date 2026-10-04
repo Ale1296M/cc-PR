@@ -177,8 +177,7 @@ function MessagesPage() {
   }, [messages, uid, thread]);
 
   const send = useMutation({
-    mutationFn: async () => {
-      const content = body.trim();
+    mutationFn: async (content: string) => {
       if (thread!.kind === "family") {
         const { error } = await supabase
           .from("family_messages")
@@ -191,12 +190,32 @@ function MessagesPage() {
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    // Optimistic: show the bubble immediately, roll back if the insert fails.
+    onMutate: async (content) => {
+      const key = ["thread-messages", thread?.kind, thread?.id];
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<Msg[]>(key);
+      const temp: Msg = {
+        id: `pending-${Date.now()}`,
+        sender_profile_id: uid!,
+        content,
+        created_at: new Date().toISOString(),
+        read_at: null,
+      };
+      qc.setQueryData<Msg[]>(key, [...(previous ?? []), temp]);
       setBody("");
-      qc.invalidateQueries({ queryKey: ["thread-messages", thread?.kind, thread?.id] });
+      return { key, previous, content };
     },
-    onError: (e: unknown) =>
-      toast.error(e instanceof Error ? e.message : "Couldn't send that message — try again."),
+    onError: (e: unknown, _content, ctx) => {
+      if (ctx) {
+        qc.setQueryData(ctx.key, ctx.previous);
+        setBody(ctx.content);
+      }
+      toast.error(e instanceof Error ? e.message : "Couldn't send that message — try again.");
+    },
+    onSettled: (_d, _e, _c, ctx) => {
+      if (ctx) qc.invalidateQueries({ queryKey: ctx.key });
+    },
   });
 
   const listsPending = (canSeeFamilies && recipientsPending) || (isAdmin && caregiversPending);
