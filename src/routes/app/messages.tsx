@@ -144,6 +144,8 @@ function MessagesPage() {
   });
 
   const nameOf = (id: string) => profiles?.find((p) => p.id === id)?.full_name ?? "Care team";
+  const [live, setLive] = useState(true);
+  const wasLive = useRef<boolean | null>(null);
 
   // Realtime: new messages arrive without refreshing
   useEffect(() => {
@@ -157,7 +159,19 @@ function MessagesPage() {
         { event: "*", schema: "public", table, filter: `${column}=eq.${thread.id}` },
         () => qc.invalidateQueries({ queryKey: ["thread-messages", thread.kind, thread.id] }),
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          // Catch up on anything missed while disconnected.
+          if (wasLive.current === false) {
+            qc.invalidateQueries({ queryKey: ["thread-messages", thread.kind, thread.id] });
+          }
+          wasLive.current = true;
+          setLive(true);
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          wasLive.current = false;
+          setLive(false);
+        }
+      });
     return () => {
       supabase.removeChannel(channel);
     };
