@@ -104,8 +104,55 @@ function VisitExceptions() {
         }}
       >
         {(rows) => (
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[46rem] border-collapse text-sm">
+      <>
+      <ul className="space-y-4 md:hidden" aria-label="Flagged visits">
+        {rows.map((v) => {
+          const recipient = (v.care_recipients as unknown as { full_name: string } | null)?.full_name;
+          const caregiver = (v.profiles as unknown as { full_name: string } | null)?.full_name;
+          const missing = v.evv_exception === "missing_gps";
+          return (
+            <li key={v.id} className="card-soft space-y-3 p-5">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <h2 className="min-w-0 text-lg font-bold">{recipient ?? "Care recipient"}</h2>
+                <span
+                  className={`rounded-full px-3 py-1 text-sm font-semibold ${
+                    missing ? "bg-attention-soft text-attention-foreground" : "bg-destructive/10 text-destructive"
+                  }`}
+                >
+                  {LABEL[v.evv_exception ?? ""] ?? v.evv_exception}
+                </span>
+              </div>
+              <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-base">
+                <dt className="text-muted-foreground">Caregiver</dt>
+                <dd>{caregiver ?? "Caregiver"}</dd>
+                <dt className="text-muted-foreground">When</dt>
+                <dd>
+                  {new Date(v.clock_in).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
+                  {v.clock_out ? ` · ${formatDuration(v.clock_in, v.clock_out)}` : ""}
+                </dd>
+                <dt className="text-muted-foreground">Status</dt>
+                <dd>{v.clock_out ? "Completed" : "In progress"}</dd>
+                <dt className="text-muted-foreground">Method</dt>
+                <dd>
+                  {v.clock_in_method ?? "—"}
+                  {v.clock_in_accuracy_m != null ? ` · ±${Math.round(v.clock_in_accuracy_m)}m` : ""}
+                </dd>
+              </dl>
+              {v.care_recipient_id && (
+                <Link
+                  to="/app/clients/$clientId"
+                  params={{ clientId: v.care_recipient_id }}
+                  className="flex min-h-12 w-full items-center justify-center rounded-full border border-border text-base font-medium"
+                >
+                  Open care recipient
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      <div className="hidden overflow-x-auto md:block">
+        <table className="w-full border-collapse text-base">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-widest text-muted-foreground">
               <th className="py-2 pr-4 font-medium">Care recipient</th>
@@ -165,7 +212,7 @@ function VisitExceptions() {
           </tbody>
         </table>
       </div>
-
+      </>
         )}
       </AsyncState>
     </div>
