@@ -147,7 +147,6 @@ function AppLayout() {
               <Link
                 key={to}
                 to={to as "/app"}
-              aria-current={active ? "page" : undefined}
                 aria-current={active ? "page" : undefined}
                 className={`flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-base transition ${
                   active
