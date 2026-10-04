@@ -131,19 +131,19 @@ export default function ShiftDialog({
               <button
                 type="button"
                 disabled={cancelShift.isPending}
-                className="mr-auto min-h-10 rounded-full border border-destructive px-4 text-sm text-destructive disabled:opacity-50"
+                className="mr-auto min-h-12 rounded-full border border-destructive px-4 text-sm text-destructive disabled:opacity-50"
               >
                 Cancel shift
               </button>
             </ConfirmAction>
           )}
-          <button onClick={onClose} className="min-h-10 rounded-full border border-border px-4 text-sm">
+          <button onClick={onClose} className="min-h-12 rounded-full border border-border px-4 text-sm">
             Close
           </button>
           <button
             disabled={!recipientId || !date || !start || !end || save.isPending}
             onClick={() => save.mutate()}
-            className="min-h-10 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-12 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
           >
             {shift ? "Save" : "Create"}
           </button>

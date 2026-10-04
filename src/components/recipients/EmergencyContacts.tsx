@@ -40,7 +40,7 @@ const emptyDraft: Draft = {
 };
 
 const inputCls =
-  "mt-1 min-h-10 w-full rounded-md border border-border bg-background px-4 text-sm";
+  "mt-1 min-h-12 w-full rounded-md border border-border bg-background px-4 text-sm";
 
 export function EmergencyContacts({
   careRecipientId,
@@ -244,14 +244,14 @@ export function EmergencyContacts({
           type="button"
           onClick={() => save.mutate()}
           disabled={save.isPending}
-          className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+          className="min-h-12 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
         >
           {save.isPending ? "Saving…" : editingId ? "Save changes" : "Add contact"}
         </button>
         <button
           type="button"
           onClick={reset}
-          className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50"
+          className="min-h-12 rounded-full border border-border px-6 text-sm hover:bg-secondary/50"
         >
           Cancel
         </button>
@@ -270,7 +270,7 @@ export function EmergencyContacts({
               setDraft({ ...emptyDraft, is_primary: (contacts ?? []).length === 0 });
               setAdding(true);
             }}
-            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary/50"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary/50"
           >
             <Plus className="h-4 w-4" /> Add contact
           </button>
@@ -312,14 +312,14 @@ export function EmergencyContacts({
                 <div className="mt-2 flex flex-wrap items-center gap-4 text-sm">
                   <a
                     href={`tel:${c.phone_primary.replace(/[^+\d]/g, "")}`}
-                    className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
+                    className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
                   >
                     <Phone className="h-4 w-4" /> {c.phone_primary}
                   </a>
                   {c.phone_secondary && (
                     <a
                       href={`tel:${c.phone_secondary.replace(/[^+\d]/g, "")}`}
-                      className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary/50"
+                      className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary/50"
                     >
                       <Phone className="h-4 w-4" /> {c.phone_secondary}
                     </a>
@@ -327,7 +327,7 @@ export function EmergencyContacts({
                   {c.email && (
                     <a
                       href={`mailto:${c.email}`}
-                      className="inline-flex min-h-10 items-center gap-2 text-sm text-primary underline"
+                      className="inline-flex min-h-12 items-center gap-2 text-sm text-primary underline"
                     >
                       <Mail className="h-4 w-4" /> {c.email}
                     </a>
@@ -343,7 +343,7 @@ export function EmergencyContacts({
                       type="button"
                       onClick={() => makePrimary.mutate(c.id)}
                       disabled={makePrimary.isPending}
-                      className="min-h-10 rounded-full border border-border px-4 text-xs hover:bg-secondary/50 disabled:opacity-50"
+                      className="min-h-12 rounded-full border border-border px-4 text-xs hover:bg-secondary/50 disabled:opacity-50"
                     >
                       Make primary
                     </button>

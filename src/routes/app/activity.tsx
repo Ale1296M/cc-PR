@@ -149,7 +149,7 @@ function ActivityLog() {
             key={t.key}
             type="button"
             onClick={() => setTable(t.key)}
-            className={`min-h-10 rounded-full px-4 text-sm transition ${
+            className={`min-h-12 rounded-full px-4 text-sm transition ${
               table === t.key
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:opacity-90"
@@ -168,7 +168,7 @@ function ActivityLog() {
             type="date"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
-            className="min-h-11 rounded-md border border-border bg-background px-3 text-sm"
+            className="min-h-12 rounded-md border border-border bg-background px-3 text-sm"
           />
         </label>
         <label className="text-sm">
@@ -177,7 +177,7 @@ function ActivityLog() {
             type="date"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            className="min-h-11 rounded-md border border-border bg-background px-3 text-sm"
+            className="min-h-12 rounded-md border border-border bg-background px-3 text-sm"
           />
         </label>
         {hasFilters && (
@@ -188,7 +188,7 @@ function ActivityLog() {
               setFrom("");
               setTo("");
             }}
-            className="min-h-10 text-sm text-primary underline"
+            className="min-h-12 text-sm text-primary underline"
           >
             Clear filters
           </button>
@@ -237,7 +237,7 @@ function ActivityLog() {
                       <button
                         type="button"
                         onClick={() => setOpenId(open ? null : r.id)}
-                        className="mt-2 min-h-10 text-sm text-primary underline"
+                        className="mt-2 min-h-12 text-sm text-primary underline"
                       >
                         {open ? "Hide changes" : `Show changes (${diff.length})`}
                       </button>

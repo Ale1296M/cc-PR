@@ -79,7 +79,7 @@ function VisitExceptions() {
             key={f.key}
             type="button"
             onClick={() => setFilter(f.key)}
-            className={`min-h-10 rounded-full px-4 text-sm transition ${
+            className={`min-h-12 rounded-full px-4 text-sm transition ${
               filter === f.key
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:opacity-90"
@@ -107,7 +107,7 @@ function VisitExceptions() {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[46rem] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-border text-left text-[10px] uppercase tracking-widest text-muted-foreground">
+            <tr className="border-b border-border text-left text-xs uppercase tracking-widest text-muted-foreground">
               <th className="py-2 pr-4 font-medium">Care recipient</th>
               <th className="py-2 pr-4 font-medium">Caregiver</th>
               <th className="py-2 pr-4 font-medium">Shift time</th>

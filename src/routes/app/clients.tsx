@@ -99,7 +99,7 @@ function CareRecipientsPage() {
         {role === "admin" && (
           <button
             onClick={() => setShowNew(true)}
-            className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
+            className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
           >
             <Plus className="h-4 w-4 shrink-0" /> <span className="hidden sm:inline">Add care recipient</span><span className="sm:hidden">Add</span>
           </button>
@@ -135,7 +135,7 @@ function CareRecipientsPage() {
                   {tags.map((t) => (
                     <span
                       key={t.label}
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] ${
+                      className={`rounded-full px-2.5 py-0.5 text-xs ${
                         t.risk ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
                       }`}
                     >
@@ -154,7 +154,7 @@ function CareRecipientsPage() {
 
             {c.emergency_contact_name && (
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Emergency contact</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Emergency contact</p>
                 <p className="mt-1 text-sm">{c.emergency_contact_name}</p>
                 {c.emergency_contact_phone && (
                   <p className="text-sm text-muted-foreground">{c.emergency_contact_phone}</p>
@@ -166,13 +166,13 @@ function CareRecipientsPage() {
               <Link
                 to="/app/clients/$clientId"
                 params={{ clientId: c.id }}
-                className="inline-flex min-h-10 items-center justify-center rounded-full border border-border px-3 text-sm hover:bg-muted"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-border px-3 text-sm hover:bg-muted"
               >
                 View Profile
               </Link>
               <Link
                 to="/app/care-plan"
-                className="inline-flex min-h-10 items-center justify-center rounded-full bg-primary px-3 text-sm text-primary-foreground hover:opacity-90"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-3 text-sm text-primary-foreground hover:opacity-90"
               >
                 Care Plan
               </Link>

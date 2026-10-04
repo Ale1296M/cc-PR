@@ -193,7 +193,7 @@ function NavBtn({
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-10 rounded-full border px-4 text-sm ${
+      className={`min-h-12 rounded-full border px-4 text-sm ${
         active
           ? "border-primary bg-primary text-primary-foreground"
           : "border-border text-foreground hover:bg-secondary/55"

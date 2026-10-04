@@ -110,7 +110,7 @@ function Choice<T extends string | number>({
                 if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); move(i + 1); }
                 if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); move(i - 1); }
               }}
-              className={`min-h-11 rounded-xl border px-4 py-4 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+              className={`min-h-12 rounded-xl border px-4 py-4 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 active
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background hover:bg-secondary/50"
@@ -285,7 +285,7 @@ function VisitFlow() {
           {done.name ? `${done.name}'s visit` : "This visit"} was recorded · {done.duration}.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-4">
-          <Link to="/app" className="min-h-11 rounded-xl bg-primary px-6 py-4 text-sm text-primary-foreground">
+          <Link to="/app" className="min-h-12 rounded-xl bg-primary px-6 py-4 text-sm text-primary-foreground">
             Back to home
           </Link>
           <button
@@ -300,7 +300,7 @@ function VisitFlow() {
               setHygiene(null);
               setNotes("");
             }}
-            className="min-h-11 rounded-xl border border-border px-6 py-4 text-sm hover:bg-secondary/50"
+            className="min-h-12 rounded-xl border border-border px-6 py-4 text-sm hover:bg-secondary/50"
           >
             Log another visit
           </button>
@@ -359,7 +359,7 @@ function VisitFlow() {
                     key={r.id}
                     type="button"
                     onClick={() => setPicked(r.id)}
-                    className={`min-h-11 rounded-lg border border-border p-6 text-left transition ${
+                    className={`min-h-12 rounded-lg border border-border p-6 text-left transition ${
                       activeSel ? "border-primary bg-secondary/40" : "hover:bg-secondary/30"
                     }`}
                   >
@@ -386,7 +386,7 @@ function VisitFlow() {
                 type="button"
                 onClick={() => clockIn.mutate()}
                 disabled={clockIn.isPending}
-                className="min-h-11 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+                className="min-h-12 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
               >
                 {clockIn.isPending ? "Checking location…" : "Clock in now"}
               </button>
@@ -443,7 +443,7 @@ function VisitFlow() {
             type="button"
             disabled={!complete || finish.isPending}
             onClick={() => finish.mutate()}
-            className="min-h-11 w-full rounded-xl bg-primary px-6 py-4 text-primary-foreground disabled:opacity-50"
+            className="min-h-12 w-full rounded-xl bg-primary px-6 py-4 text-primary-foreground disabled:opacity-50"
           >
             {finish.isPending ? "Saving…" : "Clock out & save visit"}
           </button>
@@ -455,7 +455,7 @@ function VisitFlow() {
           <button
             type="button"
             onClick={() => setReporting(true)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 text-sm hover:bg-secondary/50"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border px-6 text-sm hover:bg-secondary/50"
           >
             <AlertTriangle className="h-4 w-4" /> Report an incident
           </button>

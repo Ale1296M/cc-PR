@@ -301,14 +301,14 @@ function MessagesPage() {
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search conversations…"
                   aria-label="Search conversations"
-                  className="min-h-11 w-full rounded-full border border-border bg-background px-4 text-sm"
+                  className="min-h-12 w-full rounded-full border border-border bg-background px-4 text-sm"
                 />
                 <div className="flex gap-2">
                   <select
                     value={starting}
                     onChange={(e) => setStarting(e.target.value)}
                     aria-label="Select contact"
-                    className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-3 text-sm"
+                    className="min-h-12 min-w-0 flex-1 rounded-full border border-border bg-background px-3 text-sm"
                   >
                     <option value="">Select contact…</option>
 
@@ -330,13 +330,13 @@ function MessagesPage() {
                       const [kind, id] = starting.split(":");
                       openThread({ kind: kind as Thread["kind"], id });
                     }}
-                    className="min-h-11 shrink-0 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
+                    className="min-h-12 shrink-0 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
                   >
                     Start chat
                   </button>
                 </div>
               </div>
-              <p className="px-4 pt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
+              <p className="px-4 pt-4 text-xs uppercase tracking-widest text-muted-foreground">
                 Families
               </p>
               <ul className="space-y-1 p-2">
@@ -344,7 +344,7 @@ function MessagesPage() {
                   <li key={f.id}>
                     <button
                       onClick={() => openThread({ kind: "family", id: f.id })}
-                      className={`min-h-11 w-full rounded-lg px-3 py-3 text-left text-sm transition hover:bg-secondary ${
+                      className={`min-h-12 w-full rounded-lg px-3 py-3 text-left text-sm transition hover:bg-secondary ${
                         thread.kind === "family" && thread.id === f.id
                           ? "border border-border bg-secondary font-medium"
                           : "border border-transparent"
@@ -360,7 +360,7 @@ function MessagesPage() {
                   </li>
                 )}
               </ul>
-              <p className="border-t border-border px-4 pt-4 text-[11px] uppercase tracking-widest text-muted-foreground">
+              <p className="border-t border-border px-4 pt-4 text-xs uppercase tracking-widest text-muted-foreground">
                 Caregivers
               </p>
               <ul className="space-y-1 p-2">
@@ -368,7 +368,7 @@ function MessagesPage() {
                   <li key={c.id}>
                     <button
                       onClick={() => openThread({ kind: "caregiver", id: c.id })}
-                      className={`min-h-11 w-full rounded-lg px-3 py-3 text-left text-sm transition hover:bg-secondary ${
+                      className={`min-h-12 w-full rounded-lg px-3 py-3 text-left text-sm transition hover:bg-secondary ${
                         thread.kind === "caregiver" && thread.id === c.id
                           ? "border border-border bg-secondary font-medium"
                           : "border border-transparent"
@@ -405,7 +405,7 @@ function MessagesPage() {
                 return (
                   <div key={m.id} className={`max-w-[80%] ${mine ? "ml-auto text-right" : ""} ${m.id.startsWith("pending-") ? "opacity-70" : ""}`}>
                     {!mine && (
-                      <p className="mb-1 text-[11px] text-muted-foreground">{nameOf(m.sender_profile_id)}</p>
+                      <p className="mb-1 text-xs text-muted-foreground">{nameOf(m.sender_profile_id)}</p>
                     )}
                     <div
                       className={`inline-block rounded-2xl px-4 py-2 text-left text-sm ${
@@ -413,7 +413,7 @@ function MessagesPage() {
                       }`}
                     >
                       {m.content}
-                      <p className="mt-1 text-[10px] opacity-70">
+                      <p className="mt-1 text-xs opacity-70">
                         {new Date(m.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                         {mine && m.id.startsWith("pending-") ? " · Sending…" : mine && m.read_at ? " · Read" : mine ? " · Sent" : ""}
                       </p>
@@ -438,11 +438,11 @@ function MessagesPage() {
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Type a message…"
                 aria-label="Message"
-                className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm"
+                className="min-h-12 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm"
               />
               <button
                 disabled={!body.trim()}
-                className="min-h-11 shrink-0 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
+                className="min-h-12 shrink-0 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
               >
                 Send
               </button>

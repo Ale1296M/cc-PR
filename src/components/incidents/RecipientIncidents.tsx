@@ -61,7 +61,7 @@ export function RecipientIncidents({
         <button
           type="button"
           onClick={() => setReporting(true)}
-          className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary/50"
+          className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary/50"
         >
           <AlertTriangle className="h-4 w-4" /> Report an incident
         </button>
