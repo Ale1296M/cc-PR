@@ -728,6 +728,36 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          event: string
+          id: number
+          resource_id: string | null
+          resource_type: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          event: string
+          id?: never
+          resource_id?: string | null
+          resource_type: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          event?: string
+          id?: never
+          resource_id?: string | null
+          resource_type?: string
+        }
+        Relationships: []
+      }
       subscription_tiers: {
         Row: {
           created_at: string
@@ -1020,6 +1050,15 @@ export type Database = {
         Args: { _caregiver_id: string; _uid: string }
         Returns: boolean
       }
+      log_security_event: {
+        Args: {
+          _details?: Json
+          _event: string
+          _resource_id: string
+          _resource_type: string
+        }
+        Returns: undefined
+      }
       meters_between: {
         Args: { a_lat: number; a_lng: number; b_lat: number; b_lng: number }
         Returns: number
@@ -1027,6 +1066,10 @@ export type Database = {
       profiles_share_care_circle: {
         Args: { _target: string; _viewer: string }
         Returns: boolean
+      }
+      recipient_access_level: {
+        Args: { _recipient_id: string }
+        Returns: string
       }
       user_can_access_family: {
         Args: { _family_id: string; _user_id: string }

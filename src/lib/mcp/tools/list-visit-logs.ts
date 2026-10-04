@@ -8,8 +8,8 @@ export default defineTool({
   description: "List recent visit logs (clock in/out, mood, notes) for care recipients the user can access.",
   inputSchema: {
     care_recipient_id: z.string().uuid().optional().describe("Only visits for this care recipient."),
-    since: z.string().optional().describe("ISO date/time lower bound for clock-in."),
-    limit: z.number().int().optional().describe("Max rows to return (default 50)."),
+    since: z.string().max(40).refine((v) => !Number.isNaN(Date.parse(v)), "Invalid date").optional().describe("ISO date/time lower bound for clock-in."),
+    limit: z.number().int().min(1).max(200).optional().describe("Max rows to return (default 50)."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ care_recipient_id, since, limit }, ctx) => {

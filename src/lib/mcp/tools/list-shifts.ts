@@ -1,3 +1,4 @@
+import { isoDateSchema, sanitizeText } from "@/lib/security/validation";
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { supabaseForUser, toolError, toolJson, unauthenticated } from "../supabase";
@@ -8,9 +9,9 @@ export default defineTool({
   description: "List scheduled caregiving shifts, optionally filtered by care recipient and date range.",
   inputSchema: {
     care_recipient_id: z.string().uuid().optional().describe("Only shifts for this care recipient."),
-    from: z.string().optional().describe("ISO date (YYYY-MM-DD) lower bound for the shift date."),
-    to: z.string().optional().describe("ISO date (YYYY-MM-DD) upper bound for the shift date."),
-    limit: z.number().int().optional().describe("Max rows to return (default 50)."),
+    from: isoDateSchema.optional().describe("ISO date (YYYY-MM-DD) lower bound for the shift date."),
+    to: isoDateSchema.optional().describe("ISO date (YYYY-MM-DD) upper bound for the shift date."),
+    limit: z.number().int().min(1).max(200).optional().describe("Max rows to return (default 50)."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ care_recipient_id, from, to, limit }, ctx) => {
