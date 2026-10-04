@@ -1,16 +1,10 @@
 import { RoleGate } from "@/lib/role-gate";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
+import { ClientOnly } from "@tanstack/react-router";
+
+const WellbeingTrendChart = lazy(() => import("@/components/charts/WellbeingTrendChart"));
 import { useQuery } from "@tanstack/react-query";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { AlertTriangle, ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
@@ -479,27 +473,11 @@ function WellbeingTrends() {
           </p>
         ) : (
           <div className="mt-4 h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 11 }} />
-                <Tooltip
-                  formatter={(v, _n, p) => [
-                    `${v} · ${(p?.payload as { label?: string })?.label ?? ""}`,
-                    "Score",
-                  ]}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  stroke="currentColor"
-                  className="text-primary"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <ClientOnly fallback={null}>
+              <Suspense fallback={<AsyncSkeleton shape="rows" count={3} />}>
+                <WellbeingTrendChart data={chartData} />
+              </Suspense>
+            </ClientOnly>
           </div>
         )}
         <p className="mt-3 text-xs italic text-muted-foreground">

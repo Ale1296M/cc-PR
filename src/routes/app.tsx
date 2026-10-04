@@ -97,7 +97,7 @@ function AppLayout() {
 
   if (loading || !user) {
     return (
-      <div className="grid min-h-screen place-items-center text-muted-foreground">
+      <div role="status" aria-live="polite" className="grid min-h-screen place-items-center text-muted-foreground">
         Loading…
       </div>
     );
@@ -116,7 +116,13 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen md:flex">
-      <aside className="hidden md:flex md:w-64 md:flex-col bg-sidebar text-sidebar-foreground">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-3 focus:text-primary-foreground"
+      >
+        Skip to main content
+      </a>
+      <aside aria-label="Sidebar" className="hidden md:flex md:w-64 md:flex-col bg-sidebar text-sidebar-foreground">
         <div className="p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -133,7 +139,7 @@ function AppLayout() {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1 px-4">
+        <nav aria-label="Main" className="flex-1 space-y-1 px-4">
           {visibleNav.map(({ to, label, icon: Icon }) => {
             const active = to === "/app" ? path === to : path.startsWith(to);
             const badge = badgeFor(to);
@@ -141,13 +147,14 @@ function AppLayout() {
               <Link
                 key={to}
                 to={to as "/app"}
+                aria-current={active ? "page" : undefined}
                 className={`flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-base transition ${
                   active
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 }`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4" aria-hidden />
                 <span className="flex-1">{label}</span>
                 {badge != null && (
                   <span className="rounded-full bg-attention-soft px-2 py-0.5 text-[11px] font-medium text-attention-foreground">
@@ -159,7 +166,7 @@ function AppLayout() {
           })}
         </nav>
 
-        <div className="border-t border-sidebar-border p-4">
+        <footer className="border-t border-sidebar-border p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-accent text-sm font-semibold text-sidebar-accent-foreground">
@@ -183,10 +190,10 @@ function AppLayout() {
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
-        </div>
+        </footer>
       </aside>
 
-      <main className="flex-1 bg-background pb-24 md:pb-0">
+      <div className="flex-1 bg-background pb-24 md:pb-0">
         <header className="mx-auto flex max-w-5xl items-center justify-between px-6 pt-6 md:px-12">
           <span className="text-xs uppercase tracking-widest text-muted-foreground">
             {dateEyebrow}
@@ -195,15 +202,18 @@ function AppLayout() {
             <Link
               to="/app/incidents"
               className="relative inline-flex h-12 w-12 items-center justify-center rounded-md text-muted-foreground transition hover:bg-secondary"
-              aria-label="Notifications"
+              aria-label={(unreviewed ?? 0) > 0 ? `Notifications: ${unreviewed} unreviewed incidents` : "Notifications"}
             >
               <Bell className="h-5 w-5" />
               {(unreviewed ?? 0) > 0 && (
-                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-attention-soft text-[10px] font-medium text-attention-foreground">
+                <span aria-hidden className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-attention-soft text-[10px] font-medium text-attention-foreground">
                   {unreviewed}
                 </span>
               )}
             </Link>
+            <span className="sr-only" role="status" aria-live="polite">
+              {(unreviewed ?? 0) > 0 ? `${unreviewed} unreviewed incident${unreviewed === 1 ? "" : "s"}` : ""}
+            </span>
             <Button variant="outline" size="sm" className="gap-2 text-muted-foreground" onClick={() => toast.info("Help Center coming soon")}>
               <HelpCircle className="h-4 w-4" />
               Help Center
@@ -211,13 +221,13 @@ function AppLayout() {
           </div>
         </header>
 
-        <div className="mx-auto max-w-5xl px-6 py-6 md:px-12 md:py-8">
+        <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl px-6 py-6 outline-none md:px-12 md:py-8">
           {role === null ? <AwaitingRole email={user.email ?? ""} /> : <Outlet />}
-        </div>
-      </main>
+        </main>
+      </div>
 
       {/* Mobile tab bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-around border-t border-border bg-card/95 py-2 backdrop-blur md:hidden">
+      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-20 flex justify-around border-t border-border bg-card/95 py-2 backdrop-blur md:hidden">
         {visibleNav.map(({ to, label, icon: Icon }) => {
           const active = to === "/app" ? path === to : path.startsWith(to);
           const badge = badgeFor(to);
@@ -225,11 +235,12 @@ function AppLayout() {
             <Link
               key={to}
               to={to as "/app"}
+              aria-current={active ? "page" : undefined}
               className={`relative flex min-h-14 min-w-14 flex-col items-center justify-center gap-1 px-3 py-1 text-sm ${
                 active ? "text-primary" : "text-muted-foreground"
               }`}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5" aria-hidden />
               {badge != null && (
                 <span className="absolute right-2 top-0 rounded-full bg-attention-soft px-1.5 text-[10px] font-medium text-attention-foreground">
                   {badge}

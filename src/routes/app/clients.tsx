@@ -99,6 +99,7 @@ function CareRecipientsPage() {
         {role === "admin" && (
           <button
             onClick={() => setShowNew(true)}
+            aria-haspopup="dialog"
             className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
           >
             <Plus className="h-4 w-4 shrink-0" /> <span className="hidden sm:inline">Add care recipient</span><span className="sm:hidden">Add</span>
@@ -226,8 +227,11 @@ function NewCareRecipient({
     onCreate({ full_name, family_id, address_line, emergency_contact_name, emergency_contact_phone });
   };
   return (
-    <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-foreground/30 p-4" role="dialog" aria-modal="true" aria-labelledby="new-recipient-title">
-      <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
+    <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-foreground/30 p-4" role="dialog" aria-modal="true" aria-labelledby="new-recipient-title" onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}>
+      <div
+        className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl"
+        ref={(el) => { if (el && !el.contains(document.activeElement)) el.querySelector<HTMLElement>("input,select,textarea,button")?.focus(); }}
+      >
         <h2 id="new-recipient-title" className="type-subhead mb-4">New care recipient</h2>
         <form
           noValidate

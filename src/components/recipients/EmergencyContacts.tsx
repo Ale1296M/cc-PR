@@ -270,9 +270,10 @@ export function EmergencyContacts({
               setDraft({ ...emptyDraft, is_primary: (contacts ?? []).length === 0 });
               setAdding(true);
             }}
+            aria-expanded={adding}
             className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border px-4 text-sm hover:bg-secondary/50"
           >
-            <Plus className="h-4 w-4" /> Add contact
+            <Plus className="h-4 w-4" aria-hidden /> Add contact
           </button>
         )}
       </div>
