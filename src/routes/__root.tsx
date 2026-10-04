@@ -8,7 +8,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -37,40 +37,50 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
-  console.error(error);
   const router = useRouter();
+  const [errorId] = useState(() =>
+    Math.random().toString(16).slice(2, 10).toUpperCase(),
+  );
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+    console.error(`[CCPR-${errorId}]`, error);
+    reportLovableError(error, {
+      boundary: "tanstack_root_error_component",
+      errorId,
+      timestamp: new Date().toISOString(),
+    });
+  }, [error, errorId]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+    <main role="alert" className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-lg text-center">
+        <h1 className="text-3xl font-semibold text-foreground">Un momento, por favor</h1>
+        <p className="mt-1 text-lg text-muted-foreground">One moment, please</p>
+        <p className="mt-4 text-lg text-foreground">
+          Ocurrió un problema técnico, pero sus datos y citas están seguros. Nuestro equipo ya fue notificado.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <p className="mt-2 text-base text-muted-foreground">
+          Something went wrong, but your information is safe. Our team has been notified.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-6 text-lg font-medium text-primary-foreground hover:bg-primary/90"
           >
-            Try again
+            Volver a intentar · Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex min-h-12 items-center justify-center rounded-md border border-input bg-background px-6 text-lg font-medium text-foreground hover:bg-accent"
           >
-            Go home
+            Ir al inicio · Go home
           </a>
         </div>
+        <p className="mt-6 text-sm text-muted-foreground">Código de referencia / Reference: CCPR-{errorId}</p>
       </div>
-    </div>
+    </main>
   );
 }
 
