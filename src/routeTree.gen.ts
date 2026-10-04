@@ -9,64 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WellbeingRouteImport } from './routes/wellbeing'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as AppIndexRouteImport } from './routes/app/index'
-import { Route as DashboardFamilyRouteImport } from './routes/dashboard/family'
-import { Route as DashboardCaregiverRouteImport } from './routes/dashboard/caregiver'
-import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
-import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
-import { Route as AppVisitRouteImport } from './routes/app/visit'
-import { Route as AppUsersRouteImport } from './routes/app/users'
-import { Route as AppScheduleRouteImport } from './routes/app/schedule'
-import { Route as AppMessagesRouteImport } from './routes/app/messages'
-import { Route as AppIncidentsRouteImport } from './routes/app/incidents'
-import { Route as AppExceptionsRouteImport } from './routes/app/exceptions'
-import { Route as AppDeletedRouteImport } from './routes/app/deleted'
-import { Route as AppClientsRouteImport } from './routes/app/clients'
-import { Route as AppCarePlanRouteImport } from './routes/app/care-plan'
-import { Route as AppActivityRouteImport } from './routes/app/activity'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as WellbeingRouteImport } from './routes/wellbeing'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as AppClientsClientIdRouteImport } from './routes/app/clients.$clientId'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppActivityRouteImport } from './routes/app/activity'
+import { Route as AppCarePlanRouteImport } from './routes/app/care-plan'
+import { Route as AppClientsRouteImport } from './routes/app/clients'
+import { Route as AppDeletedRouteImport } from './routes/app/deleted'
+import { Route as AppExceptionsRouteImport } from './routes/app/exceptions'
+import { Route as AppIncidentsRouteImport } from './routes/app/incidents'
+import { Route as AppMessagesRouteImport } from './routes/app/messages'
+import { Route as AppScheduleRouteImport } from './routes/app/schedule'
+import { Route as AppUsersRouteImport } from './routes/app/users'
+import { Route as AppVisitRouteImport } from './routes/app/visit'
+import { Route as AppWellbeingRouteImport } from './routes/app/wellbeing'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
+import { Route as DashboardCaregiverRouteImport } from './routes/dashboard/caregiver'
+import { Route as DashboardFamilyRouteImport } from './routes/dashboard/family'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as AppClientsClientIdRouteImport } from './routes/app/clients.$clientId'
 
-const WellbeingRoute = WellbeingRouteImport.update({
-  id: '/wellbeing',
-  path: '/wellbeing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -74,84 +49,51 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WellbeingRoute = WellbeingRouteImport.update({
+  id: '/wellbeing',
+  path: '/wellbeing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppRoute,
-} as any)
-const DashboardFamilyRoute = DashboardFamilyRouteImport.update({
-  id: '/dashboard/family',
-  path: '/dashboard/family',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardCaregiverRoute = DashboardCaregiverRouteImport.update({
-  id: '/dashboard/caregiver',
-  path: '/dashboard/caregiver',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardAdminRoute = DashboardAdminRouteImport.update({
-  id: '/dashboard/admin',
-  path: '/dashboard/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppWellbeingRoute = AppWellbeingRouteImport.update({
-  id: '/wellbeing',
-  path: '/wellbeing',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppVisitRoute = AppVisitRouteImport.update({
-  id: '/visit',
-  path: '/visit',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppUsersRoute = AppUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppScheduleRoute = AppScheduleRouteImport.update({
-  id: '/schedule',
-  path: '/schedule',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMessagesRoute = AppMessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppIncidentsRoute = AppIncidentsRouteImport.update({
-  id: '/incidents',
-  path: '/incidents',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppExceptionsRoute = AppExceptionsRouteImport.update({
-  id: '/exceptions',
-  path: '/exceptions',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDeletedRoute = AppDeletedRouteImport.update({
-  id: '/deleted',
-  path: '/deleted',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppClientsRoute = AppClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCarePlanRoute = AppCarePlanRouteImport.update({
-  id: '/care-plan',
-  path: '/care-plan',
   getParentRoute: () => AppRoute,
 } as any)
 const AppActivityRoute = AppActivityRouteImport.update({
@@ -159,22 +101,80 @@ const AppActivityRoute = AppActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AppRoute,
 } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
-  id: '/$clientId',
-  path: '/$clientId',
-  getParentRoute: () => AppClientsRoute,
+const AppCarePlanRoute = AppCarePlanRouteImport.update({
+  id: '/care-plan',
+  path: '/care-plan',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientsRoute = AppClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDeletedRoute = AppDeletedRouteImport.update({
+  id: '/deleted',
+  path: '/deleted',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppExceptionsRoute = AppExceptionsRouteImport.update({
+  id: '/exceptions',
+  path: '/exceptions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIncidentsRoute = AppIncidentsRouteImport.update({
+  id: '/incidents',
+  path: '/incidents',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMessagesRoute = AppMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppScheduleRoute = AppScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVisitRoute = AppVisitRouteImport.update({
+  id: '/visit',
+  path: '/visit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWellbeingRoute = AppWellbeingRouteImport.update({
+  id: '/wellbeing',
+  path: '/wellbeing',
+  getParentRoute: () => AppRoute,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAdminRoute = DashboardAdminRouteImport.update({
+  id: '/dashboard/admin',
+  path: '/dashboard/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardCaregiverRoute = DashboardCaregiverRouteImport.update({
+  id: '/dashboard/caregiver',
+  path: '/dashboard/caregiver',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardFamilyRoute = DashboardFamilyRouteImport.update({
+  id: '/dashboard/family',
+  path: '/dashboard/family',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
@@ -182,10 +182,10 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
-  getParentRoute: () => rootRouteImport,
+const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
+  id: '/$clientId',
+  path: '/$clientId',
+  getParentRoute: () => AppClientsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -397,46 +397,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wellbeing': {
-      id: '/wellbeing'
-      path: '/wellbeing'
-      fullPath: '/wellbeing'
-      preLoaderRoute: typeof WellbeingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -446,130 +411,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/': {
-      id: '/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/dashboard/family': {
-      id: '/dashboard/family'
-      path: '/dashboard/family'
-      fullPath: '/dashboard/family'
-      preLoaderRoute: typeof DashboardFamilyRouteImport
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/caregiver': {
-      id: '/dashboard/caregiver'
-      path: '/dashboard/caregiver'
-      fullPath: '/dashboard/caregiver'
-      preLoaderRoute: typeof DashboardCaregiverRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/admin': {
-      id: '/dashboard/admin'
-      path: '/dashboard/admin'
-      fullPath: '/dashboard/admin'
-      preLoaderRoute: typeof DashboardAdminRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/wellbeing': {
-      id: '/app/wellbeing'
+    '/wellbeing': {
+      id: '/wellbeing'
       path: '/wellbeing'
-      fullPath: '/app/wellbeing'
-      preLoaderRoute: typeof AppWellbeingRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/visit': {
-      id: '/app/visit'
-      path: '/visit'
-      fullPath: '/app/visit'
-      preLoaderRoute: typeof AppVisitRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/users': {
-      id: '/app/users'
-      path: '/users'
-      fullPath: '/app/users'
-      preLoaderRoute: typeof AppUsersRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/schedule': {
-      id: '/app/schedule'
-      path: '/schedule'
-      fullPath: '/app/schedule'
-      preLoaderRoute: typeof AppScheduleRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/messages': {
-      id: '/app/messages'
-      path: '/messages'
-      fullPath: '/app/messages'
-      preLoaderRoute: typeof AppMessagesRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/incidents': {
-      id: '/app/incidents'
-      path: '/incidents'
-      fullPath: '/app/incidents'
-      preLoaderRoute: typeof AppIncidentsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/exceptions': {
-      id: '/app/exceptions'
-      path: '/exceptions'
-      fullPath: '/app/exceptions'
-      preLoaderRoute: typeof AppExceptionsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/deleted': {
-      id: '/app/deleted'
-      path: '/deleted'
-      fullPath: '/app/deleted'
-      preLoaderRoute: typeof AppDeletedRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/clients': {
-      id: '/app/clients'
-      path: '/clients'
-      fullPath: '/app/clients'
-      preLoaderRoute: typeof AppClientsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/care-plan': {
-      id: '/app/care-plan'
-      path: '/care-plan'
-      fullPath: '/app/care-plan'
-      preLoaderRoute: typeof AppCarePlanRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/activity': {
-      id: '/app/activity'
-      path: '/activity'
-      fullPath: '/app/activity'
-      preLoaderRoute: typeof AppActivityRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      fullPath: '/wellbeing'
+      preLoaderRoute: typeof WellbeingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/list-tools': {
@@ -579,18 +460,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/clients/$clientId': {
-      id: '/app/clients/$clientId'
-      path: '/$clientId'
-      fullPath: '/app/clients/$clientId'
-      preLoaderRoute: typeof AppClientsClientIdRouteImport
-      parentRoute: typeof AppClientsRoute
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/activity': {
+      id: '/app/activity'
+      path: '/activity'
+      fullPath: '/app/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/care-plan': {
+      id: '/app/care-plan'
+      path: '/care-plan'
+      fullPath: '/app/care-plan'
+      preLoaderRoute: typeof AppCarePlanRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/clients': {
+      id: '/app/clients'
+      path: '/clients'
+      fullPath: '/app/clients'
+      preLoaderRoute: typeof AppClientsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/deleted': {
+      id: '/app/deleted'
+      path: '/deleted'
+      fullPath: '/app/deleted'
+      preLoaderRoute: typeof AppDeletedRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/exceptions': {
+      id: '/app/exceptions'
+      path: '/exceptions'
+      fullPath: '/app/exceptions'
+      preLoaderRoute: typeof AppExceptionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/incidents': {
+      id: '/app/incidents'
+      path: '/incidents'
+      fullPath: '/app/incidents'
+      preLoaderRoute: typeof AppIncidentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/messages': {
+      id: '/app/messages'
+      path: '/messages'
+      fullPath: '/app/messages'
+      preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/schedule': {
+      id: '/app/schedule'
+      path: '/schedule'
+      fullPath: '/app/schedule'
+      preLoaderRoute: typeof AppScheduleRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/users': {
+      id: '/app/users'
+      path: '/users'
+      fullPath: '/app/users'
+      preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/visit': {
+      id: '/app/visit'
+      path: '/visit'
+      fullPath: '/app/visit'
+      preLoaderRoute: typeof AppVisitRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/wellbeing': {
+      id: '/app/wellbeing'
+      path: '/wellbeing'
+      fullPath: '/app/wellbeing'
+      preLoaderRoute: typeof AppWellbeingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/admin': {
+      id: '/dashboard/admin'
+      path: '/dashboard/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof DashboardAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/caregiver': {
+      id: '/dashboard/caregiver'
+      path: '/dashboard/caregiver'
+      fullPath: '/dashboard/caregiver'
+      preLoaderRoute: typeof DashboardCaregiverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/family': {
+      id: '/dashboard/family'
+      path: '/dashboard/family'
+      fullPath: '/dashboard/family'
+      preLoaderRoute: typeof DashboardFamilyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
@@ -599,6 +585,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/clients/$clientId': {
+      id: '/app/clients/$clientId'
+      path: '/$clientId'
+      fullPath: '/app/clients/$clientId'
+      preLoaderRoute: typeof AppClientsClientIdRouteImport
+      parentRoute: typeof AppClientsRoute
     }
   }
 }

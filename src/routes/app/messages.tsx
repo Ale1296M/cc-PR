@@ -144,6 +144,8 @@ function MessagesPage() {
   });
 
   const nameOf = (id: string) => profiles?.find((p) => p.id === id)?.full_name ?? "Care team";
+  const [live, setLive] = useState(true);
+  const wasLive = useRef<boolean | null>(null);
 
   // Realtime: new messages arrive without refreshing
   useEffect(() => {
@@ -157,7 +159,19 @@ function MessagesPage() {
         { event: "*", schema: "public", table, filter: `${column}=eq.${thread.id}` },
         () => qc.invalidateQueries({ queryKey: ["thread-messages", thread.kind, thread.id] }),
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          // Catch up on anything missed while disconnected.
+          if (wasLive.current === false) {
+            qc.invalidateQueries({ queryKey: ["thread-messages", thread.kind, thread.id] });
+          }
+          wasLive.current = true;
+          setLive(true);
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          wasLive.current = false;
+          setLive(false);
+        }
+      });
     return () => {
       supabase.removeChannel(channel);
     };
@@ -177,8 +191,7 @@ function MessagesPage() {
   }, [messages, uid, thread]);
 
   const send = useMutation({
-    mutationFn: async () => {
-      const content = body.trim();
+    mutationFn: async (content: string) => {
       if (thread!.kind === "family") {
         const { error } = await supabase
           .from("family_messages")
@@ -191,12 +204,32 @@ function MessagesPage() {
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    // Optimistic: show the bubble immediately, roll back if the insert fails.
+    onMutate: async (content) => {
+      const key = ["thread-messages", thread?.kind, thread?.id];
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<Msg[]>(key);
+      const temp: Msg = {
+        id: `pending-${Date.now()}`,
+        sender_profile_id: uid!,
+        content,
+        created_at: new Date().toISOString(),
+        read_at: null,
+      };
+      qc.setQueryData<Msg[]>(key, [...(previous ?? []), temp]);
       setBody("");
-      qc.invalidateQueries({ queryKey: ["thread-messages", thread?.kind, thread?.id] });
+      return { key, previous, content };
     },
-    onError: (e: unknown) =>
-      toast.error(e instanceof Error ? e.message : "Couldn't send that message — try again."),
+    onError: (e: unknown, _content, ctx) => {
+      if (ctx) {
+        qc.setQueryData(ctx.key, ctx.previous);
+        setBody(ctx.content);
+      }
+      toast.error(e instanceof Error ? e.message : "Couldn't send that message — try again.");
+    },
+    onSettled: (_d, _e, _c, ctx) => {
+      if (ctx) qc.invalidateQueries({ queryKey: ctx.key });
+    },
   });
 
   const listsPending = (canSeeFamilies && recipientsPending) || (isAdmin && caregiversPending);
@@ -229,6 +262,11 @@ function MessagesPage() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Messages</p>
         <h1 className="type-section mt-1">{heading}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{subheading}</p>
+        {thread && !live && (
+          <p role="status" className="mt-2 text-xs text-attention-foreground">
+            Reconnecting — new messages will appear once the live connection is back.
+          </p>
+        )}
       </header>
 
       {(loading || listsPending) && <AsyncSkeleton shape="chat" count={5} />}
@@ -365,7 +403,7 @@ function MessagesPage() {
               {!messagesPending && !messagesError && (messages ?? []).map((m) => {
                 const mine = m.sender_profile_id === uid;
                 return (
-                  <div key={m.id} className={`max-w-[80%] ${mine ? "ml-auto text-right" : ""}`}>
+                  <div key={m.id} className={`max-w-[80%] ${mine ? "ml-auto text-right" : ""} ${m.id.startsWith("pending-") ? "opacity-70" : ""}`}>
                     {!mine && (
                       <p className="mb-1 text-[11px] text-muted-foreground">{nameOf(m.sender_profile_id)}</p>
                     )}
@@ -377,7 +415,7 @@ function MessagesPage() {
                       {m.content}
                       <p className="mt-1 text-[10px] opacity-70">
                         {new Date(m.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                        {mine && m.read_at ? " · Read" : ""}
+                        {mine && m.id.startsWith("pending-") ? " · Sending…" : mine && m.read_at ? " · Read" : mine ? " · Sent" : ""}
                       </p>
                     </div>
                   </div>
@@ -390,7 +428,7 @@ function MessagesPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (body.trim()) send.mutate();
+                if (body.trim()) send.mutate(body.trim());
               }}
               className="flex gap-2 border-t border-border p-4"
             >
@@ -403,10 +441,10 @@ function MessagesPage() {
                 className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm"
               />
               <button
-                disabled={send.isPending || !body.trim()}
+                disabled={!body.trim()}
                 className="min-h-11 shrink-0 rounded-full bg-primary px-4 text-sm text-primary-foreground disabled:opacity-50"
               >
-                {send.isPending ? "Sending…" : "Send"}
+                Send
               </button>
             </form>
           </section>
