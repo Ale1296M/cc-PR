@@ -64,6 +64,7 @@ async function writeClockOut(opts: {
   visitLogId: string;
   existingException?: string | null;
   notes?: string | null;
+  mood?: string | null;
   clockOut: string;
   pos: CapturedPosition | null;
 }) {
@@ -72,6 +73,7 @@ async function writeClockOut(opts: {
     clock_out_method: opts.pos ? "gps" : "manual",
   };
   if (opts.notes !== undefined) update.notes = opts.notes || null;
+  if (opts.mood !== undefined) update.mood = opts.mood || null;
   if (opts.pos) {
     update.clock_out_lat = opts.pos.lat;
     update.clock_out_lng = opts.pos.lng;
@@ -91,6 +93,7 @@ export async function clockOutVisit(opts: {
   visitLogId: string;
   existingException?: string | null;
   notes?: string | null;
+  mood?: string | null;
 }) {
   const pos = await capturePosition();
   const clockOut = new Date().toISOString();
