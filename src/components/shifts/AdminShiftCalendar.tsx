@@ -230,7 +230,8 @@ function EventBlock({
         onClick();
       }}
       title={event.title}
-      className="cc-event"
+      aria-label={`${event.title}, ${format(event.start, "EEEE MMMM d, h:mm a")}, ${event.resource.status}. Open shift`}
+      className="cc-event focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       style={{ ...style, backgroundColor: s.bg, color: s.fg }}
     >
       <span className="block truncate font-medium">{format(event.start, "h:mm a")}</span>
@@ -280,7 +281,16 @@ function WeekGrid({
               {HOURS.map((h) => (
                 <div
                   key={h}
-                  className="cc-slot"
+                  className="cc-slot focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Create shift ${format(d, "EEEE MMMM d")} at ${format(new Date(2020, 0, 1, h), "h a")}`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      (e.currentTarget as HTMLElement).click();
+                    }
+                  }}
                   style={{ height: PX_PER_HOUR }}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
@@ -348,11 +358,26 @@ function MonthGrid({
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7">
-        {days.map((d) => (
+      <div className="grid grid-cols-7" role="grid" aria-label={`Shifts for ${format(cursor, "MMMM yyyy")}`}>
+        {days.map((d, i) => (
           <div
             key={d.toISOString()}
-            className={`cc-month-cell ${isSameMonth(d, cursor) ? "" : "cc-off-range"}`}
+            className={`cc-month-cell focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${isSameMonth(d, cursor) ? "" : "cc-off-range"}`}
+            role="gridcell"
+            tabIndex={0}
+            data-day={i}
+            aria-label={`${format(d, "EEEE MMMM d")}. Press Enter to create a shift`}
+            onKeyDown={(e) => {
+              const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7 }[e.key];
+              if (step) {
+                e.preventDefault();
+                const grid = (e.currentTarget as HTMLElement).parentElement;
+                (grid?.querySelector(`[data-day="${i + step}"]`) as HTMLElement | null)?.focus();
+              } else if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                (e.currentTarget as HTMLElement).click();
+              }
+            }}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
