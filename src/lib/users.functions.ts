@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertAdmin } from "@/lib/security/access";
 
 export type AppRole = "admin" | "caregiver" | "family_member";
 
@@ -12,12 +13,6 @@ export type AdminUserRow = {
   role: AppRole | null;
   created_at: string;
 };
-
-async function assertAdmin(supabase: any, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-  if (error) throw new Error("Unable to verify permissions");
-  if (!data) throw new Error("Forbidden: admin role required");
-}
 
 export const listUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
