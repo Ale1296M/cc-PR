@@ -115,7 +115,7 @@ function RecentlyDeleted() {
             key={k.table}
             type="button"
             onClick={() => setKindIdx(i)}
-            className={`min-h-10 rounded-full border px-4 text-sm transition ${
+            className={`min-h-12 rounded-full border px-4 text-sm transition ${
               i === kindIdx
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border hover:bg-secondary/50"
@@ -166,7 +166,7 @@ function RecentlyDeleted() {
                     <button
                       type="button"
                       disabled={restore.isPending}
-                      className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
+                      className="min-h-12 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
                     >
                       Restore
                     </button>

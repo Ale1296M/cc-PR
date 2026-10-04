@@ -125,7 +125,7 @@ function UsersPage() {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`rounded-full px-4 py-1.5 text-sm transition ${
+              className={`min-h-12 rounded-full px-4 py-1.5 text-sm transition ${
                 tab === t.key
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-secondary-foreground hover:opacity-90"
@@ -163,7 +163,7 @@ function UsersPage() {
             </div>
             <div className="flex flex-wrap items-end gap-6">
               <div>
-                <p className="mb-1 text-[10px] uppercase tracking-widest text-muted-foreground">
+                <p className="mb-1 text-xs uppercase tracking-widest text-muted-foreground">
                   Assigned role
                 </p>
                 <span className={`inline-block rounded-full px-4 py-1 text-xs capitalize ${roleBadge(u.role)}`}>
@@ -173,7 +173,7 @@ function UsersPage() {
               <div>
                 <label
                   htmlFor={`role-${u.id}`}
-                  className="mb-1 block text-[10px] uppercase tracking-widest text-muted-foreground"
+                  className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground"
                 >
                   Change role
                 </label>
@@ -191,7 +191,7 @@ function UsersPage() {
                     }
                     mutate.mutate({ userId: u.id, role: next });
                   }}
-                  className="min-h-11 rounded-lg border border-border bg-background px-4 text-sm capitalize"
+                  className="min-h-12 rounded-lg border border-border bg-background px-4 text-sm capitalize"
                 >
                   <option value="">Pending (no role)</option>
                   {ROLES.map((r) => (

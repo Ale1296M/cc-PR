@@ -99,7 +99,7 @@ function CareRecipientsPage() {
         {role === "admin" && (
           <button
             onClick={() => setShowNew(true)}
-            className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
+            className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
           >
             <Plus className="h-4 w-4 shrink-0" /> <span className="hidden sm:inline">Add care recipient</span><span className="sm:hidden">Add</span>
           </button>
@@ -135,7 +135,7 @@ function CareRecipientsPage() {
                   {tags.map((t) => (
                     <span
                       key={t.label}
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] ${
+                      className={`rounded-full px-2.5 py-0.5 text-xs ${
                         t.risk ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
                       }`}
                     >
@@ -154,7 +154,7 @@ function CareRecipientsPage() {
 
             {c.emergency_contact_name && (
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Emergency contact</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Emergency contact</p>
                 <p className="mt-1 text-sm">{c.emergency_contact_name}</p>
                 {c.emergency_contact_phone && (
                   <p className="text-sm text-muted-foreground">{c.emergency_contact_phone}</p>
@@ -166,13 +166,13 @@ function CareRecipientsPage() {
               <Link
                 to="/app/clients/$clientId"
                 params={{ clientId: c.id }}
-                className="inline-flex min-h-10 items-center justify-center rounded-full border border-border px-3 text-sm hover:bg-muted"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-border px-3 text-sm hover:bg-muted"
               >
                 View Profile
               </Link>
               <Link
                 to="/app/care-plan"
-                className="inline-flex min-h-10 items-center justify-center rounded-full bg-primary px-3 text-sm text-primary-foreground hover:opacity-90"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-3 text-sm text-primary-foreground hover:opacity-90"
               >
                 Care Plan
               </Link>
@@ -213,56 +213,97 @@ function NewCareRecipient({
   const [address_line, setAddress] = useState("");
   const [emergency_contact_name, setContact] = useState("");
   const [emergency_contact_phone, setPhone] = useState("");
+  const [tried, setTried] = useState(false);
+  const errors: Record<string, string> = {};
+  if (!full_name.trim()) errors.full_name = "Please enter the person's full name.";
+  if (!family_id) errors.family_id = "Please choose which family this person belongs to.";
+  if (emergency_contact_phone && emergency_contact_phone.replace(/\D/g, "").length < 10)
+    errors.phone = "That phone number looks too short — include the area code, e.g. 787-555-0123.";
+  const show = (k: string) => (tried ? errors[k] : undefined);
+  const submit = () => {
+    setTried(true);
+    if (Object.keys(errors).length) return;
+    onCreate({ full_name, family_id, address_line, emergency_contact_name, emergency_contact_phone });
+  };
   return (
-    <div className="fixed inset-0 z-30 grid place-items-center bg-foreground/30 p-4">
+    <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-foreground/30 p-4" role="dialog" aria-modal="true" aria-labelledby="new-recipient-title">
       <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
-        <h3 className="type-subhead mb-4">New care recipient</h3>
+        <h2 id="new-recipient-title" className="type-subhead mb-4">New care recipient</h2>
+        <form
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
         <div className="space-y-4">
-          <F label="Full name" value={full_name} onChange={setName} />
-          <label className="block">
-            <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Family</span>
+          <F id="nr-name" label="Full name" value={full_name} onChange={setName} error={show("full_name")} required />
+          <div>
+            <label htmlFor="nr-family" className="mb-1 block text-sm font-semibold">Family (required)</label>
             <select
+              id="nr-family"
               value={family_id}
               onChange={(e) => setFamily(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
+              aria-invalid={!!show("family_id")}
+              aria-describedby={show("family_id") ? "nr-family-err nr-family-hint" : "nr-family-hint"}
+              className="min-h-12 w-full rounded-md border border-border bg-background px-4 py-2 text-base"
             >
               <option value="">Select a family…</option>
               {families.map((f) => (
                 <option key={f.id} value={f.id}>{f.label}</option>
               ))}
             </select>
-            <span className="mt-1 block text-xs text-muted-foreground">
+            {show("family_id") && <p id="nr-family-err" className="field-error" role="alert">{show("family_id")}</p>}
+            <p id="nr-family-hint" className="mt-1 text-sm text-muted-foreground">
               Everyone who belongs to this family will be able to see this care recipient.
-            </span>
-          </label>
-          <F label="Address" value={address_line} onChange={setAddress} />
-          <F label="Emergency contact" value={emergency_contact_name} onChange={setContact} />
-          <F label="Contact phone" value={emergency_contact_phone} onChange={setPhone} />
+            </p>
+          </div>
+          <F id="nr-address" label="Address" value={address_line} onChange={setAddress} />
+          <F id="nr-contact" label="Emergency contact" value={emergency_contact_name} onChange={setContact} />
+          <F id="nr-phone" label="Contact phone" type="tel" value={emergency_contact_phone} onChange={setPhone} error={show("phone")} />
         </div>
-        <div className="mt-6 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-full border border-border px-4 py-2 text-sm">Cancel</button>
+        <div className="mt-6 flex flex-wrap justify-end gap-3">
+          <button type="button" onClick={onClose} className="min-h-12 rounded-full border border-border px-5 text-base">Cancel</button>
           <button
-            disabled={!full_name || !family_id || busy}
-            onClick={() => onCreate({ full_name, family_id, address_line, emergency_contact_name, emergency_contact_phone })}
-            className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+            type="submit"
+            disabled={busy}
+            className="min-h-12 rounded-full bg-primary px-5 text-base text-primary-foreground disabled:opacity-50"
           >
-            Add
+            {busy ? "Adding…" : "Add"}
           </button>
         </div>
+        </form>
       </div>
     </div>
   );
 }
 
-function F({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function F({
+  id, label, value, onChange, error, required, type = "text",
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  required?: boolean;
+  type?: string;
+}) {
   return (
-    <label className="block">
-      <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
+    <div>
+      <label htmlFor={id} className="mb-1 block text-sm font-semibold">
+        {label}{required ? " (required)" : ""}
+      </label>
       <input
+        id={id}
+        type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-border bg-background px-4 py-2 text-sm"
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-err` : undefined}
+        className="min-h-12 w-full rounded-md border border-border bg-background px-4 py-2 text-base"
       />
-    </label>
+      {error && <p id={`${id}-err`} className="field-error" role="alert">{error}</p>}
+    </div>
   );
 }

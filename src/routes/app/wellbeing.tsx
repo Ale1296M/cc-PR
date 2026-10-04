@@ -269,7 +269,7 @@ function WellbeingTrends() {
               setRecipientId(e.target.value);
               setSelectedDay(null);
             }}
-            className="mb-6 min-h-11 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
+            className="mb-6 min-h-12 w-full max-w-sm rounded-md border border-border bg-background px-4 text-sm"
           >
             {list.map((r) => (
               <option key={r.id} value={r.id}>
@@ -402,7 +402,7 @@ function WellbeingTrends() {
               setRecipientId(e.target.value);
               setSelectedDay(null);
             }}
-            className="min-h-11 w-full max-w-sm rounded-md border border-border bg-secondary/40 px-4 text-sm"
+            className="min-h-12 w-full max-w-sm rounded-md border border-border bg-secondary/40 px-4 text-sm"
           >
             {list.map((r) => (
               <option key={r.id} value={r.id}>
@@ -453,7 +453,7 @@ function WellbeingTrends() {
                 }`}
               >
                 <span className={`h-10 w-full rounded-md ${BAND_CLASS[d.band]}`} />
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {date.getDate()} {date.toLocaleDateString([], { month: "short" })}
                 </span>
               </button>

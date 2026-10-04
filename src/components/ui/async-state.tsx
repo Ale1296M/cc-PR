@@ -148,7 +148,7 @@ export function AsyncError({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 inline-flex min-h-10 items-center rounded-full border border-border px-4 type-meta hover:bg-secondary/50"
+          className="mt-4 inline-flex min-h-12 items-center rounded-full border border-border px-4 type-meta hover:bg-secondary/50"
         >
           Try again
         </button>

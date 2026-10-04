@@ -20,7 +20,7 @@ export function DashboardShell({
 
   const links = (
     <>
-      <Button variant="outline" className="min-h-11 w-full sm:w-auto" onClick={signOut}>
+      <Button variant="outline" className="min-h-12 w-full sm:w-auto" onClick={signOut}>
         <LogOut /> Sign out
       </Button>
     </>

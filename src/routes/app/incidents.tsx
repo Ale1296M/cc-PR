@@ -105,7 +105,7 @@ function IncidentsAdmin() {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as Status | "all")}
-            className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
+            className="mt-1 min-h-12 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
           >
             <option value="all">All statuses</option>
             {STATUSES.map((s) => (
@@ -118,7 +118,7 @@ function IncidentsAdmin() {
           <select
             value={severity}
             onChange={(e) => setSeverity(e.target.value)}
-            className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
+            className="mt-1 min-h-12 w-full rounded-md border border-border bg-background px-4 text-sm sm:w-48"
           >
             <option value="all">All severities</option>
             {SEVERITIES.map((s) => (
@@ -280,7 +280,7 @@ function IncidentCard({ row }: { row: Row }) {
             <button
               type="button"
               disabled={update.isPending}
-              className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+              className="min-h-12 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
             >
               Resolve
             </button>
@@ -291,7 +291,7 @@ function IncidentCard({ row }: { row: Row }) {
             type="button"
             onClick={() => update.mutate("under_review")}
             disabled={update.isPending}
-            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
+            className="min-h-12 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
           >
             Mark under review
           </button>
@@ -301,7 +301,7 @@ function IncidentCard({ row }: { row: Row }) {
             type="button"
             onClick={() => update.mutate("open")}
             disabled={update.isPending}
-            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
+            className="min-h-12 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
           >
             Reopen
           </button>
@@ -318,7 +318,7 @@ function IncidentCard({ row }: { row: Row }) {
             <button
               type="button"
               disabled={remove.isPending}
-              className="min-h-10 rounded-full border border-border px-6 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+              className="min-h-12 rounded-full border border-border px-6 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
             >
               Remove
             </button>

@@ -243,7 +243,7 @@ function HomeLocationCard({
               onChange={(e) => setLat(e.target.value)}
               inputMode="decimal"
               placeholder="18.4655"
-              className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
+              className="mt-1 min-h-12 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
           <label className="text-sm">
@@ -253,7 +253,7 @@ function HomeLocationCard({
               onChange={(e) => setLng(e.target.value)}
               inputMode="decimal"
               placeholder="-66.1057"
-              className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
+              className="mt-1 min-h-12 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
           <label className="text-sm">
@@ -262,7 +262,7 @@ function HomeLocationCard({
               value={radius}
               onChange={(e) => setRadius(e.target.value)}
               inputMode="numeric"
-              className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
+              className="mt-1 min-h-12 w-full rounded-md border border-border bg-background px-4 text-sm"
             />
           </label>
         </div>
@@ -271,7 +271,7 @@ function HomeLocationCard({
             type="button"
             onClick={() => save.mutate()}
             disabled={save.isPending}
-            className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-12 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             {save.isPending ? "Saving…" : "Save home location"}
           </button>
@@ -279,7 +279,7 @@ function HomeLocationCard({
             type="button"
             onClick={useMyLocation}
             disabled={locating}
-            className="min-h-10 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
+            className="min-h-12 rounded-full border border-border px-6 text-sm hover:bg-secondary/50 disabled:opacity-50"
           >
             {locating ? "Reading location…" : "Use my current location"}
           </button>
@@ -404,7 +404,7 @@ function ClockInBar({
           <button
             onClick={() => clockIn.mutate()}
             disabled={clockIn.isPending}
-            className="mt-4 min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+            className="mt-4 min-h-12 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             {clockIn.isPending ? (locating ? "Checking location…" : "Clocking in…") : "Clock in now"}
           </button>
@@ -425,7 +425,7 @@ function ClockInBar({
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             aria-label="Mood"
-            className="min-h-11 w-full rounded-md border border-border bg-background px-4 text-sm"
+            className="min-h-12 w-full rounded-md border border-border bg-background px-4 text-sm"
           >
             <option value="">Mood…</option>
             {["Great", "Okay", "Tired", "Unwell", "Concern", "Cheerful"].map((m) => <option key={m}>{m}</option>)}
@@ -440,7 +440,7 @@ function ClockInBar({
           <button
             onClick={() => clockOut.mutate()}
             disabled={clockOut.isPending}
-            className="min-h-10 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
+            className="min-h-12 rounded-full bg-primary px-6 text-sm text-primary-foreground disabled:opacity-50"
           >
             {clockOut.isPending ? (locating ? "Checking location…" : "Saving…") : "Clock out & save"}
           </button>

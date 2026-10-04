@@ -229,7 +229,7 @@ function RosterTable() {
                     <button
                       type="button"
                       onClick={() => toggleSort(key)}
-                      className="flex min-h-11 w-full items-center gap-1 px-2 font-semibold hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="flex min-h-12 w-full items-center gap-1 px-2 font-semibold hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       aria-label={`Sort by ${label}`}
                     >
                       {label}

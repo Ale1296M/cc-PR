@@ -361,7 +361,7 @@ function CaregiverHero({
           </p>
           <Link
             to="/app/visit"
-            className="mt-6 inline-flex min-h-11 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
+            className="mt-6 inline-flex min-h-12 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
           >
             Clock in &amp; log visit
           </Link>
@@ -375,7 +375,7 @@ function CaregiverHero({
           </p>
           <Link
             to="/app/visit"
-            className="mt-6 inline-flex min-h-11 items-center rounded-full border border-border px-8 text-base font-medium transition hover:bg-secondary/50"
+            className="mt-6 inline-flex min-h-12 items-center rounded-full border border-border px-8 text-base font-medium transition hover:bg-secondary/50"
           >
             Clock in &amp; log visit
           </Link>
@@ -423,7 +423,7 @@ function FamilyHero({
           </p>
           <Link
             to="/app/wellbeing"
-            className="mt-6 inline-flex min-h-11 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
+            className="mt-6 inline-flex min-h-12 items-center rounded-full bg-primary px-8 text-base font-medium text-primary-foreground transition hover:opacity-90"
           >
             See wellbeing history
           </Link>

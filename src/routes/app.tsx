@@ -141,7 +141,7 @@ function AppLayout() {
               <Link
                 key={to}
                 to={to as "/app"}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition ${
+                className={`flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-base transition ${
                   active
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -173,7 +173,7 @@ function AppLayout() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-11 w-11 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              className="h-12 w-12 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               onClick={async () => {
                 await supabase.auth.signOut();
                 navigate({ to: "/" });
@@ -194,7 +194,7 @@ function AppLayout() {
           <div className="flex items-center gap-3">
             <Link
               to="/app/incidents"
-              className="relative inline-flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition hover:bg-secondary"
+              className="relative inline-flex h-12 w-12 items-center justify-center rounded-md text-muted-foreground transition hover:bg-secondary"
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5" />
@@ -225,7 +225,7 @@ function AppLayout() {
             <Link
               key={to}
               to={to as "/app"}
-              className={`relative flex flex-col items-center gap-1 px-4 py-1 text-xs ${
+              className={`relative flex min-h-14 min-w-14 flex-col items-center justify-center gap-1 px-3 py-1 text-sm ${
                 active ? "text-primary" : "text-muted-foreground"
               }`}
             >
