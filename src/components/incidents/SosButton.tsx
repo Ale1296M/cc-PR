@@ -20,7 +20,7 @@ export function SosButton({ careRecipientId, recipientName }: { careRecipientId:
       if (!user) throw new Error("Not signed in");
       if (typeof navigator !== "undefined" && !navigator.onLine) throw new Error("offline");
       const pos = await capturePosition(5000).catch(() => null);
-      const where = pos ? ` Location: ${pos.lat.toFixed(5)}, ${pos.lng.toFixed(5)} (±${Math.round(pos.accuracy)}m).` : "";
+      const where = pos ? ` Location: ${pos.lat.toFixed(5)}, ${pos.lng.toFixed(5)} (±${Math.round(pos.accuracy ?? 0)}m).` : "";
       const { error } = await supabase.from("incident_reports").insert({
         care_recipient_id: careRecipientId,
         reported_by: user.id,
