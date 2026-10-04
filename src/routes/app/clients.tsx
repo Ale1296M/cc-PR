@@ -99,6 +99,8 @@ function CareRecipientsPage() {
         {role === "admin" && (
           <button
             onClick={() => setShowNew(true)}
+            aria-expanded={showNew}
+            aria-controls="new-care-recipient"
             className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-primary px-4 text-sm text-primary-foreground"
           >
             <Plus className="h-4 w-4 shrink-0" /> <span className="hidden sm:inline">Add care recipient</span><span className="sm:hidden">Add</span>

@@ -212,6 +212,9 @@ function AppLayout() {
                 </span>
               )}
             </Link>
+            <span className="sr-only" role="status" aria-live="polite">
+              {(unreviewed ?? 0) > 0 ? `${unreviewed} unreviewed incident${unreviewed === 1 ? "" : "s"}` : ""}
+            </span>
             <Button variant="outline" size="sm" className="gap-2 text-muted-foreground" onClick={() => toast.info("Help Center coming soon")}>
               <HelpCircle className="h-4 w-4" />
               Help Center
