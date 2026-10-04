@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Check } from "lucide-react";
+import { AlertTriangle, Check, CloudOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
@@ -9,7 +9,8 @@ import { RoleGate } from "@/lib/role-gate";
 import { AsyncEmpty, AsyncError, AsyncSkeleton } from "@/components/ui/async-state";
 import { VerifiedBadge } from "@/components/visits/VerifiedBadge";
 import { formatDuration } from "@/lib/geo";
-import { clockInVisit, clockOutVisit, saveWellbeingEntry } from "@/lib/visit-clock";
+import { clockInVisit, finishVisit, flushOfflineQueue } from "@/lib/visit-clock";
+import { useOnline, useQueuedJobs } from "@/lib/offline-queue";
 import { ReportIncidentDialog } from "@/components/incidents/ReportIncidentDialog";
 
 export const Route = createFileRoute("/app/visit")({
@@ -82,18 +83,34 @@ function Choice<T extends string | number>({
   value: T | null;
   onChange: (v: T) => void;
 }) {
+  const labelId = useId();
+  const activeIndex = options.findIndex((o) => o.value === value);
+  const move = (i: number) => {
+    const next = (i + options.length) % options.length;
+    onChange(options[next].value);
+    document.getElementById(`${labelId}-${next}`)?.focus();
+  };
   return (
     <div className="card-soft p-6">
-      <p className="font-display text-xl">{title}</p>
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
-        {options.map((o) => {
+      <p id={labelId} className="font-display text-xl">{title}</p>
+      <div role="radiogroup" aria-labelledby={labelId} className="mt-4 grid gap-2 sm:grid-cols-3">
+        {options.map((o, i) => {
           const active = value === o.value;
+          const tabbable = active || (activeIndex === -1 && i === 0);
           return (
             <button
               key={String(o.value)}
+              id={`${labelId}-${i}`}
               type="button"
+              role="radio"
+              aria-checked={active}
+              tabIndex={tabbable ? 0 : -1}
               onClick={() => onChange(o.value)}
-              className={`min-h-11 rounded-xl border px-4 py-4 text-sm transition ${
+              onKeyDown={(e) => {
+                if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); move(i + 1); }
+                if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); move(i - 1); }
+              }}
+              className={`min-h-11 rounded-xl border px-4 py-4 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 active
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background hover:bg-secondary/50"
@@ -122,6 +139,20 @@ function VisitFlow() {
   const [notes, setNotes] = useState("");
   const [done, setDone] = useState<{ name: string; duration: string } | null>(null);
   const [reporting, setReporting] = useState(false);
+  const [proximity, setProximity] = useState<string | null>(null);
+  const online = useOnline();
+  const queued = useQueuedJobs();
+
+  // Sync visits stored while offline as soon as the connection is back.
+  useEffect(() => {
+    if (!online || queued.length === 0) return;
+    void flushOfflineQueue().then((n) => {
+      if (n > 0) {
+        toast.success(n === 1 ? "Offline visit synced" : `${n} offline visits synced`);
+        qc.invalidateQueries({ queryKey: ["visit-flow-active"] });
+      }
+    });
+  }, [online, queued.length, qc]);
 
   const {
     data: recipients,
@@ -140,13 +171,13 @@ function VisitFlow() {
       if (!cg?.id) return [];
       const { data, error } = await supabase
         .from("care_shifts")
-        .select("care_recipients(id, full_name, home_lat, home_lng, geofence_radius_m)")
+        .select("care_recipients(id, full_name, home_lat, home_lng, geofence_radius_m, deleted_at)")
         .eq("caregiver_id", cg.id);
       if (error) throw error;
       const map = new Map<string, Recipient>();
       for (const row of data ?? []) {
-        const r = row.care_recipients as unknown as Recipient | null;
-        if (r?.id) map.set(r.id, r);
+        const r = row.care_recipients as unknown as (Recipient & { deleted_at: string | null }) | null;
+        if (r?.id && !r.deleted_at) map.set(r.id, r);
       }
       return [...map.values()].sort((a, b) => a.full_name.localeCompare(b.full_name));
     },
@@ -178,9 +209,21 @@ function VisitFlow() {
   const clockIn = useMutation({
     mutationFn: async () => {
       if (!uid || !recipient) throw new Error("Pick a care recipient first.");
-      return clockInVisit({ careRecipientId: recipient.id });
+      return clockInVisit({
+        careRecipientId: recipient.id,
+        fence: {
+          homeLat: recipient.home_lat,
+          homeLng: recipient.home_lng,
+          radiusM: recipient.geofence_radius_m,
+        },
+      });
     },
     onSuccess: (row) => {
+      const away =
+        row.evv_exception === "out_of_range" && row.distanceM != null
+          ? `You're about ${Math.round(row.distanceM)} m from the home (allowed: ${row.radiusM} m). Your visit is clocked in and the care team will review it.`
+          : null;
+      setProximity(away);
       toast.success(
         row.location_verified
           ? "Clocked in · location verified"
@@ -202,25 +245,27 @@ function VisitFlow() {
     mutationFn: async () => {
       if (!active) throw new Error("You need to clock in first.");
       if (!complete) throw new Error("Complete the five check-in questions first.");
-      await saveWellbeingEntry({
-        visit_log_id: active.id,
-        mood_scale: mood!,
-        food_appetite: appetite as "good" | "fair" | "poor",
-        medicine_taken: medicine as "yes" | "no" | "partial",
-        movement_assisted: movement !== "independent",
-        hygiene_bathing_completed: hygiene === "both",
-        hygiene_grooming_completed: hygiene !== "none",
-        mood_notes: notes.trim() || null,
-      });
-      const clockOut = await clockOutVisit({
+      const res = await finishVisit({
         visitLogId: active.id,
         existingException: active.evv_exception,
         notes: notes.trim() || null,
+        wellbeing: {
+          visit_log_id: active.id,
+          mood_scale: mood!,
+          food_appetite: appetite as "good" | "fair" | "poor",
+          medicine_taken: medicine as "yes" | "no" | "partial",
+          movement_assisted: movement !== "independent",
+          hygiene_bathing_completed: hygiene === "both",
+          hygiene_grooming_completed: hygiene !== "none",
+          mood_notes: notes.trim() || null,
+        },
       });
-      return formatDuration(active.clock_in, clockOut);
+      return { duration: formatDuration(active.clock_in, res.clockOut), queued: res.queued };
     },
-    onSuccess: (duration) => {
-      toast.success(`Visit saved · ${duration}`);
+    onSuccess: ({ duration, queued: wasQueued }) => {
+      if (wasQueued) toast.message(`Saved on this device · ${duration}. It will sync when you're back online.`);
+      else toast.success(`Visit saved · ${duration}`);
+      setProximity(null);
       setDone({ name: recipient?.full_name ?? "", duration });
       qc.invalidateQueries({ queryKey: ["visit-flow-active", recipientId, uid] });
       qc.invalidateQueries({ queryKey: ["visits", recipientId] });
@@ -270,6 +315,18 @@ function VisitFlow() {
         <p className="text-sm uppercase tracking-widest text-muted-foreground">Caregiver</p>
         <h1 className="type-section mt-1">Log a visit</h1>
       </header>
+
+      {(!online || queued.length > 0) && (
+        <div role="status" className="mb-6 flex items-start gap-3 rounded-lg border border-attention/40 bg-attention/10 p-4 text-sm">
+          <CloudOff className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <p>
+            {!online ? "You're offline. " : ""}
+            {queued.length > 0
+              ? `${queued.length} visit${queued.length > 1 ? "s" : ""} saved on this device — ${online ? "syncing now…" : "will sync when you're back online."}`
+              : "You can finish and save a visit; it will sync once you reconnect. Clocking in needs a connection."}
+          </p>
+        </div>
+      )}
 
       <section>
         {recipientsPending && <AsyncSkeleton shape="rows" count={4} />}
@@ -345,11 +402,13 @@ function VisitFlow() {
                 {new Date(active.clock_in).toLocaleTimeString([], { timeStyle: "short" })}
               </p>
               <VerifiedBadge verified={active.location_verified} />
-              {active.location_verified === false && (
+              {active.location_verified !== true && active.evv_exception && (
                 <span className="text-xs text-muted-foreground">
                   {active.evv_exception === "missing_gps"
                     ? "Location wasn’t shared."
-                    : "Recorded away from the home address."}
+                    : active.evv_exception === "no_home_set"
+                      ? "No home address on file yet — the care team will confirm this visit."
+                      : (proximity ?? "Recorded away from the home address.")}
                 </span>
               )}
             </div>
